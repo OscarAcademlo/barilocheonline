@@ -198,7 +198,35 @@ class BariRutaSupabaseClient {
     setupRealtime() {
         if (!this.supabase) return;
 
-        // 1. Suscripción en tiempo real a los vehículos (transmitidos desde la app Android)
+        // 0. CANAL BROADCAST EFÍMERO DE ULTRABAJA LATENCIA (MÉTODO CCVLITE)
+        this.trackingBroadcastChannel = this.supabase.channel('tracking');
+        this.trackingBroadcastChannel
+            .on('broadcast', { event: 'location' }, ({ payload }) => {
+                if (!payload || !payload.lat || !payload.lng) return;
+                const idx = this.vehicles.findIndex(
+                    v => (v.company_name || '').trim().toLowerCase() === (payload.company_name || '').trim().toLowerCase() && 
+                         (v.vehicle_code || '').trim().toLowerCase() === (payload.vehicle_code || '').trim().toLowerCase()
+                );
+                if (idx >= 0) {
+                    this.vehicles[idx] = { ...this.vehicles[idx], ...payload };
+                } else {
+                    this.vehicles.unshift(payload);
+                }
+                this.syncCompaniesFromVehicles([payload]);
+                this.filterAndNotifyVehicles();
+            })
+            .on('broadcast', { event: 'status' }, ({ payload }) => {
+                if (payload && payload.active === false) {
+                    this.vehicles = this.vehicles.filter(
+                        v => !((v.company_name || '').trim().toLowerCase() === (payload.company_name || '').trim().toLowerCase() && 
+                               (v.vehicle_code || '').trim().toLowerCase() === (payload.vehicle_code || '').trim().toLowerCase())
+                    );
+                    this.filterAndNotifyVehicles();
+                }
+            })
+            .subscribe();
+
+        // 1. Suscripción en tiempo real a los vehículos en la base de datos (Postgres Changes)
         this.supabase
             .channel('realtime_vehicles_channel')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, payload => {

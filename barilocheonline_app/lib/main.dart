@@ -75,9 +75,12 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
   int _packetsSent = 0;
   String _lastSentTime = '--:--:--';
   String _statusMessage = 'Listo para iniciar transmisión';
+  // Timestamp del último envío — evita duplicados entre stream y timer
+  DateTime? _lastSentAt;
 
   List<Map<String, dynamic>> _touristsWaiting = [];
   RealtimeChannel? _touristChannel;
+  RealtimeChannel? _trackingBroadcastChannel;
 
   @override
   void initState() {
@@ -90,6 +93,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
     _positionStreamSub?.cancel();
     _activePulseTimer?.cancel();
     _touristChannel?.unsubscribe();
+    _trackingBroadcastChannel?.unsubscribe();
     _companyNameCtrl.dispose();
     _vehicleCodeCtrl.dispose();
     _driverNameCtrl.dispose();
@@ -154,6 +158,14 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
       _statusMessage = 'Conectando con GPS y transmitiendo...';
     });
 
+    // Conectar canal broadcast efímero de ultrabaja latencia (Método CCV Lite)
+    try {
+      _trackingBroadcastChannel = Supabase.instance.client.channel('tracking');
+      _trackingBroadcastChannel?.subscribe();
+    } catch (e) {
+      debugPrint('Error conectando canal broadcast: $e');
+    }
+
     // Configuración de emisión con soporte para segundo plano y pantalla apagada
     late final LocationSettings locationSettings;
 
@@ -187,43 +199,47 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
       debugPrint('Error obteniendo posición inicial: $e');
     }
 
-    // 1. Escucha por Stream continuo
+    // 1. Escucha continua por Stream (fuente principal de datos GPS)
     _positionStreamSub = Geolocator.getPositionStream(locationSettings: locationSettings).listen(
       (Position position) async {
+        if (!mounted) return;
         setState(() {
           _currentPosition = position;
         });
         await _sendTelemetryToSupabase(position);
       },
       onError: (err) {
-        setState(() {
-          _statusMessage = 'Error de GPS: $err';
-        });
+        debugPrint('GPS Stream error: $err');
+        if (mounted) {
+          setState(() {
+            _statusMessage = 'Error de GPS: $err';
+          });
+        }
       },
+      cancelOnError: false, // No cancelar ante errores transitorios
     );
 
-    // 2. Timer de pulso activo constante cada 2 segundos (garantiza telemetría ininterrumpida)
+    // 2. Timer guardián: dispara SOLO si el stream estuvo más de 3 seg sin enviar
+    //    (cubre cortes de GPS o suspensión del stream por el OS)
     _activePulseTimer?.cancel();
-    _activePulseTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
-      if (!_isStreaming) {
+    _activePulseTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
+      if (!_isStreaming || !mounted) {
         timer.cancel();
         return;
       }
-      try {
-        final pos = await Geolocator.getCurrentPosition(
-          locationSettings: const LocationSettings(
-            accuracy: LocationAccuracy.bestForNavigation,
-            timeLimit: Duration(seconds: 3),
-          ),
-        );
-        if (_isStreaming && mounted) {
-          setState(() {
-            _currentPosition = pos;
-          });
-          await _sendTelemetryToSupabase(pos);
-        }
-      } catch (e) {
-        debugPrint('Timer GPS pulso: $e');
+
+      // Solo actúa si el stream no envió en los últimos 3 segundos
+      final now = DateTime.now();
+      final lastSent = _lastSentAt;
+      if (lastSent != null && now.difference(lastSent).inSeconds < 3) {
+        return; // El stream está activo, no duplicar
+      }
+
+      // Stream inactivo — usar la última posición conocida como heartbeat
+      final pos = _currentPosition;
+      if (pos != null && _isStreaming && mounted) {
+        debugPrint('⚡ Timer guardián: stream inactivo, usando última posición conocida');
+        await _sendTelemetryToSupabase(pos);
       }
     });
 
@@ -240,6 +256,16 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
     final company = _companyNameCtrl.text.trim();
     final vehicle = _vehicleCodeCtrl.text.trim();
+
+    // Notificar estado inactivo por Broadcast
+    try {
+      _trackingBroadcastChannel?.sendBroadcastMessage(
+        event: 'status',
+        payload: {'company_name': company, 'vehicle_code': vehicle, 'active': false},
+      );
+      _trackingBroadcastChannel?.unsubscribe();
+      _trackingBroadcastChannel = null;
+    } catch (_) {}
 
     // 1. Borrado inmediato por HTTP Direct REST
     try {
@@ -280,9 +306,16 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
   Future<void> _sendTelemetryToSupabase(Position pos) async {
     final company = _companyNameCtrl.text.trim();
     final vehicle = _vehicleCodeCtrl.text.trim();
+    if (company.isEmpty || vehicle.isEmpty) return;
+
     final driver = _driverNameCtrl.text.trim();
     final excursion = _excursionNameCtrl.text.trim();
     final speedKmH = pos.speed > 0 ? pos.speed * 3.6 : 0.0;
+    final now = DateTime.now();
+
+    // Registrar timestamp de envío ANTES de cualquier operación async
+    // para que el timer guardián no se active innecesariamente
+    _lastSentAt = now;
 
     final payload = {
       'company_name': company,
@@ -294,19 +327,28 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
       'speed': speedKmH.roundToDouble(),
       'heading': pos.heading.roundToDouble(),
       'status': 'en_camino',
-      'updated_at': DateTime.now().toUtc().toIso8601String(),
+      'updated_at': now.toUtc().toIso8601String(),
     };
 
-    bool sent = false;
+    // 0. Broadcast ultra-rápido (baja latencia, para mapa en tiempo real)
+    try {
+      await _trackingBroadcastChannel?.sendBroadcastMessage(
+        event: 'location',
+        payload: payload,
+      );
+    } catch (e) {
+      debugPrint('Broadcast send error: $e');
+    }
 
-    // Método 1: Supabase Flutter SDK
+    // 1. Persistencia en Supabase DB (para recarga de página y estado inicial)
+    bool sent = false;
     try {
       final supabase = Supabase.instance.client;
       await supabase.from('vehicles').upsert(payload, onConflict: 'company_name,vehicle_code');
       sent = true;
     } catch (_) {}
 
-    // Método 2: HTTP Direct REST PostgREST (100% infalible)
+    // 2. Fallback HTTP directo si el SDK falla
     if (!sent) {
       try {
         final uri = Uri.parse('$kSupabaseUrl/rest/v1/vehicles?on_conflict=company_name,vehicle_code');
@@ -322,17 +364,18 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
         );
         if (res.statusCode >= 200 && res.statusCode < 300) {
           sent = true;
+        } else {
+          debugPrint('HTTP fallback status: ${res.statusCode} — ${res.body}');
         }
       } catch (e) {
-        debugPrint('Error HTTP Postgrest: $e');
+        debugPrint('Error HTTP PostgREST: $e');
       }
     }
 
     if (mounted) {
-      final now = DateTime.now();
       setState(() {
         _packetsSent++;
-        _statusMessage = 'Emitiendo coordenadas en vivo 🛰️';
+        _statusMessage = sent ? 'Emitiendo coordenadas en vivo 🛰️' : '⚠️ Broadcast activo, DB sin confirmar';
         _lastSentTime =
             '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}';
       });
