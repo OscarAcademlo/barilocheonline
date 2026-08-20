@@ -154,50 +154,50 @@ class AuthManager {
                 <!-- LOGIN -->
                 <div id="globalLoginFormContainer">
                     <form onsubmit="window.authManager.handleLoginSubmit(event)">
-                        <div class="input-group-custom">
-                            <label><i class="fas fa-envelope"></i> Email</label>
-                            <input type="email" id="globalLoginEmail" placeholder="tu-email@ejemplo.com" required>
+                        <div class="input-group-custom" style="margin-bottom:16px;">
+                            <label style="display:block; font-size:0.85rem; font-weight:700; margin-bottom:8px; color:#e2e8f0;"><i class="fas fa-envelope"></i> Email</label>
+                            <input type="email" id="globalLoginEmail" name="user_email" placeholder="tu-email@ejemplo.com" autocomplete="email" spellcheck="false" required style="width:100% !important; height:48px !important; padding:12px 16px !important; border-radius:14px !important; border:1px solid #334155 !important; background:#0f172a !important; color:#ffffff !important; font-size:0.95rem !important; box-sizing:border-box !important; outline:none !important; display:block !important;">
                         </div>
-                        <div class="input-group-custom">
-                            <label><i class="fas fa-lock"></i> Contraseña</label>
-                            <div class="pass-input-box">
-                                <input type="password" id="globalLoginPass" placeholder="••••••••" required>
-                                <button type="button" class="btn-toggle-pass" onclick="window.togglePasswordVisibility('globalLoginPass', this)">
+                        <div class="input-group-custom" style="margin-bottom:16px;">
+                            <label style="display:block; font-size:0.85rem; font-weight:700; margin-bottom:8px; color:#e2e8f0;"><i class="fas fa-lock"></i> Contraseña</label>
+                            <div class="pass-input-box" style="position:relative !important; width:100% !important; display:flex !important; align-items:center !important; margin:0 !important; padding:0 !important;">
+                                <input type="password" id="globalLoginPass" name="user_password" placeholder="••••••••" autocomplete="current-password" required style="width:100% !important; height:48px !important; padding:12px 45px 12px 16px !important; border-radius:14px !important; border:1px solid #334155 !important; background:#0f172a !important; color:#ffffff !important; font-size:0.95rem !important; box-sizing:border-box !important; outline:none !important; display:block !important;">
+                                <button type="button" class="btn-toggle-pass" onclick="window.togglePasswordVisibility('globalLoginPass', this)" style="position:absolute !important; right:12px !important; top:50% !important; transform:translateY(-50%) !important; background:transparent !important; border:none !important; cursor:pointer !important; color:#94a3b8 !important; font-size:1.15rem !important; padding:6px !important; z-index:10 !important; display:flex !important; align-items:center !important; justify-content:center !important; line-height:1 !important;">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
                         </div>
-                        <div id="globalLoginError" class="auth-error-msg"></div>
-                        <button type="submit" id="btnGlobalLoginSubmit" class="btn-auth-primary">Ingresar</button>
+                        <div id="globalLoginError" class="auth-error-msg" style="color:#ef4444; font-size:0.85rem; margin-bottom:12px; text-align:center; font-weight:600;"></div>
+                        <button type="submit" id="btnGlobalLoginSubmit" class="btn-auth-primary" style="width:100%; background:var(--primary, #0084ff); color:white; border:none; padding:14px; border-radius:14px; font-weight:800; font-size:0.95rem; cursor:pointer; margin-top:6px;">Ingresar</button>
                     </form>
-                    <div class="auth-switch-row">
+                    <div class="auth-switch-row" style="margin-top:18px; text-align:center; font-size:0.85rem; color:#94a3b8;">
                         <span>¿No tienes cuenta aún?</span>
-                        <a href="javascript:void(0)" onclick="window.authManager.toggleMode('signup')">Crear cuenta gratis</a>
+                        <a href="javascript:void(0)" onclick="window.authManager.toggleMode('signup')" style="color:var(--primary, #0084ff); font-weight:700; text-decoration:none; margin-left:4px;">Crear cuenta gratis</a>
                     </div>
                 </div>
 
                 <!-- SIGNUP -->
                 <div id="globalSignupFormContainer" style="display:none;">
                     <form onsubmit="window.authManager.handleSignupSubmit(event)">
-                        <div class="input-group-custom">
-                            <label><i class="fas fa-envelope"></i> Tu Email</label>
-                            <input type="email" id="globalSignupEmail" placeholder="tu-email@ejemplo.com" required>
+                        <div class="input-group-custom" style="margin-bottom:16px;">
+                            <label style="display:block; font-size:0.85rem; font-weight:700; margin-bottom:8px; color:#e2e8f0;"><i class="fas fa-envelope"></i> Tu Email</label>
+                            <input type="email" id="globalSignupEmail" name="signup_email" placeholder="tu-email@ejemplo.com" autocomplete="email" spellcheck="false" required style="width:100% !important; height:48px !important; padding:12px 16px !important; border-radius:14px !important; border:1px solid #334155 !important; background:#0f172a !important; color:#ffffff !important; font-size:0.95rem !important; box-sizing:border-box !important; outline:none !important; display:block !important;">
                         </div>
-                        <div class="input-group-custom">
-                            <label><i class="fas fa-lock"></i> Crear Contraseña</label>
-                            <div class="pass-input-box">
-                                <input type="password" id="globalSignupPass" placeholder="Mínimo 6 caracteres" minlength="6" required>
-                                <button type="button" class="btn-toggle-pass" onclick="window.togglePasswordVisibility('globalSignupPass', this)">
+                        <div class="input-group-custom" style="margin-bottom:16px;">
+                            <label style="display:block; font-size:0.85rem; font-weight:700; margin-bottom:8px; color:#e2e8f0;"><i class="fas fa-lock"></i> Crear Contraseña</label>
+                            <div class="pass-input-box" style="position:relative !important; width:100% !important; display:flex !important; align-items:center !important; margin:0 !important; padding:0 !important;">
+                                <input type="password" id="globalSignupPass" name="signup_password" placeholder="Mínimo 6 caracteres" minlength="6" autocomplete="new-password" required style="width:100% !important; height:48px !important; padding:12px 45px 12px 16px !important; border-radius:14px !important; border:1px solid #334155 !important; background:#0f172a !important; color:#ffffff !important; font-size:0.95rem !important; box-sizing:border-box !important; outline:none !important; display:block !important;">
+                                <button type="button" class="btn-toggle-pass" onclick="window.togglePasswordVisibility('globalSignupPass', this)" style="position:absolute !important; right:12px !important; top:50% !important; transform:translateY(-50%) !important; background:transparent !important; border:none !important; cursor:pointer !important; color:#94a3b8 !important; font-size:1.15rem !important; padding:6px !important; z-index:10 !important; display:flex !important; align-items:center !important; justify-content:center !important; line-height:1 !important;">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
                         </div>
-                        <div id="globalSignupError" class="auth-error-msg"></div>
-                        <button type="submit" id="btnGlobalSignupSubmit" class="btn-auth-primary">Registrarme</button>
+                        <div id="globalSignupError" class="auth-error-msg" style="color:#ef4444; font-size:0.85rem; margin-bottom:12px; text-align:center; font-weight:600;"></div>
+                        <button type="submit" id="btnGlobalSignupSubmit" class="btn-auth-primary" style="width:100%; background:var(--primary, #0084ff); color:white; border:none; padding:14px; border-radius:14px; font-weight:800; font-size:0.95rem; cursor:pointer; margin-top:6px;">Registrarme</button>
                     </form>
-                    <div class="auth-switch-row">
+                    <div class="auth-switch-row" style="margin-top:18px; text-align:center; font-size:0.85rem; color:#94a3b8;">
                         <span>¿Ya tienes cuenta?</span>
-                        <a href="javascript:void(0)" onclick="window.authManager.toggleMode('login')">Iniciar sesión</a>
+                        <a href="javascript:void(0)" onclick="window.authManager.toggleMode('login')" style="color:var(--primary, #0084ff); font-weight:700; text-decoration:none; margin-left:4px;">Iniciar sesión</a>
                     </div>
                 </div>
             </div>
