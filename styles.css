@@ -1179,67 +1179,74 @@ body {
     border: none !important;
 }
 
-.clean-vehicle-marker {
+.combi-live-marker {
     position: relative;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     cursor: pointer;
 }
 
-.marker-pulse-ring {
+.combi-pulse-wave {
     position: absolute;
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
+    background: rgba(0, 132, 255, 0.2);
     border: 2px solid #0084ff;
-    animation: pulseRing 2s infinite ease-out;
-    opacity: 0;
+    animation: combiPulse 2s infinite ease-out;
+    z-index: 1;
 }
 
-@keyframes pulseRing {
-    0% { transform: scale(0.5); opacity: 0.9; }
+@keyframes combiPulse {
+    0% { transform: scale(0.6); opacity: 0.9; }
     100% { transform: scale(1.6); opacity: 0; }
 }
 
-.marker-icon-box {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: #0084ff;
-    color: white;
+.combi-body-card {
+    position: relative;
+    z-index: 2;
+    background: #0f172a;
+    border: 2px solid #0084ff;
+    border-radius: 12px;
+    padding: 3px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.1rem;
-    box-shadow: 0 4px 15px rgba(0, 132, 255, 0.4);
-    border: 2.5px solid white;
-    z-index: 2;
-    transition: transform 0.4s ease;
+    box-shadow: 0 4px 18px rgba(0, 132, 255, 0.45);
+    transition: transform 0.3s ease;
 }
 
-.marker-label-tag {
+.combi-live-marker:hover .combi-body-card {
+    transform: scale(1.1);
+}
+
+.combi-badge-pill {
     position: absolute;
-    bottom: -18px;
+    bottom: -16px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.85);
-    color: white;
-    padding: 2px 8px;
-    border-radius: 8px;
-    font-size: 0.68rem;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    padding: 2px 7px;
+    border-radius: 7px;
+    font-size: 0.65rem;
     font-weight: 800;
     white-space: nowrap;
     display: flex;
+    align-items: center;
     gap: 4px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.5);
     z-index: 3;
 }
 
-.marker-label-tag span {
+.combi-speed-pill {
     color: #00cec9;
+    font-weight: 700;
 }
 
 /* ==========================================================================

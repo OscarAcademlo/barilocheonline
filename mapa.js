@@ -164,16 +164,33 @@ function renderLiveVehicles(vehicles) {
         );
         const companyPhone = currentCompany?.phone || '+5492944123456';
 
-        // Marcador con animación de pulso y orientación
+        // Marcador combi con animación de pulso y orientación
         const iconHtml = `
-            <div class="clean-vehicle-marker">
-                <div class="marker-pulse-ring"></div>
-                <div class="marker-icon-box ${isMoving ? 'moving' : ''}" style="${heading > 0 ? `transform: rotate(${heading}deg);` : ''}">
-                    <i class="fas fa-van-shuttle"></i>
+            <div class="combi-live-marker ${isMoving ? 'is-moving' : ''}">
+                <div class="combi-pulse-wave"></div>
+                <div class="combi-body-card" style="${heading > 0 ? `transform: rotate(${heading}deg);` : ''}">
+                    <div class="combi-icon-graphic">
+                        <svg viewBox="0 0 64 64" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Carrocería Combi / Minivan -->
+                            <rect x="8" y="12" width="48" height="36" rx="9" fill="#0084ff"/>
+                            <path d="M8 24H56V38C56 42.9706 51.9706 47 47 47H17C12.0294 47 8 42.9706 8 38V24Z" fill="#0066cc"/>
+                            <!-- Parabrisas frontal y ventanillas -->
+                            <rect x="13" y="16" width="17" height="10" rx="3" fill="#ffffff" opacity="0.95"/>
+                            <rect x="34" y="16" width="17" height="10" rx="3" fill="#ffffff" opacity="0.95"/>
+                            <!-- Luces LED delanteras -->
+                            <circle cx="15" cy="40" r="3.5" fill="#facc15"/>
+                            <circle cx="49" cy="40" r="3.5" fill="#facc15"/>
+                            <!-- Parrilla delantera -->
+                            <rect x="23" y="38" width="18" height="4" rx="2" fill="#ffffff" opacity="0.85"/>
+                            <!-- Ruedas -->
+                            <rect x="13" y="46" width="9" height="5" rx="2" fill="#0f172a"/>
+                            <rect x="42" y="46" width="9" height="5" rx="2" fill="#0f172a"/>
+                        </svg>
+                    </div>
                 </div>
-                <div class="marker-label-tag">
+                <div class="combi-badge-pill">
                     <b>${veh.vehicle_code || 'Combi'}</b>
-                    <span>${speedText}</span>
+                    <span class="combi-speed-pill">${speedText}</span>
                 </div>
             </div>
         `;
@@ -181,9 +198,9 @@ function renderLiveVehicles(vehicles) {
         const customIcon = L.divIcon({
             className: 'custom-leaflet-marker',
             html: iconHtml,
-            iconSize: [50, 50],
-            iconAnchor: [25, 25],
-            popupAnchor: [0, -25]
+            iconSize: [60, 60],
+            iconAnchor: [30, 30],
+            popupAnchor: [0, -30]
         });
 
         // MINICARD ESTILO UBER / CABIFY PREMIUM

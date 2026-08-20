@@ -54,11 +54,11 @@ class BariRutaSupabaseClient {
                 this.fetchData();
                 this.setupRealtime();
 
-                // Polling automático cada 4 segundos como respaldo infalible
+                // Polling automático cada 1.5 segundos como respaldo instantáneo
                 if (this.pollingInterval) clearInterval(this.pollingInterval);
                 this.pollingInterval = setInterval(() => {
                     this.fetchVehicles();
-                }, 4000);
+                }, 1500);
             } catch (e) {
                 console.error('[BariRuta] Error al inicializar Supabase:', e);
                 this.isConnected = false;
@@ -125,10 +125,6 @@ class BariRutaSupabaseClient {
                 .order('updated_at', { ascending: false });
 
             if (!error && data) {
-                // MERGE en lugar de reemplazar:
-                // Si el broadcast llegó antes que la DB confirme el upsert,
-                // this.vehicles tiene el dato y la DB devuelve array vacío.
-                // Reemplazar todo borra el vehículo recién recibido.
                 const dbKeys = new Set(data.map(v => this._vehicleKey(v)));
 
                 // 1. Actualizar/agregar los que vinieron de DB
@@ -137,7 +133,6 @@ class BariRutaSupabaseClient {
                         v => this._vehicleKey(v) === this._vehicleKey(dbVehicle)
                     );
                     if (idx >= 0) {
-                        // Quedarse con el más reciente entre broadcast y DB
                         const existingAt = new Date(this.vehicles[idx].updated_at || 0).getTime();
                         const dbAt = new Date(dbVehicle.updated_at || 0).getTime();
                         if (dbAt >= existingAt) {
@@ -148,12 +143,11 @@ class BariRutaSupabaseClient {
                     }
                 });
 
-                // 2. Limpiar solo los que NO están en DB Y son más viejos de 30 seg
-                //    (broadcast reciente se mantiene aunque la DB no lo confirmó aún)
+                // 2. Limpiar inmediatamente los que ya no están en DB
                 this.vehicles = this.vehicles.filter(v => {
                     if (dbKeys.has(this._vehicleKey(v))) return true;
                     const updatedAt = new Date(v.updated_at || 0).getTime();
-                    return (Date.now() - updatedAt) < 30000; // 30 seg de gracia
+                    return (Date.now() - updatedAt) < 3000; // Máximo 3 segundos de gracia
                 });
 
                 this.syncCompaniesFromVehicles(data);
@@ -194,7 +188,7 @@ class BariRutaSupabaseClient {
         }
 
         const now = Date.now();
-        const MAX_STALE_MINUTES = 3; // Ocultar si no transmite hace más de 3 minutos
+        const MAX_STALE_MINUTES = 0.5; // Ocultar inmediatamente si no transmite hace más de 30 segundos
 
         // 1. Descartar vehículos inactivos o viejos
         const liveVehicles = this.vehicles.filter(v => {
