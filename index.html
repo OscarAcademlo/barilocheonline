@@ -142,10 +142,73 @@
         </a>
     </nav>
 
+    <!-- MODAL DE AUTENTICACIÓN ESTÁTICO (IDÉNTICO A ALOJAMIENTO.HTML) -->
+    <div id="authModal" class="modal-overlay" onclick="window.authManager.closeModal()">
+        <div class="modal-content auth-modal-box" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="window.authManager.closeModal()"><i class="fas fa-times"></i></button>
+            
+            <div class="auth-header-title">
+                <i class="fas fa-user-circle" style="color:var(--primary); font-size:2rem; margin-bottom:8px;"></i>
+                <h2>Iniciar Sesión</h2>
+                <p id="authNoticeMsg">Accede a tu cuenta de Bariloche.Online</p>
+            </div>
+
+            <!-- FORMULARIO LOGIN -->
+            <div id="loginFormContainer">
+                <form onsubmit="window.authManager.handleLoginSubmit(event)">
+                    <div class="input-group-custom">
+                        <label><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" id="loginEmail" placeholder="tu-email@gmail.com" required autocomplete="username">
+                    </div>
+                    <div class="input-group-custom password-wrapper-relative">
+                        <label><i class="fas fa-lock"></i> Contraseña</label>
+                        <div class="pass-input-box">
+                            <input type="password" id="loginPass" placeholder="••••••••" required autocomplete="current-password">
+                            <button type="button" class="btn-toggle-pass" onclick="window.togglePasswordVisibility('loginPass', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="loginError" class="auth-error-msg"></div>
+                    <button type="submit" id="btnLoginSubmit" class="btn-auth-primary">Ingresar</button>
+                </form>
+                <div class="auth-switch-row">
+                    <span>¿No tienes cuenta aún?</span>
+                    <a href="javascript:void(0)" onclick="window.authManager.toggleMode('signup')">Crear cuenta gratis</a>
+                </div>
+            </div>
+
+            <!-- FORMULARIO REGISTRO -->
+            <div id="signupFormContainer" style="display:none;">
+                <form onsubmit="window.authManager.handleSignupSubmit(event)">
+                    <div class="input-group-custom">
+                        <label><i class="fas fa-envelope"></i> Tu Email</label>
+                        <input type="email" id="signupEmail" placeholder="tu-email@gmail.com" required autocomplete="email">
+                    </div>
+                    <div class="input-group-custom password-wrapper-relative">
+                        <label><i class="fas fa-lock"></i> Crear Contraseña</label>
+                        <div class="pass-input-box">
+                            <input type="password" id="signupPass" placeholder="Mínimo 6 caracteres" minlength="6" required autocomplete="new-password">
+                            <button type="button" class="btn-toggle-pass" onclick="window.togglePasswordVisibility('signupPass', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="signupError" class="auth-error-msg"></div>
+                    <button type="submit" id="btnSignupSubmit" class="btn-auth-primary">Registrarme</button>
+                </form>
+                <div class="auth-switch-row">
+                    <span>¿Ya tienes cuenta?</span>
+                    <a href="javascript:void(0)" onclick="window.authManager.toggleMode('login')">Iniciar sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- SUPABASE & AUTH SYSTEM -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="auth_manager.js?v=2090"></script>
-    <script src="app.js?v=2090"></script>
+    <script src="auth_manager.js?v=2095"></script>
+    <script src="app.js?v=2095"></script>
 </body>
 
 </html>

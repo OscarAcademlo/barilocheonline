@@ -207,21 +207,20 @@ class AuthManager {
     }
 
     openModal(msg = '') {
-        this.ensureAuthModalInDOM();
-        const modal = document.getElementById('globalAuthModal');
-        const notice = document.getElementById('globalAuthNotice');
+        const modal = document.getElementById('authModal') || document.getElementById('globalAuthModal');
+        const notice = document.getElementById('authNoticeMsg') || document.getElementById('globalAuthNotice');
         if (notice && msg) notice.textContent = msg;
         if (modal) modal.style.display = 'flex';
     }
 
     closeModal() {
-        const modal = document.getElementById('globalAuthModal');
+        const modal = document.getElementById('authModal') || document.getElementById('globalAuthModal');
         if (modal) modal.style.display = 'none';
     }
 
     toggleMode(mode) {
-        const loginForm = document.getElementById('globalLoginFormContainer');
-        const signupForm = document.getElementById('globalSignupFormContainer');
+        const loginForm = document.getElementById('loginFormContainer') || document.getElementById('globalLoginFormContainer');
+        const signupForm = document.getElementById('signupFormContainer') || document.getElementById('globalSignupFormContainer');
         if (!loginForm || !signupForm) return;
         if (mode === 'signup') {
             loginForm.style.display = 'none';
@@ -234,14 +233,19 @@ class AuthManager {
 
     async handleLoginSubmit(e) {
         e.preventDefault();
-        const email = document.getElementById('globalLoginEmail').value.trim();
-        const pass = document.getElementById('globalLoginPass').value;
-        const btn = document.getElementById('btnGlobalLoginSubmit');
-        const errorEl = document.getElementById('globalLoginError');
+        const emailInput = document.getElementById('loginEmail') || document.getElementById('globalLoginEmail');
+        const passInput = document.getElementById('loginPass') || document.getElementById('globalLoginPass');
+        const btn = document.getElementById('btnLoginSubmit') || document.getElementById('btnGlobalLoginSubmit');
+        const errorEl = document.getElementById('loginError') || document.getElementById('globalLoginError');
 
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Ingresando...';
-        errorEl.textContent = '';
+        const email = emailInput ? emailInput.value.trim() : '';
+        const pass = passInput ? passInput.value : '';
+
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Ingresando...';
+        }
+        if (errorEl) errorEl.textContent = '';
 
         try {
             if (!this.supabase) throw new Error('Servicio de autenticación no inicializado');
@@ -252,23 +256,30 @@ class AuthManager {
             this.updateUI();
             this.notifyListeners();
         } catch (err) {
-            errorEl.textContent = err.message || 'Error al iniciar sesión';
+            if (errorEl) errorEl.textContent = err.message || 'Error al iniciar sesión';
         } finally {
-            btn.disabled = false;
-            btn.innerHTML = 'Ingresar';
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = 'Ingresar';
+            }
         }
     }
 
     async handleSignupSubmit(e) {
         e.preventDefault();
-        const email = document.getElementById('globalSignupEmail').value.trim();
-        const pass = document.getElementById('globalSignupPass').value;
-        const btn = document.getElementById('btnGlobalSignupSubmit');
-        const errorEl = document.getElementById('globalSignupError');
+        const emailInput = document.getElementById('signupEmail') || document.getElementById('globalSignupEmail');
+        const passInput = document.getElementById('signupPass') || document.getElementById('globalSignupPass');
+        const btn = document.getElementById('btnSignupSubmit') || document.getElementById('btnGlobalSignupSubmit');
+        const errorEl = document.getElementById('signupError') || document.getElementById('globalSignupError');
 
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
-        errorEl.textContent = '';
+        const email = emailInput ? emailInput.value.trim() : '';
+        const pass = passInput ? passInput.value : '';
+
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
+        }
+        if (errorEl) errorEl.textContent = '';
 
         try {
             if (!this.supabase) throw new Error('Servicio de autenticación no inicializado');
@@ -283,10 +294,12 @@ class AuthManager {
             alert('🎉 ¡Cuenta creada con éxito! Si tienes la verificación activa, revisa tu correo.');
             this.closeModal();
         } catch (err) {
-            errorEl.textContent = err.message || 'Error al registrarte';
+            if (errorEl) errorEl.textContent = err.message || 'Error al registrarte';
         } finally {
-            btn.disabled = false;
-            btn.innerHTML = 'Registrarme';
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = 'Registrarme';
+            }
         }
     }
 
