@@ -154,50 +154,50 @@ class AuthManager {
                 <!-- LOGIN -->
                 <div id="globalLoginFormContainer">
                     <form onsubmit="window.authManager.handleLoginSubmit(event)">
-                        <div class="input-group-custom" style="margin-bottom:15px;">
-                            <label style="display:block; font-size:0.82rem; font-weight:700; margin-bottom:6px;"><i class="fas fa-envelope"></i> Email</label>
-                            <input type="email" id="globalLoginEmail" placeholder="tu-email@ejemplo.com" required style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--border, #333); background:var(--bg-main, #0f172a); color:inherit; box-sizing:border-box; outline:none;">
+                        <div class="input-group-custom">
+                            <label><i class="fas fa-envelope"></i> Email</label>
+                            <input type="email" id="globalLoginEmail" placeholder="tu-email@ejemplo.com" required>
                         </div>
-                        <div class="input-group-custom" style="margin-bottom:15px;">
-                            <label style="display:block; font-size:0.82rem; font-weight:700; margin-bottom:6px;"><i class="fas fa-lock"></i> Contraseña</label>
-                            <div class="pass-input-box" style="position:relative; width:100%; display:flex; align-items:center;">
-                                <input type="password" id="globalLoginPass" placeholder="••••••••" required style="width:100%; padding:12px 45px 12px 14px; border-radius:12px; border:1px solid var(--border, #333); background:var(--bg-main, #0f172a); color:inherit; box-sizing:border-box; outline:none;">
-                                <button type="button" class="btn-toggle-pass" onclick="window.togglePasswordVisibility('globalLoginPass', this)" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:#94a3b8; font-size:1.1rem; padding:4px; z-index:10; display:flex; align-items:center; justify-content:center;">
+                        <div class="input-group-custom">
+                            <label><i class="fas fa-lock"></i> Contraseña</label>
+                            <div class="pass-input-box">
+                                <input type="password" id="globalLoginPass" placeholder="••••••••" required>
+                                <button type="button" class="btn-toggle-pass" onclick="window.togglePasswordVisibility('globalLoginPass', this)">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
                         </div>
-                        <div id="globalLoginError" class="auth-error-msg" style="color:#ef4444; font-size:0.82rem; margin-bottom:10px; text-align:center; font-weight:600;"></div>
-                        <button type="submit" id="btnGlobalLoginSubmit" class="btn-auth-primary" style="width:100%; background:var(--primary, #0084ff); color:white; border:none; padding:14px; border-radius:14px; font-weight:800; font-size:0.95rem; cursor:pointer;">Ingresar</button>
+                        <div id="globalLoginError" class="auth-error-msg"></div>
+                        <button type="submit" id="btnGlobalLoginSubmit" class="btn-auth-primary">Ingresar</button>
                     </form>
-                    <div class="auth-switch-row" style="margin-top:16px; text-align:center; font-size:0.82rem; color:var(--text-secondary, #94a3b8);">
+                    <div class="auth-switch-row">
                         <span>¿No tienes cuenta aún?</span>
-                        <a href="javascript:void(0)" onclick="window.authManager.toggleMode('signup')" style="color:var(--primary, #0084ff); font-weight:700; text-decoration:none; margin-left:4px;">Crear cuenta gratis</a>
+                        <a href="javascript:void(0)" onclick="window.authManager.toggleMode('signup')">Crear cuenta gratis</a>
                     </div>
                 </div>
 
                 <!-- SIGNUP -->
                 <div id="globalSignupFormContainer" style="display:none;">
                     <form onsubmit="window.authManager.handleSignupSubmit(event)">
-                        <div class="input-group-custom" style="margin-bottom:15px;">
-                            <label style="display:block; font-size:0.82rem; font-weight:700; margin-bottom:6px;"><i class="fas fa-envelope"></i> Tu Email</label>
-                            <input type="email" id="globalSignupEmail" placeholder="tu-email@ejemplo.com" required style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--border, #333); background:var(--bg-main, #0f172a); color:inherit; box-sizing:border-box; outline:none;">
+                        <div class="input-group-custom">
+                            <label><i class="fas fa-envelope"></i> Tu Email</label>
+                            <input type="email" id="globalSignupEmail" placeholder="tu-email@ejemplo.com" required>
                         </div>
-                        <div class="input-group-custom" style="margin-bottom:15px;">
-                            <label style="display:block; font-size:0.82rem; font-weight:700; margin-bottom:6px;"><i class="fas fa-lock"></i> Crear Contraseña</label>
-                            <div class="pass-input-box" style="position:relative; width:100%; display:flex; align-items:center;">
-                                <input type="password" id="globalSignupPass" placeholder="Mínimo 6 caracteres" minlength="6" required style="width:100%; padding:12px 45px 12px 14px; border-radius:12px; border:1px solid var(--border, #333); background:var(--bg-main, #0f172a); color:inherit; box-sizing:border-box; outline:none;">
-                                <button type="button" class="btn-toggle-pass" onclick="window.togglePasswordVisibility('globalSignupPass', this)" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:#94a3b8; font-size:1.1rem; padding:4px; z-index:10; display:flex; align-items:center; justify-content:center;">
+                        <div class="input-group-custom">
+                            <label><i class="fas fa-lock"></i> Crear Contraseña</label>
+                            <div class="pass-input-box">
+                                <input type="password" id="globalSignupPass" placeholder="Mínimo 6 caracteres" minlength="6" required>
+                                <button type="button" class="btn-toggle-pass" onclick="window.togglePasswordVisibility('globalSignupPass', this)">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
                         </div>
-                        <div id="globalSignupError" class="auth-error-msg" style="color:#ef4444; font-size:0.82rem; margin-bottom:10px; text-align:center; font-weight:600;"></div>
-                        <button type="submit" id="btnGlobalSignupSubmit" class="btn-auth-primary" style="width:100%; background:var(--primary, #0084ff); color:white; border:none; padding:14px; border-radius:14px; font-weight:800; font-size:0.95rem; cursor:pointer;">Registrarme</button>
+                        <div id="globalSignupError" class="auth-error-msg"></div>
+                        <button type="submit" id="btnGlobalSignupSubmit" class="btn-auth-primary">Registrarme</button>
                     </form>
-                    <div class="auth-switch-row" style="margin-top:16px; text-align:center; font-size:0.82rem; color:var(--text-secondary, #94a3b8);">
+                    <div class="auth-switch-row">
                         <span>¿Ya tienes cuenta?</span>
-                        <a href="javascript:void(0)" onclick="window.authManager.toggleMode('login')" style="color:var(--primary, #0084ff); font-weight:700; text-decoration:none; margin-left:4px;">Iniciar sesión</a>
+                        <a href="javascript:void(0)" onclick="window.authManager.toggleMode('login')">Iniciar sesión</a>
                     </div>
                 </div>
             </div>

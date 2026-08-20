@@ -457,6 +457,31 @@ if ($action === 'get_promo_codes') {
     exit;
 }
 
+// 10. PANEL ADMIN: ELIMINAR CÓDIGO PROMO
+if ($action === 'delete_promo_code') {
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true) ?: $_POST;
+    $adminEmail = strtolower(trim($data['admin_email'] ?? ''));
+    $code = strtoupper(trim($data['code'] ?? ''));
+
+    if ($adminEmail !== ADMIN_EMAIL) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
+        exit;
+    }
+
+    $codesFile = __DIR__ . '/codigos_promo.json';
+    $codes = file_exists($codesFile) ? json_decode(file_get_contents($codesFile), true) : [];
+
+    $newCodes = array_values(array_filter($codes, function($c) use ($code) {
+        return strtoupper($c['code']) !== $code;
+    }));
+
+    file_put_contents($codesFile, json_encode($newCodes, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    echo json_encode(['status' => 'success', 'message' => 'Código eliminado con éxito', 'data' => $newCodes]);
+    exit;
+}
+
 http_response_code(400);
 echo json_encode(['status' => 'error', 'message' => 'Acción no reconocida']);
 ?>
