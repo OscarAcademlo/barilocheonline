@@ -162,6 +162,8 @@ function showAccommodationDetails(id) {
     const acc = accommodations.find(a => String(a.id) === String(id));
     if (!acc) return;
 
+    const isOwnerOrAdmin = currentUser && (currentUser.email === acc.owner_email || currentUser.email === ADMIN_EMAIL);
+
     const modal = document.getElementById('accommodationModal');
     const content = document.getElementById('modalContent');
     if (!modal || !content) return;
