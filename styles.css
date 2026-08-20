@@ -1659,6 +1659,42 @@ body {
     box-shadow: 0 6px 20px rgba(0, 184, 148, 0.4);
 }
 
+.btn-publish-floating {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: linear-gradient(135deg, #0084ff 0%, #00b894 100%);
+    color: white;
+    border: none;
+    padding: 14px 22px;
+    border-radius: 30px;
+    font-weight: 900;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-publish-floating:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 8px 30px rgba(0, 184, 148, 0.6);
+}
+
+@media (max-width: 768px) {
+    .btn-publish-floating {
+        top: auto;
+        bottom: 80px;
+        right: 50%;
+        transform: translateX(50%);
+        width: 85%;
+        justify-content: center;
+    }
+}
+
 .browse-header {
     display: flex;
     justify-content: space-between;
