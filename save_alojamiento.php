@@ -3,6 +3,8 @@ header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Pragma: no-cache");
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
@@ -43,7 +45,7 @@ if ($action === 'check_subscription') {
     $now = time();
 
     foreach ($subs as $sub) {
-        if (strtolower($sub['email']) === $email && $sub['active']) {
+        if (strtolower($sub['email']) === $email && !empty($sub['active'])) {
             $exp = strtotime($sub['expires_at']);
             if ($exp > $now) {
                 echo json_encode([

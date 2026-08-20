@@ -311,13 +311,18 @@ function updateUserBar() {
 }
 
 async function checkUserSubscription() {
-    if (!currentUser) return;
+    if (!currentUser) {
+        currentSubscription = null;
+        return null;
+    }
     try {
-        const res = await fetch(`save_alojamiento.php?action=check_subscription&email=${encodeURIComponent(currentUser.email)}`);
+        const res = await fetch(`save_alojamiento.php?action=check_subscription&email=${encodeURIComponent(currentUser.email)}&_t=${Date.now()}`);
         const data = await res.json();
         currentSubscription = data;
+        return data;
     } catch (e) {
         console.warn('Error checking subscription:', e);
+        return null;
     }
 }
 
@@ -328,13 +333,20 @@ async function handlePublishClick() {
         return;
     }
 
-    await checkUserSubscription();
+    const sub = await checkUserSubscription();
 
     const isAdmin = (currentUser.email === ADMIN_EMAIL);
-    const hasActiveSub = currentSubscription && currentSubscription.active;
+    const hasActiveSub = (sub && (sub.active === true || sub.active === 'true' || sub.is_admin === true));
 
     if (isAdmin || hasActiveSub) {
-        openPublisherModal();
+        closeSubscriptionModal();
+        // Si el usuario ya tiene un alojamiento publicado, abrirlo para editar; si no, abrir nuevo
+        const existingAcc = accommodations.find(a => a.owner_email && a.owner_email.toLowerCase() === currentUser.email.toLowerCase());
+        if (existingAcc) {
+            openPublisherModal(existingAcc);
+        } else {
+            openPublisherModal();
+        }
     } else {
         openSubscriptionModal();
     }
@@ -506,11 +518,17 @@ async function redeemPromoCode() {
         if (data.status === 'success') {
             resultEl.innerHTML = `✅ ${data.message}`;
             resultEl.style.color = '#10b981';
+            currentSubscription = { active: true, is_admin: (currentUser.email === ADMIN_EMAIL), expires_at: data.expires_at };
             await checkUserSubscription();
             setTimeout(() => {
                 closeSubscriptionModal();
-                openPublisherModal();
-            }, 1200);
+                const existingAcc = accommodations.find(a => a.owner_email && a.owner_email.toLowerCase() === currentUser.email.toLowerCase());
+                if (existingAcc) {
+                    openPublisherModal(existingAcc);
+                } else {
+                    openPublisherModal();
+                }
+            }, 900);
         } else {
             resultEl.textContent = '❌ ' + (data.message || 'Código inválido o expirado');
             resultEl.style.color = '#ef4444';
