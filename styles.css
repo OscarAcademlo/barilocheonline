@@ -1209,19 +1209,19 @@ body {
 .combi-body-card {
     position: relative;
     z-index: 2;
-    background: #0f172a;
+    background: #ffffff;
     border: 2px solid #0084ff;
     border-radius: 12px;
     padding: 3px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 18px rgba(0, 132, 255, 0.45);
+    box-shadow: 0 4px 18px rgba(0, 132, 255, 0.55), 0 2px 8px rgba(0,0,0,0.25);
     transition: transform 0.3s ease;
 }
 
 .combi-live-marker:hover .combi-body-card {
-    transform: scale(1.1);
+    transform: scale(1.15);
 }
 
 .combi-badge-pill {

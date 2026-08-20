@@ -164,27 +164,30 @@ function renderLiveVehicles(vehicles) {
         );
         const companyPhone = currentCompany?.phone || '+5492944123456';
 
-        // Marcador combi con animación de pulso y orientación
+        // Marcador combi BLANCA con animación de pulso y orientación
         const iconHtml = `
             <div class="combi-live-marker ${isMoving ? 'is-moving' : ''}">
                 <div class="combi-pulse-wave"></div>
                 <div class="combi-body-card" style="${heading > 0 ? `transform: rotate(${heading}deg);` : ''}">
                     <div class="combi-icon-graphic">
-                        <svg viewBox="0 0 64 64" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Carrocería Combi / Minivan -->
-                            <rect x="8" y="12" width="48" height="36" rx="9" fill="#0084ff"/>
-                            <path d="M8 24H56V38C56 42.9706 51.9706 47 47 47H17C12.0294 47 8 42.9706 8 38V24Z" fill="#0066cc"/>
-                            <!-- Parabrisas frontal y ventanillas -->
-                            <rect x="13" y="16" width="17" height="10" rx="3" fill="#ffffff" opacity="0.95"/>
-                            <rect x="34" y="16" width="17" height="10" rx="3" fill="#ffffff" opacity="0.95"/>
-                            <!-- Luces LED delanteras -->
-                            <circle cx="15" cy="40" r="3.5" fill="#facc15"/>
-                            <circle cx="49" cy="40" r="3.5" fill="#facc15"/>
-                            <!-- Parrilla delantera -->
-                            <rect x="23" y="38" width="18" height="4" rx="2" fill="#ffffff" opacity="0.85"/>
+                        <svg viewBox="0 0 64 64" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Carrocería Combi BLANCA brillante -->
+                            <rect x="8" y="10" width="48" height="38" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+                            <path d="M8 23H56V38C56 43.5 51.5 48 46 48H18C12.5 48 8 43.5 8 38V23Z" fill="#f8fafc"/>
+                            <!-- Techo / Franja de contraste azul Bariloche -->
+                            <path d="M8 18H56V23H8V18Z" fill="#0084ff"/>
+                            <!-- Parabrisas frontal y ventanillas oscuras -->
+                            <rect x="12" y="13" width="18" height="9" rx="2.5" fill="#1e293b"/>
+                            <rect x="34" y="13" width="18" height="9" rx="2.5" fill="#1e293b"/>
+                            <!-- Luces delanteras potentes amarillas -->
+                            <circle cx="14" cy="41" r="4" fill="#facc15" stroke="#eab308" stroke-width="1"/>
+                            <circle cx="50" cy="41" r="4" fill="#facc15" stroke="#eab308" stroke-width="1"/>
+                            <!-- Parrilla y paragolpes delantero -->
+                            <rect x="22" y="39" width="20" height="4.5" rx="2" fill="#334155"/>
+                            <rect x="24" y="40.5" width="16" height="1.5" rx="0.5" fill="#94a3b8"/>
                             <!-- Ruedas -->
-                            <rect x="13" y="46" width="9" height="5" rx="2" fill="#0f172a"/>
-                            <rect x="42" y="46" width="9" height="5" rx="2" fill="#0f172a"/>
+                            <rect x="13" y="47" width="9" height="5" rx="2" fill="#0f172a"/>
+                            <rect x="42" y="47" width="9" height="5" rx="2" fill="#0f172a"/>
                         </svg>
                     </div>
                 </div>

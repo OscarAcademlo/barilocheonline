@@ -125,29 +125,17 @@ class BariRutaSupabaseClient {
                 .order('updated_at', { ascending: false });
 
             if (!error && data) {
-                const dbKeys = new Set(data.map(v => this._vehicleKey(v)));
-
-                // 1. Actualizar/agregar los que vinieron de DB
+                // 1. Actualizar o insertar los que vinieron de DB
                 data.forEach(dbVehicle => {
+                    dbVehicle._lastSeen = Date.now();
                     const idx = this.vehicles.findIndex(
                         v => this._vehicleKey(v) === this._vehicleKey(dbVehicle)
                     );
                     if (idx >= 0) {
-                        const existingAt = new Date(this.vehicles[idx].updated_at || 0).getTime();
-                        const dbAt = new Date(dbVehicle.updated_at || 0).getTime();
-                        if (dbAt >= existingAt) {
-                            this.vehicles[idx] = dbVehicle;
-                        }
+                        this.vehicles[idx] = { ...this.vehicles[idx], ...dbVehicle, _lastSeen: Date.now() };
                     } else {
                         this.vehicles.push(dbVehicle);
                     }
-                });
-
-                // 2. Limpiar inmediatamente los que ya no están en DB
-                this.vehicles = this.vehicles.filter(v => {
-                    if (dbKeys.has(this._vehicleKey(v))) return true;
-                    const updatedAt = new Date(v.updated_at || 0).getTime();
-                    return (Date.now() - updatedAt) < 3000; // Máximo 3 segundos de gracia
                 });
 
                 this.syncCompaniesFromVehicles(data);
@@ -188,14 +176,10 @@ class BariRutaSupabaseClient {
         }
 
         const now = Date.now();
-        const MAX_STALE_MINUTES = 0.5; // Ocultar inmediatamente si no transmite hace más de 30 segundos
-
-        // 1. Descartar vehículos inactivos o viejos
+        // Mantener activo si se recibió transmisión en los últimos 45 segundos
         const liveVehicles = this.vehicles.filter(v => {
-            if (!v.updated_at) return true;
-            const updatedTime = new Date(v.updated_at).getTime();
-            const diffMinutes = (now - updatedTime) / (1000 * 60);
-            return diffMinutes <= MAX_STALE_MINUTES;
+            const lastSeen = v._lastSeen || new Date(v.updated_at || 0).getTime() || 0;
+            return (now - lastSeen) < 45000;
         });
 
         const target = (this.selectedCompany || '').toLowerCase().trim();
@@ -225,12 +209,12 @@ class BariRutaSupabaseClient {
         this.trackingBroadcastChannel
             .on('broadcast', { event: 'location' }, ({ payload }) => {
                 if (!payload || !payload.lat || !payload.lng) return;
-                // Usar clave compuesta estable (igual que la DB) para evitar duplicados
+                payload._lastSeen = Date.now();
                 const idx = this.vehicles.findIndex(
                     v => this._vehicleKey(v) === this._vehicleKey(payload)
                 );
                 if (idx >= 0) {
-                    this.vehicles[idx] = { ...this.vehicles[idx], ...payload };
+                    this.vehicles[idx] = { ...this.vehicles[idx], ...payload, _lastSeen: Date.now() };
                 } else {
                     this.vehicles.unshift(payload);
                 }
@@ -262,17 +246,18 @@ class BariRutaSupabaseClient {
                         );
                     }
                 } else if (newItem) {
+                    newItem._lastSeen = Date.now();
                     const idx = this.vehicles.findIndex(
                         v => this._vehicleKey(v) === this._vehicleKey(newItem)
                     );
                     if (idx >= 0) {
-                        this.vehicles[idx] = newItem;
+                        this.vehicles[idx] = { ...this.vehicles[idx], ...newItem, _lastSeen: Date.now() };
                     } else {
                         this.vehicles.unshift(newItem);
                     }
 
                     // Auto-descubrir empresa si es nueva
-                this.syncCompaniesFromVehicles([newItem]);
+                    this.syncCompaniesFromVehicles([newItem]);
                 }
 
                 this.filterAndNotifyVehicles();
