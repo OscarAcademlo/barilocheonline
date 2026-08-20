@@ -6,6 +6,8 @@
 .agent/
 .idea/
 .vscode/
+ccvlite/
+*ccv*
 
 # Binaries & APKs (GitHub limit is 100MB)
 *.apk
