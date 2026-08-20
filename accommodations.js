@@ -31,12 +31,12 @@ function initSupabase() {
         sbClient = window.supabase.createClient(SB_URL, SB_ANON_KEY);
         sbClient.auth.onAuthStateChange(async (event, session) => {
             currentUser = session ? session.user : null;
-            updateUserBar();
             if (currentUser) {
                 await checkUserSubscription();
             } else {
                 currentSubscription = null;
             }
+            updateUserBar();
         });
     }
 }
@@ -249,17 +249,49 @@ function closeAccommodationModal() {
     document.body.style.overflow = 'auto';
 }
 
+function formatSubscriptionStatusBadge() {
+    const isAdmin = !!(currentUser && currentUser.email && currentUser.email.toLowerCase().trim() === ADMIN_EMAIL);
+    if (isAdmin) {
+        return '<span class="badge-admin" style="background:#e74c3c; color:white; font-size:0.75rem; font-weight:800; padding:4px 8px; border-radius:6px;">ADMIN (Vitalicio)</span>';
+    }
+
+    if (!currentSubscription || !currentSubscription.expires_at) {
+        return '';
+    }
+
+    const now = Date.now();
+    const expDate = new Date(currentSubscription.expires_at);
+    const expTime = expDate.getTime();
+    const diffMs = expTime - now;
+    const diffHours = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60)));
+    const diffDays = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+    const formattedDate = expDate.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+    if (diffMs <= 0) {
+        return `<button type="button" onclick="openSubscriptionModal()" style="background:#ef4444; color:white; border:none; font-size:0.78rem; font-weight:800; padding:5px 10px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:5px;" title="Haz clic para suscribirte con Mercado Pago"><i class="fas fa-exclamation-circle"></i> Período finalizado • Suscribite</button>`;
+    } else if (diffHours <= 48) {
+        // Cuenta regresiva en horas (48hs o 24hs)
+        return `<button type="button" onclick="openSubscriptionModal()" style="background:#f59e0b; color:#111; border:none; font-size:0.78rem; font-weight:800; padding:5px 10px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:5px;" title="Vence el ${formattedDate} • Haz clic para renovar con Mercado Pago"><i class="fas fa-clock"></i> Tenés el servicio hasta el ${formattedDate} • (Restan ${diffHours} hs)</button>`;
+    } else {
+        // Días restantes
+        return `<span style="background:rgba(16, 185, 129, 0.15); border:1px solid #10b981; color:#10b981; font-size:0.78rem; font-weight:800; padding:4px 10px; border-radius:8px; display:inline-flex; align-items:center; gap:5px;"><i class="fas fa-calendar-check"></i> Tenés el servicio hasta el ${formattedDate} • (Restan ${diffDays} días)</span>`;
+    }
+}
+
 function updateUserBar() {
     const userBar = document.getElementById('userAuthStatus');
     const isAdmin = !!(currentUser && currentUser.email && currentUser.email.toLowerCase().trim() === ADMIN_EMAIL);
 
     if (userBar) {
         if (currentUser) {
+            const subBadge = formatSubscriptionStatusBadge();
             userBar.innerHTML = `
-                <div class="auth-logged-pill" style="${isAdmin ? 'border:1px solid #e74c3c; background:rgba(231, 76, 60, 0.12);' : ''}">
-                    <i class="fas ${isAdmin ? 'fa-user-shield' : 'fa-user-circle'}" style="${isAdmin ? 'color:#e74c3c;' : 'color:var(--primary);'} font-size:1.1rem;"></i>
-                    <span style="font-weight:700; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${currentUser.email}</span>
-                    ${isAdmin ? '<span class="badge-admin">ADMIN</span>' : ''}
+                <div class="auth-logged-pill" style="${isAdmin ? 'border:1px solid #e74c3c; background:rgba(231, 76, 60, 0.12);' : ''} display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <i class="fas ${isAdmin ? 'fa-user-shield' : 'fa-user-circle'}" style="${isAdmin ? 'color:#e74c3c;' : 'color:var(--primary);'} font-size:1.1rem;"></i>
+                        <span style="font-weight:700; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${currentUser.email}</span>
+                    </div>
+                    ${subBadge}
                     ${isAdmin ? '<a href="admin.html" class="btn-admin-pill" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px;"><i class="fas fa-shield-alt"></i> Panel Admin</a>' : ''}
                     ${isAdmin ? '<button onclick="openAdminPanel()" class="btn-admin-pill"><i class="fas fa-key"></i> Códigos</button>' : ''}
                     <button onclick="handleLogout()" class="btn-logout-mini" title="Cerrar sesión" style="margin-left:4px;"><i class="fas fa-sign-out-alt"></i></button>
@@ -672,17 +704,33 @@ function openPublisherModal(editData = null) {
             const formatted = expDate.toLocaleDateString('es-AR', options);
             const isPromo = currentSubscription.plan && (currentSubscription.plan.includes('promo') || currentSubscription.plan.includes('grant'));
 
-            if (planText) {
-                planText.innerHTML = `🎉 <b>${isPromo ? 'Código de Gratuidad Activo' : 'Suscripción Activa'}:</b> Vigente para publicar y modificar hasta el <u style="font-weight:800;">${formatted}</u>.`;
+            const now = Date.now();
+            const diffMs = expDate.getTime() - now;
+            const diffHours = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60)));
+            const diffDays = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+
+            if (diffMs <= 0) {
+                if (planText) planText.innerHTML = `⛔ <b>Tu período de servicio ha finalizado:</b> Suscribite con Mercado Pago para volver a publicar en el mapa.`;
+                if (planBadge) { planBadge.textContent = 'Vencido'; planBadge.style.background = '#ef4444'; }
+                planNotice.style.display = 'flex';
+                planNotice.style.background = 'rgba(239, 68, 68, 0.12)';
+                planNotice.style.borderColor = '#ef4444';
+                planNotice.style.color = '#ef4444';
+            } else if (diffHours <= 48) {
+                if (planText) planText.innerHTML = `⚠️ <b>Tenés el servicio hasta el ${formatted}</b> • (Restan solo <u>${diffHours} horas</u>). Renová con Mercado Pago para mantener tu publicación activa sin cortes.`;
+                if (planBadge) { planBadge.textContent = isPromo ? 'Promo por Vencer' : 'Por Vencer'; planBadge.style.background = '#f59e0b'; }
+                planNotice.style.display = 'flex';
+                planNotice.style.background = 'rgba(245, 158, 11, 0.12)';
+                planNotice.style.borderColor = '#f59e0b';
+                planNotice.style.color = '#f59e0b';
+            } else {
+                if (planText) planText.innerHTML = `🎉 <b>Tenés el servicio hasta el ${formatted}</b> • (Restan <u>${diffDays} días</u> para finalizar ${isPromo ? 'el canje de código' : 'lo pagado'}).`;
+                if (planBadge) { planBadge.textContent = isPromo ? 'Código Activo' : 'Suscripción Activa'; planBadge.style.background = '#10b981'; }
+                planNotice.style.display = 'flex';
+                planNotice.style.background = 'rgba(16, 185, 129, 0.12)';
+                planNotice.style.borderColor = '#10b981';
+                planNotice.style.color = '#10b981';
             }
-            if (planBadge) {
-                planBadge.textContent = isPromo ? 'Promoción Vigente' : 'Suscripción Activa';
-                planBadge.style.background = '#10b981';
-            }
-            planNotice.style.display = 'flex';
-            planNotice.style.background = 'rgba(16, 185, 129, 0.12)';
-            planNotice.style.borderColor = '#10b981';
-            planNotice.style.color = '#10b981';
         } else {
             planNotice.style.display = 'none';
         }
