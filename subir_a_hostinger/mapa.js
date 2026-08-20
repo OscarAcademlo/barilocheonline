@@ -93,7 +93,8 @@ function renderLiveVehicles(vehicles) {
     const activeKeys = new Set();
     vehicles.forEach(v => {
         if (v.lat && v.lng) {
-            activeKeys.add(String(v.id || v.vehicle_code));
+            // Clave estable company|vehicle_code (misma que en supabase_client.js)
+            activeKeys.add(`${(v.company_name || '').trim().toLowerCase()}|${(v.vehicle_code || '').trim().toLowerCase()}`);
         }
     });
 
@@ -111,7 +112,9 @@ function renderLiveVehicles(vehicles) {
     vehicles.forEach(veh => {
         if (!veh.lat || !veh.lng) return;
 
-        const key = String(veh.id || veh.vehicle_code);
+        // Clave estable que coincide con _vehicleKey() en supabase_client.js
+        // Evita duplicados entre datos de Broadcast (sin id) y datos de DB (con id)
+        const key = `${(veh.company_name || '').trim().toLowerCase()}|${(veh.vehicle_code || '').trim().toLowerCase()}`;
         const latLng = [veh.lat, veh.lng];
 
         // --- ACTUALIZAR TRAZADO DEL RECORRIDO EN TIEMPO REAL ---

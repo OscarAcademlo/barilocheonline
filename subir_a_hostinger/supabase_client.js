@@ -203,9 +203,9 @@ class BariRutaSupabaseClient {
         this.trackingBroadcastChannel
             .on('broadcast', { event: 'location' }, ({ payload }) => {
                 if (!payload || !payload.lat || !payload.lng) return;
+                // Usar clave compuesta estable (igual que la DB) para evitar duplicados
                 const idx = this.vehicles.findIndex(
-                    v => (v.company_name || '').trim().toLowerCase() === (payload.company_name || '').trim().toLowerCase() && 
-                         (v.vehicle_code || '').trim().toLowerCase() === (payload.vehicle_code || '').trim().toLowerCase()
+                    v => this._vehicleKey(v) === this._vehicleKey(payload)
                 );
                 if (idx >= 0) {
                     this.vehicles[idx] = { ...this.vehicles[idx], ...payload };
@@ -218,8 +218,7 @@ class BariRutaSupabaseClient {
             .on('broadcast', { event: 'status' }, ({ payload }) => {
                 if (payload && payload.active === false) {
                     this.vehicles = this.vehicles.filter(
-                        v => !((v.company_name || '').trim().toLowerCase() === (payload.company_name || '').trim().toLowerCase() && 
-                               (v.vehicle_code || '').trim().toLowerCase() === (payload.vehicle_code || '').trim().toLowerCase())
+                        v => this._vehicleKey(v) !== this._vehicleKey(payload)
                     );
                     this.filterAndNotifyVehicles();
                 }
@@ -237,12 +236,12 @@ class BariRutaSupabaseClient {
                 if (eventType === 'DELETE') {
                     if (oldItem) {
                         this.vehicles = this.vehicles.filter(
-                            v => !(v.company_name === oldItem.company_name && v.vehicle_code === oldItem.vehicle_code)
+                            v => this._vehicleKey(v) !== this._vehicleKey(oldItem)
                         );
                     }
                 } else if (newItem) {
                     const idx = this.vehicles.findIndex(
-                        v => v.company_name === newItem.company_name && v.vehicle_code === newItem.vehicle_code
+                        v => this._vehicleKey(v) === this._vehicleKey(newItem)
                     );
                     if (idx >= 0) {
                         this.vehicles[idx] = newItem;
@@ -251,7 +250,7 @@ class BariRutaSupabaseClient {
                     }
 
                     // Auto-descubrir empresa si es nueva
-                    this.syncCompaniesFromVehicles([newItem]);
+                this.syncCompaniesFromVehicles([newItem]);
                 }
 
                 this.filterAndNotifyVehicles();
@@ -265,6 +264,11 @@ class BariRutaSupabaseClient {
                 this.fetchCompanies();
             })
             .subscribe();
+    }
+
+    // Clave única estable por vehículo (company_name + vehicle_code, case-insensitive)
+    _vehicleKey(v) {
+        return `${(v.company_name || '').trim().toLowerCase()}|${(v.vehicle_code || '').trim().toLowerCase()}`;
     }
 
     // MÉTODOS DE ADMINISTRACIÓN (PARA admin.html)
