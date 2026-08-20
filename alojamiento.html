@@ -191,6 +191,15 @@
             <h2 id="publisherModalTitle">Publicar Alojamiento</h2>
             <p class="publisher-subtitle">Completá los datos de tu propiedad para que los turistas te contacten.</p>
 
+            <!-- AVISO VISIBLE DE VIGENCIA Y FECHA DE VENCIMIENTO DEL CÓDIGO/SUSCRIPCIÓN -->
+            <div id="publisherActivePlanNotice" class="publisher-plan-badge" style="display:none; margin: 14px 0 20px; padding: 14px 18px; background: rgba(16, 185, 129, 0.12); border: 1px solid #10b981; border-radius: 14px; color: #10b981; font-size: 0.92rem; font-weight: 700; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <i class="fas fa-calendar-check" style="font-size:1.3rem; flex-shrink:0;"></i>
+                    <span id="publisherActivePlanText">Cargando vigencia...</span>
+                </div>
+                <span id="publisherPlanTypeBadge" style="background:#10b981; color:white; font-size:0.75rem; padding:4px 10px; border-radius:8px; text-transform:uppercase; font-weight:800;">Activo</span>
+            </div>
+
             <form id="publisherForm" onsubmit="handlePublisherFormSubmit(event)" enctype="multipart/form-data">
                 <input type="hidden" id="editAccId" name="id">
                 <input type="hidden" id="existingImagesInput" name="existing_images">
@@ -271,15 +280,17 @@
                 </div>
 
                 <!-- SELECTOR DE UBICACIÓN EN EL MAPA + BUSCADOR DE DIRECCIÓN -->
-                <div class="input-group-custom address-search-group">
+                <div class="input-group-custom">
                     <label><i class="fas fa-search-location"></i> Dirección y Altura (Escribí la calle y número o arrastrá el pin)</label>
-                    <div style="display:flex; gap:8px; margin-bottom:8px;">
-                        <input type="text" id="addressSearchInput" placeholder="Ej: Av. Bustillo 5000, Mitre 350, San Martín 400..." autocomplete="off" oninput="handleAddressInput(this.value)">
-                        <button type="button" onclick="searchAddressClick()" style="background:var(--primary); color:white; border:none; padding:0 16px; border-radius:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px; flex-shrink:0;">
-                            <i class="fas fa-search"></i> Buscar
-                        </button>
+                    <div style="position:relative; margin-bottom:10px;">
+                        <div style="display:flex; gap:8px;">
+                            <input type="text" id="addressSearchInput" placeholder="Ej: Bustillo 5040, Mitre 350, San Martín 400..." autocomplete="off" oninput="handleAddressInput(this.value)" style="width:100%; height:46px; border-radius:12px; padding:10px 14px; background:var(--bg-main); color:var(--text-primary); border:1px solid var(--border);">
+                            <button type="button" onclick="searchAddressClick()" style="background:var(--primary); color:white; border:none; padding:0 18px; border-radius:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px; flex-shrink:0; height:46px;">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
+                        <div id="addressSuggestions" class="address-suggestions-dropdown" style="display:none; position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:999999; background:#1e293b; border:1px solid #334155; border-radius:14px; box-shadow:0 15px 35px rgba(0,0,0,0.6); max-height:220px; overflow-y:auto;"></div>
                     </div>
-                    <div id="addressSuggestions" class="address-suggestions-dropdown" style="display:none;"></div>
                     <div id="pickerMapContainer" style="height: 220px; border-radius: 14px; border: 1px solid var(--border); overflow:hidden;"></div>
                 </div>
 

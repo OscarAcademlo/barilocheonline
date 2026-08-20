@@ -651,6 +651,43 @@ function openPublisherModal(editData = null) {
         document.getElementById('accLng').value = '-71.3103';
     }
 
+    // MOSTRAR FECHA DE VIGENCIA DEL CÓDIGO O SUSCRIPCIÓN ACTIVA
+    const planNotice = document.getElementById('publisherActivePlanNotice');
+    const planText = document.getElementById('publisherActivePlanText');
+    const planBadge = document.getElementById('publisherPlanTypeBadge');
+    const isAdm = !!(currentUser && currentUser.email && currentUser.email.toLowerCase().trim() === ADMIN_EMAIL);
+
+    if (planNotice) {
+        if (isAdm) {
+            if (planText) planText.innerHTML = `🛡️ <b>Cuenta Administrador:</b> Publicación permanente e ilimitada sin cargo.`;
+            if (planBadge) planBadge.textContent = 'Admin Vitalicio';
+            planNotice.style.display = 'flex';
+            planNotice.style.background = 'rgba(231, 76, 60, 0.12)';
+            planNotice.style.borderColor = '#e74c3c';
+            planNotice.style.color = '#e74c3c';
+            if (planBadge) planBadge.style.background = '#e74c3c';
+        } else if (currentSubscription && currentSubscription.expires_at) {
+            const expDate = new Date(currentSubscription.expires_at);
+            const options = { day: 'numeric', month: 'long', year: 'numeric' };
+            const formatted = expDate.toLocaleDateString('es-AR', options);
+            const isPromo = currentSubscription.plan && (currentSubscription.plan.includes('promo') || currentSubscription.plan.includes('grant'));
+
+            if (planText) {
+                planText.innerHTML = `🎉 <b>${isPromo ? 'Código de Gratuidad Activo' : 'Suscripción Activa'}:</b> Vigente para publicar y modificar hasta el <u style="font-weight:800;">${formatted}</u>.`;
+            }
+            if (planBadge) {
+                planBadge.textContent = isPromo ? 'Promoción Vigente' : 'Suscripción Activa';
+                planBadge.style.background = '#10b981';
+            }
+            planNotice.style.display = 'flex';
+            planNotice.style.background = 'rgba(16, 185, 129, 0.12)';
+            planNotice.style.borderColor = '#10b981';
+            planNotice.style.color = '#10b981';
+        } else {
+            planNotice.style.display = 'none';
+        }
+    }
+
     renderImagePreviews();
     modal.style.display = 'flex';
     initPickerMap(editData ? [editData.lat, editData.lng] : [-41.1335, -71.3103]);
@@ -734,14 +771,14 @@ function handleAddressInput(query) {
     const suggBox = document.getElementById('addressSuggestions');
     const clean = query.trim();
 
-    if (clean.length < 3) {
+    if (clean.length < 2) {
         if (suggBox) suggBox.style.display = 'none';
         return;
     }
 
     addressDebounceTimer = setTimeout(() => {
         fetchAddressSuggestions(clean);
-    }, 350);
+    }, 250);
 }
 
 async function fetchAddressSuggestions(query) {
@@ -749,35 +786,61 @@ async function fetchAddressSuggestions(query) {
     if (!suggBox) return;
 
     try {
-        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', San Carlos de Bariloche, Rio Negro, Argentina')}&viewbox=-71.60,-41.05,-71.10,-41.30&bounded=1&limit=6&addressdetails=1`;
-        const res = await fetch(url, { headers: { 'Accept-Language': 'es' } });
-        const data = await res.json();
+        let items = [];
 
-        if (!data || data.length === 0) {
-            suggBox.innerHTML = '<div class="suggestion-item" style="color:var(--text-secondary); cursor:default;"><i class="fas fa-info-circle"></i> No se encontraron resultados exactos. Podés mover el pin en el mapa.</div>';
+        // 1. Consulta ultrarrápida a Photon API con sesgo en Bariloche
+        try {
+            const photonUrl = `https://photon.komoot.io/api/?q=${encodeURIComponent(query + ' Bariloche')}&lat=-41.1335&lon=-71.3103&limit=8`;
+            const res = await fetch(photonUrl);
+            const data = await res.json();
+            if (data && data.features && data.features.length > 0) {
+                items = data.features.map(f => {
+                    const lon = f.geometry.coordinates[0];
+                    const lat = f.geometry.coordinates[1];
+                    const p = f.properties || {};
+                    const street = p.street || p.name || query;
+                    const num = p.housenumber ? ` ${p.housenumber}` : '';
+                    const neighborhood = p.district || p.suburb || p.locality || p.city || 'Bariloche';
+                    const label = `${street}${num}, ${neighborhood}`;
+                    return { lat, lon, street, num, neighborhood, label };
+                });
+            }
+        } catch (errPhoton) {}
+
+        // 2. Fallback con Nominatim OpenStreetMap
+        if (items.length === 0) {
+            const nomUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', San Carlos de Bariloche, Argentina')}&viewbox=-71.60,-41.05,-71.10,-41.30&bounded=0&limit=6&addressdetails=1`;
+            const nomRes = await fetch(nomUrl, { headers: { 'Accept-Language': 'es' } });
+            const nomData = await nomRes.json();
+            if (nomData && nomData.length > 0) {
+                items = nomData.map(item => {
+                    const lat = parseFloat(item.lat);
+                    const lon = parseFloat(item.lon);
+                    const addr = item.address || {};
+                    const road = addr.road || addr.pedestrian || addr.street || item.name || query;
+                    const houseNumber = addr.house_number ? ` ${addr.house_number}` : '';
+                    const suburb = addr.suburb || addr.neighbourhood || addr.city_district || 'Bariloche';
+                    const label = `${road}${houseNumber}, ${suburb}`;
+                    return { lat, lon, street: road, num: houseNumber, neighborhood: suburb, label };
+                });
+            }
+        }
+
+        if (items.length === 0) {
+            suggBox.innerHTML = '<div class="suggestion-item" style="color:var(--text-secondary); padding:10px 14px; cursor:default;"><i class="fas fa-info-circle"></i> No se encontraron sugerencias exactas. Podés arrastrar el pin en el mapa.</div>';
             suggBox.style.display = 'block';
             return;
         }
 
-        suggBox.innerHTML = data.map(item => {
-            const lat = parseFloat(item.lat);
-            const lon = parseFloat(item.lon);
-            const addr = item.address || {};
-            const road = addr.road || addr.pedestrian || addr.street || item.name || query;
-            const houseNumber = addr.house_number || '';
-            const suburb = addr.suburb || addr.neighbourhood || addr.city_district || 'Bariloche';
-            const shortName = `${road} ${houseNumber}`.trim() + `, ${suburb}`;
-
-            return `
-                <div class="suggestion-item" onclick="selectAddressSuggestion(${lat}, ${lon}, '${shortName.replace(/'/g, "\\'")}')">
-                    <i class="fas fa-location-dot"></i>
-                    <div>
-                        <div style="font-weight:700;">${road} ${houseNumber}</div>
-                        <small style="color:var(--text-secondary); font-size:0.75rem;">${suburb}, Bariloche</small>
-                    </div>
+        suggBox.innerHTML = items.map(item => `
+            <div class="suggestion-item" onclick="selectAddressSuggestion(${item.lat}, ${item.lon}, '${item.label.replace(/'/g, "\\'")}')" style="padding:10px 14px; font-size:0.88rem; color:#fff; cursor:pointer; display:flex; align-items:center; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08);">
+                <i class="fas fa-location-dot" style="color:#0084ff; font-size:1.1rem; flex-shrink:0;"></i>
+                <div>
+                    <div style="font-weight:700; color:#fff;">${item.street}${item.num}</div>
+                    <small style="color:#94a3b8; font-size:0.75rem;">${item.neighborhood}, San Carlos de Bariloche</small>
                 </div>
-            `;
-        }).join('');
+            </div>
+        `).join('');
 
         suggBox.style.display = 'block';
     } catch (e) {
