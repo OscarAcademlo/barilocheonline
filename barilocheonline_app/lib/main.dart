@@ -249,6 +249,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
   // 2. DETENER TRANSMISIÓN ("DEJAR DE MOSTRAR EN EL MAPA")
   Future<void> _stopGpsTransmission() async {
+    // Detener stream y timer PRIMERO (dejar de emitir posición)
     await _positionStreamSub?.cancel();
     _positionStreamSub = null;
     _activePulseTimer?.cancel();
@@ -257,49 +258,67 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
     final company = _companyNameCtrl.text.trim();
     final vehicle = _vehicleCodeCtrl.text.trim();
 
-    // Notificar estado inactivo por Broadcast
+    // 0. Broadcast de desactivación PRIMERO y con await
+    //    Si no se espera, el canal se cierra antes de que el mensaje salga
     try {
-      _trackingBroadcastChannel?.sendBroadcastMessage(
+      await _trackingBroadcastChannel?.sendBroadcastMessage(
         event: 'status',
         payload: {'company_name': company, 'vehicle_code': vehicle, 'active': false},
       );
+      // 300ms para que el WebSocket entregue el paquete antes de cerrar
+      await Future.delayed(const Duration(milliseconds: 300));
+    } catch (e) {
+      debugPrint('Broadcast stop error: $e');
+    } finally {
       _trackingBroadcastChannel?.unsubscribe();
       _trackingBroadcastChannel = null;
-    } catch (_) {}
+    }
 
-    // 1. Borrado inmediato por HTTP Direct REST
+    // UI responde inmediatamente — no espera la DB
+    if (mounted) {
+      setState(() {
+        _isStreaming = false;
+        _statusMessage = 'Transmisión detenida. Combi retirada del mapa.';
+      });
+    }
+
+    _showSnackBar('🔴 Transmisión finalizada. La combi se retiró del mapa.');
+
+    // Borrado de DB en segundo plano (no bloquea al chofer)
+    unawaited(_deleteVehicleFromDB(company, vehicle));
+  }
+
+  // Elimina la combi de la base de datos sin bloquear la UI
+  Future<void> _deleteVehicleFromDB(String company, String vehicle) async {
+    // Método 1: HTTP directo (más rápido)
+    bool deleted = false;
     try {
       final uri = Uri.parse(
         '$kSupabaseUrl/rest/v1/vehicles?company_name=eq.${Uri.encodeComponent(company)}&vehicle_code=eq.${Uri.encodeComponent(vehicle)}',
       );
-      await http.delete(
+      final res = await http.delete(
         uri,
         headers: {
           'apikey': kSupabaseAnonKey,
           'Authorization': 'Bearer $kSupabaseAnonKey',
         },
       );
+      if (res.statusCode >= 200 && res.statusCode < 300) deleted = true;
     } catch (e) {
       debugPrint('Error al remover por HTTP: $e');
     }
 
-    // 2. Borrado por SDK Supabase
-    try {
-      final supabase = Supabase.instance.client;
-      await supabase
-          .from('vehicles')
-          .delete()
-          .match({'company_name': company, 'vehicle_code': vehicle});
-    } catch (e) {
-      debugPrint('Error al remover por SDK: $e');
+    // Método 2: SDK como fallback si HTTP falló
+    if (!deleted) {
+      try {
+        await Supabase.instance.client
+            .from('vehicles')
+            .delete()
+            .match({'company_name': company, 'vehicle_code': vehicle});
+      } catch (e) {
+        debugPrint('Error al remover por SDK: $e');
+      }
     }
-
-    setState(() {
-      _isStreaming = false;
-      _statusMessage = 'Transmisión detenida. Combi retirada del mapa.';
-    });
-
-    _showSnackBar('🔴 Transmisión finalizada. La combi se retiró del mapa.');
   }
 
   // ENVÍO DE COORDENADAS A SUPABASE
