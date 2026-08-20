@@ -1,0 +1,29 @@
+[
+  {
+    "code": "BARI3M",
+    "months": 3,
+    "created_by": "oscarns@gmail.com",
+    "max_uses": 100,
+    "used_count": 0,
+    "active": true,
+    "created_at": "2026-08-20T12:00:00Z"
+  },
+  {
+    "code": "PROMO6M",
+    "months": 6,
+    "created_by": "oscarns@gmail.com",
+    "max_uses": 50,
+    "used_count": 0,
+    "active": true,
+    "created_at": "2026-08-20T12:00:00Z"
+  },
+  {
+    "code": "ANUAL2026",
+    "months": 12,
+    "created_by": "oscarns@gmail.com",
+    "max_uses": 20,
+    "used_count": 0,
+    "active": true,
+    "created_at": "2026-08-20T12:00:00Z"
+  }
+]

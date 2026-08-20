@@ -1,0 +1,92 @@
+[
+  {
+    "id": "acc_1",
+    "owner_email": "oscarns@gmail.com",
+    "name": "Cabaña Vista al Nahuel",
+    "type": "Cabaña",
+    "location": "Villa Llao Llao",
+    "price": 125000,
+    "rating": 4.98,
+    "lat": -41.053,
+    "lng": -71.537,
+    "images": [
+      "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&q=80&w=800"
+    ],
+    "description": "Hermosa cabaña con vista panorámica al Lago Nahuel Huapi. 3 dormitorios, cocina equipada, parrilla y deck con vista al lago.",
+    "amenities": ["Wi-Fi", "Parrilla", "Deck", "Vista al lago", "Calefacción", "Estacionamiento"],
+    "phone": "5492944123456",
+    "created_at": "2026-08-20T12:00:00Z"
+  },
+  {
+    "id": "acc_2",
+    "owner_email": "oscarns@gmail.com",
+    "name": "Loft Premium Centro",
+    "type": "Loft",
+    "location": "Centro",
+    "price": 82000,
+    "rating": 4.78,
+    "lat": -41.134,
+    "lng": -71.310,
+    "images": [
+      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=800"
+    ],
+    "description": "Moderno loft en pleno centro de Bariloche. A pasos de restaurantes, tiendas y transporte público. Ideal para parejas.",
+    "amenities": ["Wi-Fi", "Smart TV", "Cocina", "Calefacción", "Ubicación central"],
+    "phone": "5492944234567",
+    "created_at": "2026-08-20T12:00:00Z"
+  },
+  {
+    "id": "acc_3",
+    "owner_email": "oscarns@gmail.com",
+    "name": "Casa Cerro Catedral",
+    "type": "Casa",
+    "location": "Cerro Catedral",
+    "price": 150000,
+    "rating": 4.92,
+    "lat": -41.171,
+    "lng": -71.395,
+    "images": [
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=800"
+    ],
+    "description": "A minutos del centro de ski Cerro Catedral. Casa completa con 4 dormitorios, chimenea y jacuzzi. Perfecta para familias.",
+    "amenities": ["Wi-Fi", "Jacuzzi", "Chimenea", "Parrilla", "4 dormitorios", "Calefacción"],
+    "phone": "5492944345678",
+    "created_at": "2026-08-20T12:00:00Z"
+  },
+  {
+    "id": "acc_4",
+    "owner_email": "oscarns@gmail.com",
+    "name": "Depto Vista al Lago",
+    "type": "Departamento",
+    "location": "Av. Bustillo",
+    "price": 95000,
+    "rating": 4.85,
+    "lat": -41.082,
+    "lng": -71.447,
+    "images": [
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&q=80&w=800"
+    ],
+    "description": "Departamento luminoso sobre Av. Bustillo con vista directa al lago. 2 dormitorios, balcón amplio y todas las comodidades.",
+    "amenities": ["Wi-Fi", "Balcón", "Vista al lago", "Cocina completa", "Estacionamiento"],
+    "phone": "5492944456789",
+    "created_at": "2026-08-20T12:00:00Z"
+  },
+  {
+    "id": "acc_5",
+    "owner_email": "oscarns@gmail.com",
+    "name": "Cabaña Bosque Arrayanes",
+    "type": "Cabaña",
+    "location": "Circuito Chico",
+    "price": 110000,
+    "rating": 4.89,
+    "lat": -41.075,
+    "lng": -71.511,
+    "images": [
+      "https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?auto=format&fit=crop&q=80&w=800"
+    ],
+    "description": "Inmersa en el bosque del Circuito Chico. Tranquilidad absoluta, contacto con la naturaleza. 2 dormitorios y hogar a leña.",
+    "amenities": ["Hogar a leña", "Bosque", "Tranquilidad", "Parrilla", "Wi-Fi"],
+    "phone": "5492944567890",
+    "created_at": "2026-08-20T12:00:00Z"
+  }
+]

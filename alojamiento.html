@@ -8,51 +8,59 @@
     <title>Dónde Dormir | Alojamiento en Bariloche | Bariloche.Online</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#0084ff">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Leaflet CSS para el mapa -->
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="styles.css?v=2060">
+    <link rel="stylesheet" href="styles.css?v=2080">
 </head>
 
 <body class="page-accommodations native-app">
+    <!-- HEADER PRINCIPAL -->
     <header class="main-header">
         <a href="index.html" class="logo" style="text-decoration:none; color:inherit;"><b>B</b> BARILOCHE.ONLINE</a>
         <nav class="nav-desktop">
             <a href="mapa.html" class="nav-link"><i class="fas fa-satellite-dish"></i> EN VIVO</a>
             <a href="radios.html" class="nav-link">RADIOS</a>
             <a href="vuelos.html" class="nav-link">VUELOS</a>
-            <a href="alojamiento.html" class="nav-link active">DORMIR</a>
+            <a href="alojamiento.html" class="nav-link active"><i class="fas fa-bed"></i> DORMIR</a>
             <a href="comer.html" class="nav-link">COMER</a>
         </nav>
         <div class="header-icons">
+            <div id="userAuthStatus"></div>
             <div class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()"><i class="fas fa-moon"></i></div>
         </div>
     </header>
 
+    <!-- LAYOUT PRINCIPAL DE ALOJAMIENTOS -->
     <main class="accommodation-layout">
-        <!-- Lista lateral de alojamientos -->
+        <!-- BARRA LATERAL CON LISTADO Y BOTÓN DE PUBLICAR -->
         <div class="accommodation-sidebar">
             <div class="browse-header">
-                <h1>Dónde Dormir</h1>
-                <p id="accommodation-count">Cargando alojamientos...</p>
+                <div>
+                    <h1>Dónde Dormir</h1>
+                    <p id="accommodation-count">Cargando alojamientos...</p>
+                </div>
+                <button onclick="handlePublishClick()" class="btn-publish-header">
+                    <i class="fas fa-plus-circle"></i> Publicar Alojamiento
+                </button>
             </div>
+
+            <!-- LISTADO DINÁMICO AIRBNB -->
             <div id="accommodationsList" class="accommodations-list"></div>
         </div>
 
-        <!-- Mapa -->
+        <!-- MAPA INTERACTIVO -->
         <div class="accommodation-map-container">
             <div id="map"></div>
         </div>
     </main>
 
-    <!-- Modal para ver detalles -->
+    <!-- 1. MODAL DETALLES DEL ALOJAMIENTO + WHATSAPP -->
     <div id="accommodationModal" class="modal-overlay" onclick="closeAccommodationModal()">
         <div class="modal-content accommodation-modal" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeAccommodationModal()"><i class="fas fa-times"></i></button>
@@ -60,7 +68,241 @@
         </div>
     </div>
 
-    <!-- App Bottom Nav -->
+    <!-- 2. MODAL DE AUTENTICACIÓN (SUPABASE AUTH GRATIS) -->
+    <div id="authModal" class="modal-overlay" onclick="closeAuthModal()">
+        <div class="modal-content auth-modal-box" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeAuthModal()"><i class="fas fa-times"></i></button>
+            
+            <div class="auth-header-title">
+                <i class="fas fa-hotel" style="color:var(--primary); font-size:2rem; margin-bottom:8px;"></i>
+                <h2>Portal de Propietarios</h2>
+                <p id="authNoticeMsg">Iniciá sesión o creá tu cuenta para publicar tu cabaña, departamento o hotel.</p>
+            </div>
+
+            <!-- FORMULARIO LOGIN -->
+            <div id="loginFormContainer">
+                <form onsubmit="handleLoginSubmit(event)">
+                    <div class="input-group-custom">
+                        <label><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" id="loginEmail" placeholder="tu-email@gmail.com" required>
+                    </div>
+                    <div class="input-group-custom">
+                        <label><i class="fas fa-lock"></i> Contraseña</label>
+                        <input type="password" id="loginPass" placeholder="••••••••" required>
+                    </div>
+                    <div id="loginError" class="auth-error-msg"></div>
+                    <button type="submit" id="btnLoginSubmit" class="btn-auth-primary">Ingresar</button>
+                </form>
+                <div class="auth-switch-row">
+                    <span>¿No tienes cuenta aún?</span>
+                    <a href="javascript:void(0)" onclick="toggleAuthMode('signup')">Crear cuenta gratis</a>
+                </div>
+            </div>
+
+            <!-- FORMULARIO REGISTRO -->
+            <div id="signupFormContainer" style="display:none;">
+                <form onsubmit="handleSignupSubmit(event)">
+                    <div class="input-group-custom">
+                        <label><i class="fas fa-envelope"></i> Tu Email</label>
+                        <input type="email" id="signupEmail" placeholder="tu-email@gmail.com" required>
+                    </div>
+                    <div class="input-group-custom">
+                        <label><i class="fas fa-lock"></i> Crear Contraseña</label>
+                        <input type="password" id="signupPass" placeholder="Mínimo 6 caracteres" minlength="6" required>
+                    </div>
+                    <div id="signupError" class="auth-error-msg"></div>
+                    <button type="submit" id="btnSignupSubmit" class="btn-auth-primary">Registrarme</button>
+                </form>
+                <div class="auth-switch-row">
+                    <span>¿Ya tienes cuenta?</span>
+                    <a href="javascript:void(0)" onclick="toggleAuthMode('login')">Iniciar sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. MODAL DE PAGO / SUSCRIPCIÓN ($10.000 MP O CÓDIGO PROMO) -->
+    <div id="subscriptionModal" class="modal-overlay" onclick="closeSubscriptionModal()">
+        <div class="modal-content subscription-modal-box" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeSubscriptionModal()"><i class="fas fa-times"></i></button>
+            
+            <div class="sub-header-badge">
+                <span class="sub-icon-circle"><i class="fas fa-star"></i></span>
+                <h2>Publicá tu Alojamiento</h2>
+                <p>Tu propiedad aparecerá destacada en el mapa en vivo de Bariloche con contacto directo a tu WhatsApp.</p>
+            </div>
+
+            <!-- OPCIÓN 1: PAGO MERCADO PAGO -->
+            <div class="pricing-card-mp">
+                <div class="pricing-badge-popular">Plan Destacado</div>
+                <div class="pricing-amount-row">
+                    <span class="price-currency">$</span>
+                    <span class="price-val">10.000</span>
+                    <span class="price-period">/ Mes</span>
+                </div>
+                <ul class="pricing-features-list">
+                    <li><i class="fas fa-check-circle"></i> Ubicación exacta con pin en el mapa</li>
+                    <li><i class="fas fa-check-circle"></i> Botón directo a tu WhatsApp sin comisiones</li>
+                    <li><i class="fas fa-check-circle"></i> Galería de fotos y lista de comodidades</li>
+                    <li><i class="fas fa-check-circle"></i> Panel para editar precio y fotos cuando quieras</li>
+                </ul>
+
+                <button id="btnPayMP" onclick="payWithMercadoPago()" class="btn-mercadopago-checkout">
+                    <i class="fas fa-credit-card"></i> Pagar $10.000 con Mercado Pago
+                </button>
+            </div>
+
+            <!-- SEPARADOR -->
+            <div class="sub-divider-row">
+                <span>O SI TIENES UN CÓDIGO PROMOCIONAL</span>
+            </div>
+
+            <!-- OPCIÓN 2: CANJE DE CÓDIGO PROMO (3, 6, 12 MESES) -->
+            <div class="promo-code-box">
+                <div class="promo-input-row">
+                    <input type="text" id="promoCodeInput" placeholder="EJ: BARI3M, PROMO6M" style="text-transform:uppercase;">
+                    <button onclick="redeemPromoCode()" class="btn-redeem-code">Canjear</button>
+                </div>
+                <div id="promoCodeResult" class="promo-result-msg"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. MODAL DE PUBLICACIÓN / EDICIÓN DE ALOJAMIENTO -->
+    <div id="publisherModal" class="modal-overlay" onclick="closePublisherModal()">
+        <div class="modal-content publisher-modal-box" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closePublisherModal()"><i class="fas fa-times"></i></button>
+            
+            <h2 id="publisherModalTitle">Publicar Alojamiento</h2>
+            <p class="publisher-subtitle">Completá los datos de tu propiedad para que los turistas te contacten.</p>
+
+            <form id="publisherForm" onsubmit="handlePublisherFormSubmit(event)" enctype="multipart/form-data">
+                <input type="hidden" id="editAccId" name="id">
+                <input type="hidden" id="existingImagesInput" name="existing_images">
+                <input type="hidden" id="accLat" name="lat" value="-41.1335">
+                <input type="hidden" id="accLng" name="lng" value="-71.3103">
+
+                <div class="form-grid-2">
+                    <div class="input-group-custom">
+                        <label>Nombre del Alojamiento *</label>
+                        <input type="text" id="accName" name="name" placeholder="Ej: Cabaña Vista al Lago" required>
+                    </div>
+
+                    <div class="input-group-custom">
+                        <label>Tipo de Propiedad *</label>
+                        <select id="accType" name="type">
+                            <option value="Cabaña">Cabaña</option>
+                            <option value="Departamento">Departamento</option>
+                            <option value="Loft">Loft</option>
+                            <option value="Casa">Casa Completa</option>
+                            <option value="Hotel">Hotel</option>
+                            <option value="Hostel">Hostel</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid-3">
+                    <div class="input-group-custom">
+                        <label>Zona / Barrio *</label>
+                        <input type="text" id="accLocation" name="location" placeholder="Ej: Av. Bustillo Km 5" required>
+                    </div>
+
+                    <div class="input-group-custom">
+                        <label>Precio por Noche (ARS) *</label>
+                        <input type="number" id="accPrice" name="price" placeholder="Ej: 95000" required>
+                    </div>
+
+                    <div class="input-group-custom">
+                        <label>WhatsApp de Contacto *</label>
+                        <input type="tel" id="accPhone" name="phone" placeholder="Ej: 5492944123456" required>
+                    </div>
+                </div>
+
+                <div class="input-group-custom">
+                    <label>Descripción del Alojamiento</label>
+                    <textarea id="accDescription" name="description" rows="3" placeholder="Detalla comodidades, vista, capacidad de personas, etc."></textarea>
+                </div>
+
+                <!-- COMODIDADES -->
+                <div class="input-group-custom">
+                    <label>Comodidades y Servicios</label>
+                    <div class="amenities-picker-grid">
+                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Wi-Fi"> Wi-Fi</label>
+                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Parrilla"> Parrilla</label>
+                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Vista al lago"> Vista al Lago</label>
+                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Calefacción"> Calefacción</label>
+                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Estacionamiento"> Estacionamiento</label>
+                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Jacuzzi"> Jacuzzi</label>
+                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Hogar a leña"> Hogar a leña</label>
+                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Cocina completa"> Cocina completa</label>
+                    </div>
+                </div>
+
+                <!-- SUBIDA DE IMÁGENES -->
+                <div class="input-group-custom">
+                    <label><i class="fas fa-camera"></i> Fotos del Alojamiento (se guardan en el servidor)</label>
+                    <input type="file" id="accImages" name="images[]" multiple accept="image/*" class="file-input-custom">
+                    <small style="color:var(--text-secondary); display:block; margin-top:4px;">Podés seleccionar varias fotos a la vez.</small>
+                </div>
+
+                <!-- SELECTOR DE UBICACIÓN EN EL MAPA -->
+                <div class="input-group-custom">
+                    <label><i class="fas fa-map-pin"></i> Ubicación en el Mapa (Arrastrá el pin o hacé clic en el punto exacto)</label>
+                    <div id="pickerMapContainer" style="height: 200px; border-radius: 12px; border: 1px solid var(--border); margin-top: 6px;"></div>
+                </div>
+
+                <div class="publisher-btn-row">
+                    <button type="button" onclick="closePublisherModal()" class="btn-cancel-modal">Cancelar</button>
+                    <button type="submit" id="btnSubmitPublisher" class="btn-submit-publisher">
+                        <i class="fas fa-check"></i> Guardar y Publicar en el Mapa
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 5. PANEL DE ADMINISTRADOR (SOLO oscarns@gmail.com) -->
+    <div id="adminModal" class="modal-overlay" onclick="closeAdminPanel()">
+        <div class="modal-content admin-modal-box" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeAdminPanel()"><i class="fas fa-times"></i></button>
+            
+            <div class="admin-modal-header">
+                <i class="fas fa-shield-alt" style="color:var(--primary); font-size:1.8rem;"></i>
+                <div>
+                    <h2>Panel Administrador de Códigos Promo</h2>
+                    <p>Exclusivo para oscarns@gmail.com</p>
+                </div>
+            </div>
+
+            <!-- CREAR NUEVO CÓDIGO -->
+            <form onsubmit="handleCreatePromoCode(event)" class="admin-create-code-form">
+                <div class="form-grid-3">
+                    <div class="input-group-custom">
+                        <label>Nuevo Código</label>
+                        <input type="text" id="newPromoCode" placeholder="Ej: BARI2026" required style="text-transform:uppercase;">
+                    </div>
+                    <div class="input-group-custom">
+                        <label>Duración (Meses)</label>
+                        <select id="newPromoMonths">
+                            <option value="3">3 Meses Gratis</option>
+                            <option value="6">6 Meses Gratis</option>
+                            <option value="12">1 Año Gratis (12 Meses)</option>
+                        </select>
+                    </div>
+                    <div class="input-group-custom">
+                        <label>Cantidad de Usos</label>
+                        <input type="number" id="newPromoMaxUses" value="50" min="1" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-admin-create-code"><i class="fas fa-plus"></i> Crear Código Promocional</button>
+            </form>
+
+            <h3 style="margin: 20px 0 10px;">Códigos Activos en el Sistema</h3>
+            <div id="adminCodesList"></div>
+        </div>
+    </div>
+
+    <!-- NAVEGACIÓN INFERIOR MOBILE -->
     <nav class="mobile-nav">
         <a href="mapa.html" class="mobile-nav-item">
             <i class="fas fa-satellite-dish"></i>
@@ -84,10 +326,11 @@
         </a>
     </nav>
 
-    <!-- Leaflet JS -->
+    <!-- SCRIPTS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="app.js?v=2060"></script>
-    <script src="accommodations.js?v=2060"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js?v=2080"></script>
+    <script src="accommodations.js?v=2080"></script>
 </body>
 
 </html>
