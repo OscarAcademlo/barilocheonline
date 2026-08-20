@@ -44,17 +44,21 @@ if ($action === 'check_subscription') {
     $subs = file_exists($subsFile) ? json_decode(file_get_contents($subsFile), true) : [];
     $now = time();
 
-    foreach ($subs as $sub) {
-        if (strtolower($sub['email']) === $email && !empty($sub['active'])) {
-            $exp = strtotime($sub['expires_at']);
-            if ($exp > $now) {
-                echo json_encode([
-                    'active' => true,
-                    'is_admin' => false,
-                    'expires_at' => $sub['expires_at'],
-                    'plan' => $sub['plan'] ?? 'standard'
-                ]);
-                exit;
+    if (is_array($subs)) {
+        foreach ($subs as $sub) {
+            $subEmail = strtolower(trim($sub['email'] ?? ''));
+            if ($subEmail === $email && !empty($sub['active'])) {
+                $expStr = $sub['expires_at'] ?? '';
+                $exp = strtotime($expStr);
+                if ($exp >= $now) {
+                    echo json_encode([
+                        'active' => true,
+                        'is_admin' => false,
+                        'expires_at' => $expStr,
+                        'plan' => $sub['plan'] ?? 'standard'
+                    ]);
+                    exit;
+                }
             }
         }
     }
@@ -63,7 +67,7 @@ if ($action === 'check_subscription') {
     exit;
 }
 
-// 3. CANJEAR CÓDIGO PROMOCIONAL (3, 6, 12 MESES)
+// 3. CANJEAR CÓDIGO PROMOCIONAL (1, 2, 3, 6, 12 MESES)
 if ($action === 'redeem_code') {
     $raw = file_get_contents('php://input');
     $data = json_decode($raw, true) ?: $_POST;
@@ -81,17 +85,20 @@ if ($action === 'redeem_code') {
     $codes = file_exists($codesFile) ? json_decode(file_get_contents($codesFile), true) : [];
     
     $found = false;
-    $months = 3;
-    foreach ($codes as &$c) {
-        if (strtoupper($c['code']) === $code && $c['active']) {
-            if (isset($c['max_uses']) && $c['used_count'] >= $c['max_uses']) {
-                continue;
+    $months = 1;
+    if (is_array($codes)) {
+        foreach ($codes as &$c) {
+            if (strtoupper(trim($c['code'] ?? '')) === $code && !empty($c['active'])) {
+                if (isset($c['max_uses']) && ($c['used_count'] ?? 0) >= $c['max_uses']) {
+                    continue;
+                }
+                $found = true;
+                $months = max(1, intval($c['months'] ?? 1));
+                $c['used_count'] = ($c['used_count'] ?? 0) + 1;
+                break;
             }
-            $found = true;
-            $months = intval($c['months'] ?? 3);
-            $c['used_count'] = ($c['used_count'] ?? 0) + 1;
-            break;
         }
+        unset($c);
     }
 
     if (!$found) {
@@ -100,26 +107,31 @@ if ($action === 'redeem_code') {
         exit;
     }
 
-    file_put_contents($codesFile, json_encode($codes, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    @file_put_contents($codesFile, json_encode($codes, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    @chmod($codesFile, 0666);
 
-    // Guardar suscripción
+    // Guardar suscripción (30 días por mes de gratuidad)
     $subsFile = __DIR__ . '/suscripciones.json';
     $subs = file_exists($subsFile) ? json_decode(file_get_contents($subsFile), true) : [];
+    if (!is_array($subs)) $subs = [];
 
     $expiresAt = date('Y-m-d\TH:i:s\Z', strtotime("+$months months"));
 
     // Actualizar o insertar
     $updated = false;
     foreach ($subs as &$s) {
-        if (strtolower($s['email']) === $email) {
+        if (strtolower(trim($s['email'] ?? '')) === $email) {
             $s['active'] = true;
             $s['expires_at'] = $expiresAt;
             $s['plan'] = "promo_{$months}m";
+            $s['months'] = $months;
             $s['code_used'] = $code;
+            $s['updated_at'] = date('c');
             $updated = true;
             break;
         }
     }
+    unset($s);
 
     if (!$updated) {
         $subs[] = [
@@ -134,11 +146,12 @@ if ($action === 'redeem_code') {
         ];
     }
 
-    file_put_contents($subsFile, json_encode($subs, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    @file_put_contents($subsFile, json_encode($subs, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    @chmod($subsFile, 0666);
 
     echo json_encode([
         'status' => 'success',
-        'message' => "¡Código activado con éxito! Tienes $months meses de publicación gratuita.",
+        'message' => "¡Código activado con éxito! Tienes $months mes" . ($months > 1 ? 'es' : '') . " de publicación gratuita.",
         'expires_at' => $expiresAt
     ]);
     exit;

@@ -313,19 +313,48 @@ function updateUserBar() {
 }
 
 async function checkUserSubscription() {
-    if (!currentUser) {
+    if (!currentUser || !currentUser.email) {
         currentSubscription = null;
         return null;
     }
+    const cleanEmail = currentUser.email.toLowerCase().trim();
+
+    // 1. Verificar si hay suscripción/código activo en memoria local (fallback infalible)
+    let localSub = null;
     try {
-        const res = await fetch(`save_alojamiento.php?action=check_subscription&email=${encodeURIComponent(currentUser.email)}&_t=${Date.now()}`);
+        const raw = localStorage.getItem('bari_sub_' + cleanEmail);
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed.active && parsed.expires_at) {
+                if (new Date(parsed.expires_at).getTime() >= Date.now()) {
+                    localSub = parsed;
+                } else {
+                    localStorage.removeItem('bari_sub_' + cleanEmail);
+                }
+            }
+        }
+    } catch (e) {}
+
+    // 2. Consultar al servidor PHP
+    try {
+        const res = await fetch(`save_alojamiento.php?action=check_subscription&email=${encodeURIComponent(cleanEmail)}&_t=${Date.now()}`);
         const data = await res.json();
-        currentSubscription = data;
-        return data;
+        if (data && (data.active || data.is_admin)) {
+            currentSubscription = data;
+            try { localStorage.setItem('bari_sub_' + cleanEmail, JSON.stringify(data)); } catch (e) {}
+            return data;
+        }
     } catch (e) {
-        console.warn('Error checking subscription:', e);
-        return null;
+        console.warn('Error checking subscription on server:', e);
     }
+
+    if (localSub) {
+        currentSubscription = localSub;
+        return localSub;
+    }
+
+    currentSubscription = { active: (cleanEmail === ADMIN_EMAIL), is_admin: (cleanEmail === ADMIN_EMAIL) };
+    return currentSubscription;
 }
 
 // 6. BOTÓN "PUBLICAR MI ALOJAMIENTO"

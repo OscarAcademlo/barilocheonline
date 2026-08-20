@@ -332,6 +332,28 @@ window.togglePasswordVisibility = function(inputId, btnEl) {
     }
 };
 
+// MODO NOCHE GLOBAL (FUNCIONA EN TODAS LAS PÁGINAS)
+window.initTheme = function() {
+    const saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', saved);
+    const btn = document.getElementById('theme-toggle-btn');
+    if (btn) btn.innerHTML = saved === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+};
+
+window.toggleTheme = function() {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    const btn = document.getElementById('theme-toggle-btn');
+    if (btn) btn.innerHTML = next === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+};
+
+window.initTheme();
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', window.initTheme);
+}
+
 // Instancia global
 window.authManager = new AuthManager();
 })();

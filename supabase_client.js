@@ -5,8 +5,9 @@
  * ==============================================================================
  */
 
-const DEFAULT_SB_URL = 'https://pwrlbwplpgzirlcrwepi.supabase.co';
-const DEFAULT_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB3cmxid3BscGd6aXJsY3J3ZXBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzMzc0NzAsImV4cCI6MjA4NjkxMzQ3MH0.HxEfbABTObu4khKxVhtBaBuCt2RDBm34urnSEJCfJUU';
+(function () {
+    const DEFAULT_SB_URL = 'https://pwrlbwplpgzirlcrwepi.supabase.co';
+    const DEFAULT_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB3cmxid3BscGd6aXJsY3J3ZXBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzMzc0NzAsImV4cCI6MjA4NjkxMzQ3MH0.HxEfbABTObu4khKxVhtBaBuCt2RDBm34urnSEJCfJUU';
 
 class BariRutaSupabaseClient {
     constructor() {
@@ -367,3 +368,4 @@ class BariRutaSupabaseClient {
 
 // Instancia global única
 window.bariRuta = new BariRutaSupabaseClient();
+})();
