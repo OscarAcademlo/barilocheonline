@@ -118,16 +118,43 @@ class BariRutaSupabaseClient {
         if (!this.isConnected || !this.supabase) return;
 
         try {
-            // Traer todos los vehículos activos
             const { data, error } = await this.supabase
                 .from('vehicles')
                 .select('*')
                 .order('updated_at', { ascending: false });
 
             if (!error && data) {
-                this.vehicles = data;
+                // MERGE en lugar de reemplazar:
+                // Si el broadcast llegó antes que la DB confirme el upsert,
+                // this.vehicles tiene el dato y la DB devuelve array vacío.
+                // Reemplazar todo borra el vehículo recién recibido.
+                const dbKeys = new Set(data.map(v => this._vehicleKey(v)));
 
-                // Auto-descubrir empresas que están transmitiendo
+                // 1. Actualizar/agregar los que vinieron de DB
+                data.forEach(dbVehicle => {
+                    const idx = this.vehicles.findIndex(
+                        v => this._vehicleKey(v) === this._vehicleKey(dbVehicle)
+                    );
+                    if (idx >= 0) {
+                        // Quedarse con el más reciente entre broadcast y DB
+                        const existingAt = new Date(this.vehicles[idx].updated_at || 0).getTime();
+                        const dbAt = new Date(dbVehicle.updated_at || 0).getTime();
+                        if (dbAt >= existingAt) {
+                            this.vehicles[idx] = dbVehicle;
+                        }
+                    } else {
+                        this.vehicles.push(dbVehicle);
+                    }
+                });
+
+                // 2. Limpiar solo los que NO están en DB Y son más viejos de 30 seg
+                //    (broadcast reciente se mantiene aunque la DB no lo confirmó aún)
+                this.vehicles = this.vehicles.filter(v => {
+                    if (dbKeys.has(this._vehicleKey(v))) return true;
+                    const updatedAt = new Date(v.updated_at || 0).getTime();
+                    return (Date.now() - updatedAt) < 30000; // 30 seg de gracia
+                });
+
                 this.syncCompaniesFromVehicles(data);
                 this.filterAndNotifyVehicles();
             }

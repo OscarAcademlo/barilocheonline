@@ -9,6 +9,7 @@ let map = null;
 let vehicleMarkers = {};
 let vehicleTracks = {};      // Historial de coordenadas del recorrido en tiempo real
 let vehiclePolylines = {};   // Capas Polyline dibujadas en el mapa Leaflet
+let vehicleIconCache = {};   // Caché del último estado visual renderizado (evita parpadeo)
 
 document.addEventListener('DOMContentLoaded', () => {
     initTouristMap();
@@ -105,6 +106,7 @@ function renderLiveVehicles(vehicles) {
             if (vehiclePolylines[key]) map.removeLayer(vehiclePolylines[key]);
             delete vehiclePolylines[key];
             delete vehicleTracks[key];
+            delete vehicleIconCache[key]; // Limpiar caché del ícono
         }
     });
 
@@ -244,8 +246,21 @@ function renderLiveVehicles(vehicles) {
         `;
 
         if (vehicleMarkers[key]) {
+            // Siempre actualizar posición (movimiento suave)
             vehicleMarkers[key].setLatLng(latLng);
-            vehicleMarkers[key].setIcon(customIcon);
+
+            // Solo actualizar el ícono si cambió algo visual (heading o speed)
+            // Evita el parpadeo por recrear el divIcon en cada broadcast
+            const cached = vehicleIconCache[key];
+            const visualChanged = !cached ||
+                cached.heading !== heading ||
+                cached.isMoving !== isMoving;
+
+            if (visualChanged) {
+                vehicleMarkers[key].setIcon(customIcon);
+                vehicleIconCache[key] = { heading, isMoving };
+            }
+
             vehicleMarkers[key].setPopupContent(popupContent);
         } else {
             const marker = L.marker(latLng, { icon: customIcon }).addTo(map);
@@ -254,6 +269,7 @@ function renderLiveVehicles(vehicles) {
                 className: 'uber-popup-container'
             });
             vehicleMarkers[key] = marker;
+            vehicleIconCache[key] = { heading, isMoving };
         }
     });
 }
