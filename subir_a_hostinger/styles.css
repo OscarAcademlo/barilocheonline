@@ -1211,6 +1211,7 @@ body {
     box-shadow: 0 4px 15px rgba(0, 132, 255, 0.4);
     border: 2.5px solid white;
     z-index: 2;
+    transition: transform 0.4s ease;
 }
 
 .marker-label-tag {
