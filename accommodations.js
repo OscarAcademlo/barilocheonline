@@ -684,6 +684,13 @@ function openPublisherModal(editData = null) {
     }
 
     // MOSTRAR FECHA DE VIGENCIA DEL CÓDIGO O SUSCRIPCIÓN ACTIVA
+    if (!currentSubscription && currentUser && currentUser.email) {
+        try {
+            const raw = localStorage.getItem('bari_sub_' + currentUser.email.toLowerCase().trim());
+            if (raw) currentSubscription = JSON.parse(raw);
+        } catch (e) {}
+    }
+
     const planNotice = document.getElementById('publisherActivePlanNotice');
     const planText = document.getElementById('publisherActivePlanText');
     const planBadge = document.getElementById('publisherPlanTypeBadge');

@@ -1844,7 +1844,7 @@ body {
     color: var(--text-primary);
 }
 
-.input-group-custom input,
+.input-group-custom input:not([type="checkbox"]):not([type="radio"]),
 .input-group-custom select,
 .input-group-custom textarea {
     width: 100% !important;
@@ -1861,11 +1861,22 @@ body {
     transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 
+.input-group-custom input[type="checkbox"] {
+    width: 18px !important;
+    height: 18px !important;
+    accent-color: var(--primary) !important;
+    cursor: pointer !important;
+    margin: 0 4px 0 0 !important;
+    padding: 0 !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+}
+
 .input-group-custom textarea {
     height: auto !important;
 }
 
-.input-group-custom input:focus,
+.input-group-custom input:not([type="checkbox"]):not([type="radio"]):focus,
 .input-group-custom select:focus,
 .input-group-custom textarea:focus {
     border-color: var(--primary) !important;

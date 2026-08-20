@@ -79,17 +79,60 @@ class AuthManager {
         // 1. Barra de usuario en el Header (si existe el contenedor #userAuthStatus)
         if (userBar) {
             if (this.currentUser) {
+                const emailClean = this.currentUser.email.toLowerCase().trim();
+                let subBadge = '';
+                
+                if (isAdmin) {
+                    subBadge = '<span class="badge-admin" style="background:#e74c3c; color:white; font-size:0.75rem; font-weight:800; padding:3px 8px; border-radius:6px;">ADMIN</span>';
+                } else {
+                    let sub = null;
+                    try {
+                        const raw = localStorage.getItem('bari_sub_' + emailClean);
+                        if (raw) sub = JSON.parse(raw);
+                    } catch (e) {}
+
+                    if (sub && sub.expires_at) {
+                        const expDate = new Date(sub.expires_at);
+                        const now = Date.now();
+                        const diffMs = expDate.getTime() - now;
+                        const diffHours = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60)));
+                        const diffDays = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+                        const formattedDate = expDate.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+                        if (diffMs <= 0) {
+                            subBadge = `<button type="button" onclick="if(window.openSubscriptionModal) window.openSubscriptionModal()" style="background:#ef4444; color:white; border:none; font-size:0.75rem; font-weight:800; padding:4px 8px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="fas fa-exclamation-circle"></i> Período finalizado • Suscribite</button>`;
+                        } else if (diffHours <= 48) {
+                            subBadge = `<button type="button" onclick="if(window.openSubscriptionModal) window.openSubscriptionModal()" style="background:#f59e0b; color:#111; border:none; font-size:0.75rem; font-weight:800; padding:4px 8px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="fas fa-clock"></i> Tenés el servicio hasta el ${formattedDate} • (Restan ${diffHours} hs)</button>`;
+                        } else {
+                            subBadge = `<span style="background:rgba(16, 185, 129, 0.15); border:1px solid #10b981; color:#10b981; font-size:0.75rem; font-weight:800; padding:4px 8px; border-radius:8px; display:inline-flex; align-items:center; gap:4px;"><i class="fas fa-calendar-check"></i> Tenés el servicio hasta el ${formattedDate} • (Restan ${diffDays} días)</span>`;
+                        }
+                    }
+                }
+
                 userBar.innerHTML = `
-                    <div class="auth-logged-pill" style="${isAdmin ? 'border:1px solid #e74c3c; background:rgba(231, 76, 60, 0.12);' : ''}">
-                        <i class="fas ${isAdmin ? 'fa-user-shield' : 'fa-user-circle'}" style="${isAdmin ? 'color:#e74c3c;' : 'color:var(--primary);'} font-size:1.1rem;"></i>
-                        <span style="font-weight:700; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${this.currentUser.email}</span>
-                        ${isAdmin ? '<span class="badge-admin">ADMIN</span>' : ''}
+                    <div class="auth-logged-pill" style="${isAdmin ? 'border:1px solid #e74c3c; background:rgba(231, 76, 60, 0.12);' : ''} display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <i class="fas ${isAdmin ? 'fa-user-shield' : 'fa-user-circle'}" style="${isAdmin ? 'color:#e74c3c;' : 'color:var(--primary);'} font-size:1.1rem;"></i>
+                            <span style="font-weight:700; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${this.currentUser.email}</span>
+                        </div>
+                        ${subBadge}
                         ${isAdmin ? '<a href="admin.html" class="btn-admin-pill" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px;"><i class="fas fa-shield-alt"></i> Panel Admin</a>' : ''}
                         <button onclick="window.authManager.logout()" class="btn-logout-mini" title="Cerrar sesión" style="margin-left:4px;">
                             <i class="fas fa-sign-out-alt"></i>
                         </button>
                     </div>
                 `;
+
+                if (!isAdmin && !subBadge) {
+                    fetch(`save_alojamiento.php?action=check_subscription&email=${encodeURIComponent(emailClean)}&_t=${Date.now()}`)
+                        .then(r => r.json())
+                        .then(d => {
+                            if (d && (d.active || d.is_admin)) {
+                                try { localStorage.setItem('bari_sub_' + emailClean, JSON.stringify(d)); } catch (e) {}
+                                this.updateUI();
+                            }
+                        }).catch(() => {});
+                }
             } else {
                 userBar.innerHTML = `
                     <button onclick="window.authManager.openModal()" class="btn-login-header">
