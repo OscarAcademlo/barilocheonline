@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="styles.css?v=2080">
+    <link rel="stylesheet" href="styles.css?v=2100">
 </head>
 
 <body class="page-accommodations native-app">
@@ -242,28 +242,45 @@
                 <div class="input-group-custom">
                     <label>Comodidades y Servicios</label>
                     <div class="amenities-picker-grid">
-                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Wi-Fi"> Wi-Fi</label>
-                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Parrilla"> Parrilla</label>
-                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Vista al lago"> Vista al Lago</label>
-                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Calefacción"> Calefacción</label>
-                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Estacionamiento"> Estacionamiento</label>
-                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Jacuzzi"> Jacuzzi</label>
-                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Hogar a leña"> Hogar a leña</label>
-                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Cocina completa"> Cocina completa</label>
+                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Wi-Fi"> 📶 Wi-Fi</label>
+                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Parrilla"> 🥩 Parrilla</label>
+                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Vista al lago"> 🏔️ Vista al Lago</label>
+                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Calefacción"> 🔥 Calefacción</label>
+                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Estacionamiento"> 🚗 Estacionamiento</label>
+                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Pet friendly"> 🐾 Pet friendly</label>
+                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Jacuzzi"> 🛁 Jacuzzi</label>
+                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Hogar a leña"> 🪵 Hogar a leña</label>
+                        <label class="amenity-item"><input type="checkbox" class="amenity-checkbox" value="Cocina completa"> 🍳 Cocina completa</label>
+                        <label class="amenity-item"><input type="checkbox" id="otherAmenitiesCheckbox" onchange="toggleOtherAmenitiesInput(this)"> ➕ Otros</label>
+                    </div>
+                    <div id="otherAmenitiesContainer" style="display:none; margin-top:8px;">
+                        <input type="text" id="otherAmenitiesInput" placeholder="Escribe comodidades personalizadas separadas por comas (ej: Piscina climatizada, Desayuno casero)" style="width:100%;">
                     </div>
                 </div>
 
-                <!-- SUBIDA DE IMÁGENES -->
+                <!-- SUBIDA DE IMÁGENES (SOPORTE 3 O MÁS FOTOS) -->
                 <div class="input-group-custom">
-                    <label><i class="fas fa-camera"></i> Fotos del Alojamiento (se guardan en el servidor)</label>
-                    <input type="file" id="accImages" name="images[]" multiple accept="image/*" class="file-input-custom">
-                    <small style="color:var(--text-secondary); display:block; margin-top:4px;">Podés seleccionar varias fotos a la vez.</small>
+                    <label><i class="fas fa-camera"></i> Fotos del Alojamiento (Podés subir 3 o más fotos)</label>
+                    <div class="image-uploader-dropzone" onclick="document.getElementById('accImages').click()">
+                        <i class="fas fa-cloud-arrow-up" style="font-size: 1.8rem; color: var(--primary); margin-bottom: 6px;"></i>
+                        <div style="font-weight: 700; font-size: 0.9rem;">Hacé clic para elegir fotos o arrastralas aquí</div>
+                        <small style="color: var(--text-secondary);">Formatos permitidos: JPG, PNG, WEBP (sin límite de fotos)</small>
+                        <input type="file" id="accImages" multiple accept="image/*" style="display:none;" onchange="handleImageSelection(this.files)">
+                    </div>
+                    <div id="imagePreviewGrid" class="image-preview-grid"></div>
                 </div>
 
-                <!-- SELECTOR DE UBICACIÓN EN EL MAPA -->
-                <div class="input-group-custom">
-                    <label><i class="fas fa-map-pin"></i> Ubicación en el Mapa (Arrastrá el pin o hacé clic en el punto exacto)</label>
-                    <div id="pickerMapContainer" style="height: 200px; border-radius: 12px; border: 1px solid var(--border); margin-top: 6px;"></div>
+                <!-- SELECTOR DE UBICACIÓN EN EL MAPA + BUSCADOR DE DIRECCIÓN -->
+                <div class="input-group-custom address-search-group">
+                    <label><i class="fas fa-search-location"></i> Dirección y Altura (Escribí la calle y número o arrastrá el pin)</label>
+                    <div style="display:flex; gap:8px; margin-bottom:8px;">
+                        <input type="text" id="addressSearchInput" placeholder="Ej: Av. Bustillo 5000, Mitre 350, San Martín 400..." autocomplete="off" oninput="handleAddressInput(this.value)">
+                        <button type="button" onclick="searchAddressClick()" style="background:var(--primary); color:white; border:none; padding:0 16px; border-radius:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px; flex-shrink:0;">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                    </div>
+                    <div id="addressSuggestions" class="address-suggestions-dropdown" style="display:none;"></div>
+                    <div id="pickerMapContainer" style="height: 220px; border-radius: 14px; border: 1px solid var(--border); overflow:hidden;"></div>
                 </div>
 
                 <div class="publisher-btn-row">
@@ -344,8 +361,9 @@
     <!-- SCRIPTS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="app.js?v=2080"></script>
-    <script src="accommodations.js?v=2080"></script>
+    <script src="auth_manager.js?v=2100"></script>
+    <script src="app.js?v=2100"></script>
+    <script src="accommodations.js?v=2100"></script>
 </body>
 
 </html>

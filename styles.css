@@ -2152,6 +2152,128 @@ body {
     cursor: pointer;
 }
 
+/* BUSCADOR DE DIRECCIÓN CON AUTOCOMPLETADO */
+.address-search-group {
+    position: relative;
+}
+
+.address-suggestions-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 10000;
+    padding: 6px 0;
+}
+
+.suggestion-item {
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: background 0.15s ease;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover {
+    background: rgba(0, 132, 255, 0.1);
+    color: var(--primary);
+}
+
+.suggestion-item i {
+    color: var(--primary);
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+/* SUBIDA DE FOTOS Y PREVISUALIZADOR MULTI-IMAGEN */
+.image-uploader-dropzone {
+    background: var(--bg-main);
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 12px;
+}
+
+.image-uploader-dropzone:hover {
+    border-color: var(--primary);
+    background: rgba(0, 132, 255, 0.05);
+}
+
+.image-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.image-preview-card {
+    position: relative;
+    width: 100%;
+    height: 90px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid var(--border);
+    background: #000;
+}
+
+.image-preview-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-preview-badge {
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 6px;
+}
+
+.btn-remove-preview-img {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: rgba(231, 76, 60, 0.9);
+    color: white;
+    border: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.btn-remove-preview-img:hover {
+    transform: scale(1.15);
+    background: #c0392b;
+}
+
 .publisher-btn-row {
     display: flex;
     justify-content: flex-end;

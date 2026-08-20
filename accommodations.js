@@ -216,6 +216,17 @@ function showAccommodationDetails(id) {
                     <i class="fab fa-whatsapp"></i> Contactar al Dueño por WhatsApp
                 </a>
             </div>
+
+            ${isOwnerOrAdmin ? `
+                <div style="margin-top:16px; display:flex; gap:10px;">
+                    <button onclick="closeAccommodationModal(); openEditAccommodation('${acc.id}')" class="btn-owner-edit" style="flex:1; padding:12px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer;">
+                        <i class="fas fa-edit"></i> Editar mi Publicación
+                    </button>
+                    <button onclick="closeAccommodationModal(); deleteAccommodation('${acc.id}')" class="btn-owner-del" style="padding:12px 18px; font-weight:800; cursor:pointer;" title="Eliminar">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            ` : ''}
         </div>
     `;
 
@@ -523,15 +534,34 @@ async function checkUrlPaymentParams() {
     }
 }
 
-// 9. FORMULARIO DE PUBLICACIÓN Y SELECTOR DE MAPA GPS
+// 9. FORMULARIO DE PUBLICACIÓN, MULTI-FOTOS Y SELECTOR DE MAPA GPS CON AUTOCOMPLETADO
+let publisherSelectedFiles = [];
+let publisherExistingImages = [];
+let addressDebounceTimer = null;
+
 function openPublisherModal(editData = null) {
     const modal = document.getElementById('publisherModal');
     const title = document.getElementById('publisherModalTitle');
     const form = document.getElementById('publisherForm');
     form.reset();
 
+    publisherSelectedFiles = [];
+    publisherExistingImages = editData ? (editData.images || []) : [];
+
     document.getElementById('editAccId').value = editData ? editData.id : '';
-    document.getElementById('existingImagesInput').value = editData ? JSON.stringify(editData.images || []) : '[]';
+    document.getElementById('existingImagesInput').value = JSON.stringify(publisherExistingImages);
+
+    const otherContainer = document.getElementById('otherAmenitiesContainer');
+    const otherCheckbox = document.getElementById('otherAmenitiesCheckbox');
+    const otherInput = document.getElementById('otherAmenitiesInput');
+    if (otherContainer) otherContainer.style.display = 'none';
+    if (otherCheckbox) otherCheckbox.checked = false;
+    if (otherInput) otherInput.value = '';
+
+    const searchInput = document.getElementById('addressSearchInput');
+    if (searchInput) searchInput.value = '';
+    const suggBox = document.getElementById('addressSuggestions');
+    if (suggBox) suggBox.style.display = 'none';
 
     if (editData) {
         title.textContent = 'Editar Alojamiento';
@@ -544,17 +574,35 @@ function openPublisherModal(editData = null) {
         document.getElementById('accLat').value = editData.lat || -41.1335;
         document.getElementById('accLng').value = editData.lng || -71.3103;
 
+        if (searchInput) searchInput.value = editData.location || '';
+
         // Comodidades
         const ams = editData.amenities || [];
+        const standardAmenities = ['Wi-Fi', 'Parrilla', 'Vista al lago', 'Calefacción', 'Estacionamiento', 'Pet friendly', 'Jacuzzi', 'Hogar a leña', 'Cocina completa'];
+        const otherAms = [];
+
         document.querySelectorAll('.amenity-checkbox').forEach(cb => {
             cb.checked = ams.includes(cb.value);
         });
+
+        ams.forEach(a => {
+            if (!standardAmenities.includes(a)) {
+                otherAms.push(a);
+            }
+        });
+
+        if (otherAms.length > 0) {
+            if (otherCheckbox) otherCheckbox.checked = true;
+            if (otherContainer) otherContainer.style.display = 'block';
+            if (otherInput) otherInput.value = otherAms.join(', ');
+        }
     } else {
         title.textContent = 'Publicar Nuevo Alojamiento';
         document.getElementById('accLat').value = '-41.1335';
         document.getElementById('accLng').value = '-71.3103';
     }
 
+    renderImagePreviews();
     modal.style.display = 'flex';
     initPickerMap(editData ? [editData.lat, editData.lng] : [-41.1335, -71.3103]);
 }
@@ -562,6 +610,150 @@ function openPublisherModal(editData = null) {
 function closePublisherModal() {
     const modal = document.getElementById('publisherModal');
     if (modal) modal.style.display = 'none';
+    const suggBox = document.getElementById('addressSuggestions');
+    if (suggBox) suggBox.style.display = 'none';
+}
+
+function toggleOtherAmenitiesInput(cb) {
+    const container = document.getElementById('otherAmenitiesContainer');
+    if (container) {
+        container.style.display = cb.checked ? 'block' : 'none';
+        if (cb.checked) {
+            document.getElementById('otherAmenitiesInput')?.focus();
+        }
+    }
+}
+
+// GESTIÓN DE FOTOS (3 O MÁS, PREVISUALIZACIÓN Y ELIMINACIÓN)
+function handleImageSelection(files) {
+    if (!files || files.length === 0) return;
+    for (let i = 0; i < files.length; i++) {
+        publisherSelectedFiles.push(files[i]);
+    }
+    renderImagePreviews();
+    // Limpiar input file para permitir seleccionar los mismos archivos de nuevo si desea
+    const fileInput = document.getElementById('accImages');
+    if (fileInput) fileInput.value = '';
+}
+
+function removeNewImage(index) {
+    publisherSelectedFiles.splice(index, 1);
+    renderImagePreviews();
+}
+
+function removeExistingImage(index) {
+    publisherExistingImages.splice(index, 1);
+    document.getElementById('existingImagesInput').value = JSON.stringify(publisherExistingImages);
+    renderImagePreviews();
+}
+
+function renderImagePreviews() {
+    const grid = document.getElementById('imagePreviewGrid');
+    if (!grid) return;
+
+    grid.innerHTML = '';
+
+    // 1. Fotos ya subidas existentes
+    publisherExistingImages.forEach((imgUrl, idx) => {
+        const card = document.createElement('div');
+        card.className = 'image-preview-card';
+        card.innerHTML = `
+            <img src="${imgUrl}" alt="Foto ${idx + 1}">
+            <span class="image-preview-badge">Foto ${idx + 1}</span>
+            <button type="button" class="btn-remove-preview-img" onclick="removeExistingImage(${idx})" title="Eliminar foto"><i class="fas fa-times"></i></button>
+        `;
+        grid.appendChild(card);
+    });
+
+    // 2. Fotos nuevas seleccionadas para subir
+    publisherSelectedFiles.forEach((file, idx) => {
+        const objectUrl = URL.createObjectURL(file);
+        const card = document.createElement('div');
+        card.className = 'image-preview-card';
+        card.innerHTML = `
+            <img src="${objectUrl}" alt="Nueva Foto ${idx + 1}">
+            <span class="image-preview-badge" style="background:#10b981;">Nueva ${idx + 1}</span>
+            <button type="button" class="btn-remove-preview-img" onclick="removeNewImage(${idx})" title="Eliminar foto"><i class="fas fa-times"></i></button>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+// AUTOCOMPLETADO Y BÚSQUEDA PREDICTIVA DE DIRECCIÓN
+function handleAddressInput(query) {
+    clearTimeout(addressDebounceTimer);
+    const suggBox = document.getElementById('addressSuggestions');
+    const clean = query.trim();
+
+    if (clean.length < 3) {
+        if (suggBox) suggBox.style.display = 'none';
+        return;
+    }
+
+    addressDebounceTimer = setTimeout(() => {
+        fetchAddressSuggestions(clean);
+    }, 350);
+}
+
+async function fetchAddressSuggestions(query) {
+    const suggBox = document.getElementById('addressSuggestions');
+    if (!suggBox) return;
+
+    try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', San Carlos de Bariloche, Rio Negro, Argentina')}&viewbox=-71.60,-41.05,-71.10,-41.30&bounded=1&limit=6&addressdetails=1`;
+        const res = await fetch(url, { headers: { 'Accept-Language': 'es' } });
+        const data = await res.json();
+
+        if (!data || data.length === 0) {
+            suggBox.innerHTML = '<div class="suggestion-item" style="color:var(--text-secondary); cursor:default;"><i class="fas fa-info-circle"></i> No se encontraron resultados exactos. Podés mover el pin en el mapa.</div>';
+            suggBox.style.display = 'block';
+            return;
+        }
+
+        suggBox.innerHTML = data.map(item => {
+            const lat = parseFloat(item.lat);
+            const lon = parseFloat(item.lon);
+            const addr = item.address || {};
+            const road = addr.road || addr.pedestrian || addr.street || item.name || query;
+            const houseNumber = addr.house_number || '';
+            const suburb = addr.suburb || addr.neighbourhood || addr.city_district || 'Bariloche';
+            const shortName = `${road} ${houseNumber}`.trim() + `, ${suburb}`;
+
+            return `
+                <div class="suggestion-item" onclick="selectAddressSuggestion(${lat}, ${lon}, '${shortName.replace(/'/g, "\\'")}')">
+                    <i class="fas fa-location-dot"></i>
+                    <div>
+                        <div style="font-weight:700;">${road} ${houseNumber}</div>
+                        <small style="color:var(--text-secondary); font-size:0.75rem;">${suburb}, Bariloche</small>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        suggBox.style.display = 'block';
+    } catch (e) {
+        console.warn('Error al buscar dirección:', e);
+    }
+}
+
+function searchAddressClick() {
+    const val = document.getElementById('addressSearchInput')?.value.trim();
+    if (val) fetchAddressSuggestions(val);
+}
+
+function selectAddressSuggestion(lat, lon, formattedName) {
+    document.getElementById('accLat').value = lat.toFixed(6);
+    document.getElementById('accLng').value = lon.toFixed(6);
+    document.getElementById('accLocation').value = formattedName;
+    document.getElementById('addressSearchInput').value = formattedName;
+
+    const suggBox = document.getElementById('addressSuggestions');
+    if (suggBox) suggBox.style.display = 'none';
+
+    if (pickerMap && pickerMarker) {
+        pickerMap.setView([lat, lon], 15);
+        pickerMarker.setLatLng([lat, lon]);
+    }
 }
 
 function initPickerMap(initialCoords) {
@@ -624,14 +816,30 @@ async function handlePublisherFormSubmit(e) {
 
     const btn = document.getElementById('btnSubmitPublisher');
     btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando y subiendo fotos...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando fotos y publicación...';
 
     const formData = new FormData(document.getElementById('publisherForm'));
     formData.append('owner_email', currentUser.email);
+    formData.append('existing_images', JSON.stringify(publisherExistingImages));
 
-    // Amenities seleccionados
+    // Agregar todas las fotos seleccionadas
+    publisherSelectedFiles.forEach(file => {
+        formData.append('images[]', file);
+    });
+
+    // Amenities seleccionados (estándar + otros personalizados)
     const amenities = [];
     document.querySelectorAll('.amenity-checkbox:checked').forEach(cb => amenities.push(cb.value));
+
+    const otherChecked = document.getElementById('otherAmenitiesCheckbox')?.checked;
+    const otherVal = document.getElementById('otherAmenitiesInput')?.value.trim();
+    if (otherChecked && otherVal) {
+        const extraList = otherVal.split(',').map(s => s.trim()).filter(Boolean);
+        extraList.forEach(item => {
+            if (!amenities.includes(item)) amenities.push(item);
+        });
+    }
+
     formData.append('amenities', JSON.stringify(amenities));
 
     try {
@@ -641,7 +849,7 @@ async function handlePublisherFormSubmit(e) {
         });
         const data = await res.json();
         if (data.status === 'success') {
-            alert('🎉 ¡Alojamiento guardado exitosamente!');
+            alert('🎉 ¡Alojamiento guardado y actualizado exitosamente!');
             closePublisherModal();
             fetchAccommodations();
         } else {
