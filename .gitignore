@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# IDE & Agents
+.agent/
+.idea/
+.vscode/
+
+# Binaries & APKs (GitHub limit is 100MB)
+*.apk
+**/*.apk
+
+# Flutter / Dart build artifacts
+**/build/
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.pub-cache/
+**/.pub/
+barilocheonline_app/android/app/debug/
+barilocheonline_app/android/app/profile/
+barilocheonline_app/android/app/release/

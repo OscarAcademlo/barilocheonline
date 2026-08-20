@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Sintonizador de Radios | Bariloche.Online</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css?v=2060">
+</head>
+
+<body class="page-radios native-app">
+    <header class="main-header">
+        <a href="index.html" class="logo" style="text-decoration:none; color:inherit;"><b>B</b> BARILOCHE.ONLINE</a>
+        <nav class="nav-desktop">
+            <a href="mapa.html" class="nav-link"><i class="fas fa-satellite-dish"></i> EN VIVO</a>
+            <a href="radios.html" class="nav-link active">RADIOS</a>
+            <a href="vuelos.html" class="nav-link">VUELOS</a>
+            <a href="alojamiento.html" class="nav-link">DORMIR</a>
+            <a href="comer.html" class="nav-link">COMER</a>
+        </nav>
+        <div class="header-icons">
+            <div class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()"><i class="fas fa-moon"></i></div>
+        </div>
+    </header>
+
+    <main class="app-content">
+        <div class="browse-header" style="margin-bottom:20px;">
+            <h1>Sintonizador en Vivo</h1>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <p style="margin:0;">Radios de Bariloche y la región.</p>
+                <select id="citySelect" onchange="handleCityChange(this.value)"
+                    style="padding:8px 15px; border-radius:12px; border:1px solid var(--border); background:var(--bg-secondary); color:var(--text-primary); font-weight:700;">
+                    <!-- Injected -->
+                </select>
+            </div>
+        </div>
+
+        <div id="radiosList" class="listings-grid">
+            <!-- Items injected by JS -->
+        </div>
+    </main>
+
+    <!-- App Player Flotante -->
+    <div class="bottom-player" id="radioPlayer">
+        <div class="player-info">
+            <div class="player-img" id="playerIcon">B</div>
+            <div class="player-details">
+                <div class="player-name" id="playerName">Cargando...</div>
+                <div class="player-freq" id="playerFreq">---</div>
+            </div>
+        </div>
+        <div class="player-controls">
+            <button class="play-btn-main" id="playBtn" onclick="togglePlay()"><i class="fas fa-play"></i></button>
+            <button onclick="stopRadio()"
+                style="background:none; border:none; color:var(--text-secondary); margin-left:10px; cursor:pointer;"><i
+                    class="fas fa-times"></i></button>
+        </div>
+        <audio id="audioElement"></audio>
+    </div>
+
+    <!-- Mobile Nav -->
+    <nav class="mobile-nav">
+        <a href="mapa.html" class="mobile-nav-item">
+            <i class="fas fa-satellite-dish"></i>
+            <span>En Vivo</span>
+        </a>
+        <a href="radios.html" class="mobile-nav-item active">
+            <i class="fas fa-radio"></i>
+            <span>Radios</span>
+        </a>
+        <a href="vuelos.html" class="mobile-nav-item">
+            <i class="fas fa-plane"></i>
+            <span>Vuelos</span>
+        </a>
+        <a href="alojamiento.html" class="mobile-nav-item">
+            <i class="fas fa-bed"></i>
+            <span>Dormir</span>
+        </a>
+        <a href="comer.html" class="mobile-nav-item">
+            <i class="fas fa-utensils"></i>
+            <span>Comer</span>
+        </a>
+    </nav>
+
+    <script src="app.js?v=2060"></script>
+</body>
+
+</html>

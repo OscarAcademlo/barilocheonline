@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración | Bariloche.Online & BariRuta</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css?v=2075">
+    <style>
+        .admin-wrap {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px 100px;
+        }
+
+        .admin-header-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .admin-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .section-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 12px;
+        }
+
+        .company-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .company-table th, .company-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        .company-table th {
+            font-weight: 800;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        .btn-add-comp {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-del-comp {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .btn-del-comp:hover {
+            background: #c62828;
+            color: white;
+        }
+
+        .badge-active {
+            background: rgba(0, 184, 148, 0.15);
+            color: #00b894;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+
+<body class="page-profile native-app">
+    <header class="main-header">
+        <a href="index.html" class="logo" style="text-decoration:none; color:inherit;"><b>B</b> BARILOCHE.ONLINE</a>
+        <nav class="nav-desktop">
+            <a href="mapa.html" class="nav-link"><i class="fas fa-satellite-dish"></i> EN VIVO</a>
+            <a href="radios.html" class="nav-link">RADIOS</a>
+            <a href="vuelos.html" class="nav-link">VUELOS</a>
+            <a href="alojamiento.html" class="nav-link">DORMIR</a>
+            <a href="comer.html" class="nav-link">COMER</a>
+        </nav>
+        <div class="header-icons">
+            <div class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()"><i class="fas fa-moon"></i></div>
+        </div>
+    </header>
+
+    <main class="admin-wrap">
+        <div class="admin-header-card">
+            <div>
+                <h1 style="font-family:'Outfit'; font-size:1.6rem; margin:0 0 4px;">🛠️ Panel de Administración BariRuta</h1>
+                <p style="margin:0; color:var(--text-secondary); font-size:0.9rem;">
+                    Configuración de Base de Datos Supabase, Empresas y Mercado Pago.
+                </p>
+            </div>
+            <div>
+                <a href="mapa.html" style="background:var(--bg-main); border:1px solid var(--border); color:var(--text-primary); padding:10px 16px; border-radius:12px; text-decoration:none; font-weight:700; font-size:0.85rem; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="fas fa-map"></i> Ver Mapa de Turistas
+                </a>
+            </div>
+        </div>
+
+        <!-- 1. SECCIÓN DE CONFIGURACIÓN DE SUPABASE (MOVIDO AL ADMIN) -->
+        <div class="admin-card">
+            <div class="section-header-row">
+                <div>
+                    <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-gear" style="color:var(--primary);"></i> Conexión con Supabase</h2>
+                    <small style="color:var(--text-secondary);">Ingresá la URL de tu proyecto y tu API Key de Supabase para activar el Realtime.</small>
+                </div>
+                <div id="sbStatusBadge" class="badge-active" style="background:rgba(0, 132, 255, 0.15); color:var(--primary);">
+                    Cargando...
+                </div>
+            </div>
+
+            <form onsubmit="handleSaveSupabaseConfig(event)">
+                <div class="form-group-custom">
+                    <label>Project URL (ej. https://[tu-ref].supabase.co)</label>
+                    <input type="text" id="adminSbUrl" class="form-control-custom" placeholder="https://xxxxxxxx.supabase.co" required>
+                </div>
+
+                <div class="form-group-custom">
+                    <label>Publishable API Key (o Legacy Anon Key)</label>
+                    <input type="password" id="adminSbKey" class="form-control-custom" placeholder="sb_publishable_... o eyJhbGci..." required>
+                </div>
+
+                <button type="submit" class="btn-submit-pickup" style="background:#00cec9; color:#111; font-weight:800; width:auto; padding:12px 24px;">
+                    <i class="fas fa-floppy-disk"></i> Guardar y Conectar Supabase
+                </button>
+            </form>
+        </div>
+
+        <!-- 2. SECCIÓN DE EMPRESAS REGISTRADAS -->
+        <div class="admin-card">
+            <div class="section-header-row">
+                <div>
+                    <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-building" style="color:var(--primary);"></i> Empresas de Transporte</h2>
+                    <small style="color:var(--text-secondary);">Las empresas dadas de alta aparecen automáticamente en el selector del mapa del turista.</small>
+                </div>
+                <button class="btn-add-comp" onclick="openAddCompanyModal()">
+                    <i class="fas fa-plus"></i> Nueva Empresa
+                </button>
+            </div>
+
+            <div style="overflow-x:auto;">
+                <table class="company-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre Empresa</th>
+                            <th>Tipo</th>
+                            <th>Teléfono / WhatsApp</th>
+                            <th>Mercado Pago</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="companiesTableBody">
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding:30px; color:var(--text-secondary);">
+                                Cargando empresas desde Supabase...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 3. SECCIÓN DE TELEMETRÍA EN VIVO DE VEHÍCULOS (APP ANDROID) -->
+        <div class="admin-card">
+            <div class="section-header-row">
+                <div>
+                    <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-satellite-dish" style="color:#00b894;"></i> Posiciones GPS en Vivo (App Android)</h2>
+                    <small style="color:var(--text-secondary);">Coordenadas transmitidas en tiempo real a la tabla `vehicles` de Supabase.</small>
+                </div>
+            </div>
+
+            <div style="overflow-x:auto;">
+                <table class="company-table">
+                    <thead>
+                        <tr>
+                            <th>Unidad</th>
+                            <th>Empresa</th>
+                            <th>Latitud</th>
+                            <th>Longitud</th>
+                            <th>Velocidad</th>
+                            <th>Última Transmisión</th>
+                        </tr>
+                    </thead>
+                    <tbody id="telemetryTableBody">
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding:30px; color:var(--text-secondary);">
+                                Esperando transmisión GPS desde la aplicación Android...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- ==================== MODAL: ALTA DE EMPRESA ==================== -->
+    <div id="addCompanyModal" class="modal-overlay" onclick="closeAddCompanyModal()">
+        <div class="modal-content glass-modal" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeAddCompanyModal()"><i class="fas fa-times"></i></button>
+            
+            <div class="modal-header-section">
+                <div class="modal-icon-badge" style="background:rgba(0, 132, 255, 0.15); color:var(--primary);"><i class="fas fa-building"></i></div>
+                <h2>Dar de Alta Empresa</h2>
+                <p>Completá los datos de la empresa y sus credenciales de cobro de Mercado Pago.</p>
+            </div>
+
+            <form onsubmit="handleSaveCompany(event)">
+                <div class="form-group-custom">
+                    <label>Nombre de la Empresa</label>
+                    <input type="text" id="newCompName" class="form-control-custom" required placeholder="Ej. Empresa Oscar">
+                </div>
+
+                <div class="form-group-custom">
+                    <label>Categoría / Tipo de Transporte</label>
+                    <select id="newCompCategory" class="form-control-custom">
+                        <option value="combi">🚐 Combi Turística</option>
+                        <option value="micro">🚌 Micro de Larga Distancia</option>
+                        <option value="barco">🚢 Catamarán / Navegación</option>
+                        <option value="excursion">🏔️ Excursión / Aventura</option>
+                    </select>
+                </div>
+
+                <div class="form-group-custom">
+                    <label>Teléfono / WhatsApp de Contacto</label>
+                    <input type="tel" id="newCompPhone" class="form-control-custom" required placeholder="+54 9 294 4...">
+                </div>
+
+                <div class="form-group-custom">
+                    <label>Mercado Pago Public Key (Opcional)</label>
+                    <input type="text" id="newCompMpPublic" class="form-control-custom" placeholder="APP_USR-xxxx...">
+                    <small style="color:var(--text-secondary); font-size:0.75rem;">Para que los cobros del turista vayan directo a la cuenta de esta empresa.</small>
+                </div>
+
+                <div class="form-group-custom">
+                    <label>Mercado Pago Access Token (Opcional)</label>
+                    <input type="password" id="newCompMpToken" class="form-control-custom" placeholder="APP_USR-xxxx...">
+                </div>
+
+                <button type="submit" class="btn-submit-pickup">
+                    <i class="fas fa-floppy-disk"></i> Guardar Empresa en Supabase
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js?v=2075"></script>
+    <script src="supabase_client.js?v=2075"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Cargar credenciales actuales en los inputs
+            const creds = window.bariRuta.getCredentials();
+            document.getElementById('adminSbUrl').value = creds.url;
+            document.getElementById('adminSbKey').value = creds.key;
+
+            const badge = document.getElementById('sbStatusBadge');
+            if (window.bariRuta.isConnected) {
+                badge.textContent = '🟢 Conectado';
+                badge.style.color = '#00b894';
+                badge.style.background = 'rgba(0, 184, 148, 0.15)';
+            } else {
+                badge.textContent = '⚙️ No configurado';
+                badge.style.color = '#e17055';
+                badge.style.background = 'rgba(225, 112, 85, 0.15)';
+            }
+
+            renderCompaniesTable(window.bariRuta.companies);
+            renderTelemetryTable(window.bariRuta.vehicles);
+
+            window.bariRuta.onCompaniesChange(companies => {
+                renderCompaniesTable(companies);
+            });
+
+            window.bariRuta.onVehiclesChange(vehicles => {
+                renderTelemetryTable(vehicles);
+            });
+        });
+
+        function handleSaveSupabaseConfig(e) {
+            e.preventDefault();
+            const url = document.getElementById('adminSbUrl').value.trim();
+            const key = document.getElementById('adminSbKey').value.trim();
+
+            if (url && key) {
+                window.bariRuta.setCredentials(url, key);
+                alert('¡Configuración de Supabase guardada con éxito!');
+                location.reload();
+            } else {
+                alert('Completá la URL y la Key de Supabase.');
+            }
+        }
+
+        function renderCompaniesTable(companies) {
+            const tbody = document.getElementById('companiesTableBody');
+            if (!tbody) return;
+
+            if (!companies || companies.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">No hay empresas registradas.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = companies.map(c => `
+                <tr>
+                    <td><b>${c.name}</b></td>
+                    <td><span class="badge-active">${c.category || 'combi'}</span></td>
+                    <td>${c.phone || '-'}</td>
+                    <td>${c.mp_public_key ? '<span style="color:#00b894;">Configurado ✅</span>' : '<span style="color:#999;">Pendiente</span>'}</td>
+                    <td><span class="badge-active">Activa</span></td>
+                    <td>
+                        <button class="btn-del-comp" onclick="deleteCompany('${c.id}')">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderTelemetryTable(vehicles) {
+            const tbody = document.getElementById('telemetryTableBody');
+            if (!tbody) return;
+
+            if (!vehicles || vehicles.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-secondary);">No hay vehículos transmitiendo actualmente.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = vehicles.map(v => `
+                <tr>
+                    <td><b>🚐 ${v.vehicle_code}</b></td>
+                    <td>${v.company_name}</td>
+                    <td>${v.lat ? v.lat.toFixed(5) : '-'}</td>
+                    <td>${v.lng ? v.lng.toFixed(5) : '-'}</td>
+                    <td><b style="color:var(--primary);">${Math.round(v.speed || 0)} km/h</b></td>
+                    <td><small>${v.updated_at ? new Date(v.updated_at).toLocaleTimeString() : 'Reciente'}</small></td>
+                </tr>
+            `).join('');
+        }
+
+        function openAddCompanyModal() {
+            document.getElementById('addCompanyModal').style.display = 'flex';
+        }
+
+        function closeAddCompanyModal() {
+            document.getElementById('addCompanyModal').style.display = 'none';
+        }
+
+        async function handleSaveCompany(e) {
+            e.preventDefault();
+            const name = document.getElementById('newCompName').value.trim();
+            const category = document.getElementById('newCompCategory').value;
+            const phone = document.getElementById('newCompPhone').value.trim();
+            const mp_public_key = document.getElementById('newCompMpPublic').value.trim();
+            const mp_access_token = document.getElementById('newCompMpToken').value.trim();
+
+            try {
+                await window.bariRuta.addCompany({
+                    name,
+                    category,
+                    phone,
+                    mp_public_key,
+                    mp_access_token,
+                    is_active: true
+                });
+
+                closeAddCompanyModal();
+                alert(`¡Empresa "${name}" dada de alta con éxito! Ya está disponible en el mapa.`);
+            } catch (err) {
+                alert('Error al guardar empresa: ' + err.message);
+            }
+        }
+
+        async function deleteCompany(id) {
+            if (confirm('¿Estás seguro de eliminar esta empresa?')) {
+                await window.bariRuta.deleteCompany(id);
+            }
+        }
+    </script>
+</body>
+
+</html>

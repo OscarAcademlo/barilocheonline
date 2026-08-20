@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Dónde Comer | Gastronomía en Bariloche | Bariloche.Online</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css?v=2060">
+</head>
+
+<body class="page-accommodations native-app">
+    <header class="main-header">
+        <a href="index.html" class="logo" style="text-decoration:none; color:inherit;"><b>B</b> BARILOCHE.ONLINE</a>
+        <nav class="nav-desktop">
+            <a href="mapa.html" class="nav-link"><i class="fas fa-satellite-dish"></i> EN VIVO</a>
+            <a href="radios.html" class="nav-link">RADIOS</a>
+            <a href="vuelos.html" class="nav-link">VUELOS</a>
+            <a href="alojamiento.html" class="nav-link">DORMIR</a>
+            <a href="comer.html" class="nav-link active">COMER</a>
+        </nav>
+        <div class="header-icons">
+            <div class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()"><i class="fas fa-moon"></i></div>
+        </div>
+    </header>
+
+    <main class="accommodation-layout">
+        <!-- Lista lateral de gastronomía -->
+        <div class="accommodation-sidebar">
+            <div class="browse-header">
+                <h1>Dónde Comer</h1>
+                <p id="gastronomy-count">Cargando restaurantes...</p>
+            </div>
+
+            <div
+                style="padding: 0 5%; margin-bottom: 20px; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none;">
+                <span
+                    style="background: var(--primary); color: white; padding: 5px 15px; border-radius: 20px; font-weight: 600; font-size: 0.9rem; white-space: nowrap; cursor:pointer;">Todos</span>
+                <span
+                    style="background: var(--bg-secondary); border: 1px solid var(--border); padding: 5px 15px; border-radius: 20px; font-weight: 600; font-size: 0.9rem; white-space: nowrap; cursor:pointer;">Cervecerías</span>
+                <span
+                    style="background: var(--bg-secondary); border: 1px solid var(--border); padding: 5px 15px; border-radius: 20px; font-weight: 600; font-size: 0.9rem; white-space: nowrap; cursor:pointer;">Parrillas</span>
+                <span
+                    style="background: var(--bg-secondary); border: 1px solid var(--border); padding: 5px 15px; border-radius: 20px; font-weight: 600; font-size: 0.9rem; white-space: nowrap; cursor:pointer;">Chocolaterías</span>
+            </div>
+
+            <div id="gastronomyList" class="accommodations-list"></div>
+        </div>
+
+        <!-- Mapa -->
+        <div class="accommodation-map-container">
+            <div id="map"></div>
+        </div>
+    </main>
+
+    <!-- Modal para ver detalles -->
+    <div id="gastronomyModal" class="modal-overlay" onclick="closeGastronomyModal()">
+        <div class="modal-content accommodation-modal" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeGastronomyModal()"><i class="fas fa-times"></i></button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- App Bottom Nav -->
+    <nav class="mobile-nav">
+        <a href="mapa.html" class="mobile-nav-item">
+            <i class="fas fa-satellite-dish"></i>
+            <span>En Vivo</span>
+        </a>
+        <a href="radios.html" class="mobile-nav-item">
+            <i class="fas fa-radio"></i>
+            <span>Radios</span>
+        </a>
+        <a href="vuelos.html" class="mobile-nav-item">
+            <i class="fas fa-plane"></i>
+            <span>Vuelos</span>
+        </a>
+        <a href="alojamiento.html" class="mobile-nav-item">
+            <i class="fas fa-bed"></i>
+            <span>Dormir</span>
+        </a>
+        <a href="comer.html" class="mobile-nav-item active">
+            <i class="fas fa-utensils"></i>
+            <span>Comer</span>
+        </a>
+    </nav>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js?v=2060"></script>
+    <script src="gastronomy.js?v=2060"></script>
+</body>
+
+</html>

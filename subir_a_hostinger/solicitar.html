@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Solicitar Publicidad | Bariloche.Online</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css?v=2054">
+    <style>
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: inherit;
+            margin-bottom: 15px;
+        }
+        .btn-submit {
+            background: var(--primary);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            font-weight: 800;
+            width: 100%;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .btn-submit:hover {
+            opacity: 0.9;
+        }
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: none;
+        }
+        .alert-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #2e7d32;
+        }
+        .alert-error {
+            background: #ffebee;
+            color: #c62828;
+            border-left: 4px solid #c62828;
+        }
+    </style>
+</head>
+<body class="page-profile native-app">
+    <header class="main-header">
+        <a href="index.html" class="logo" style="text-decoration:none; color:inherit;"><b>B</b> BARILOCHE.ONLINE</a>
+        <nav class="nav-desktop">
+            <a href="mapa.html" class="nav-link"><i class="fas fa-satellite-dish"></i> EN VIVO</a>
+            <a href="radios.html" class="nav-link">RADIOS</a>
+            <a href="vuelos.html" class="nav-link">VUELOS</a>
+            <a href="alojamiento.html" class="nav-link">DORMIR</a>
+            <a href="comer.html" class="nav-link">COMER</a>
+        </nav>
+        <div class="header-icons">
+            <div class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()"><i class="fas fa-moon"></i></div>
+        </div>
+    </header>
+    <main class="app-content">
+        <div class="browse-header">
+            <h1>Sumá tu Negocio</h1>
+            <p>Completá el formulario para solicitar publicidad.</p>
+        </div>
+        
+        <div class="profile-card" style="background:var(--bg-secondary); padding:30px; border-radius:30px; border:1px solid var(--border); box-shadow:var(--shadow);">
+            
+            <div id="statusAlert" class="alert"></div>
+
+            <form id="solicitudForm" style="text-align:left;" enctype="multipart/form-data">
+                <h3 style="margin-bottom: 20px; color: var(--primary); border-bottom: 2px solid var(--border); padding-bottom:10px;">👤 Datos de Contacto</h3>
+                <div class="form-group">
+                    <label>Tu Nombre</label>
+                    <input type="text" id="nombre" name="nombre" class="form-control" required placeholder="Ej. Juan Pérez">
+                </div>
+                
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="email" name="email" class="form-control" required placeholder="tu@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label>Teléfono / WhatsApp de Reservas</label>
+                    <input type="tel" id="telefono" name="telefono" class="form-control" required placeholder="Ej. +54 9 294...">
+                </div>
+
+                <h3 style="margin: 30px 0 20px; color: var(--primary); border-bottom: 2px solid var(--border); padding-bottom:10px;">🏠 Datos del Alojamiento / Negocio</h3>
+                <div class="form-group">
+                    <label>Nombre del Lugar</label>
+                    <input type="text" id="negocio" name="negocio" class="form-control" required placeholder="Ej. Cabaña Los Pinos">
+                </div>
+
+                <div class="form-group">
+                    <label>Ubicación / Barrio</label>
+                    <input type="text" id="ubicacion" name="ubicacion" class="form-control" required placeholder="Ej. Villa Llao Llao / Centro">
+                </div>
+
+                <div class="form-group">
+                    <label>Precio Estimado por Noche ($ ARS)</label>
+                    <input type="number" id="precio" name="precio" class="form-control" placeholder="Ej. 120000">
+                </div>
+
+                <div class="form-group">
+                    <label>Descripción del Lugar</label>
+                    <textarea id="descripcion" name="descripcion" class="form-control" rows="4" placeholder="Ej. Hermosa cabaña con vista al lago..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Comodidades (Seleccioná varias)</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top:10px;">
+                        <label style="font-weight: normal;"><input type="checkbox" name="comodidades[]" value="Wi-Fi"> Wi-Fi</label>
+                        <label style="font-weight: normal;"><input type="checkbox" name="comodidades[]" value="Parrilla"> Parrilla</label>
+                        <label style="font-weight: normal;"><input type="checkbox" name="comodidades[]" value="Vista al lago"> Vista al lago</label>
+                        <label style="font-weight: normal;"><input type="checkbox" name="comodidades[]" value="Desayuno"> Desayuno</label>
+                        <label style="font-weight: normal;"><input type="checkbox" name="comodidades[]" value="Estacionamiento"> Estacionamiento</label>
+                        <label style="font-weight: normal;"><input type="checkbox" name="comodidades[]" value="Calefacción"> Calefacción</label>
+                    </div>
+                </div>
+
+                <h3 style="margin: 30px 0 20px; color: var(--primary); border-bottom: 2px solid var(--border); padding-bottom:10px;">📸 Fotos</h3>
+                <div class="form-group">
+                    <label>Subí hasta 3 fotos (Formatos: JPG, PNG)</label>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px;">Las mejores fotos atraen más turistas.</p>
+                    <input type="file" id="fotos" name="fotos[]" class="form-control" multiple accept="image/*" style="padding: 10px; background: white;" onchange="validarFotos(this)">
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn-submit" style="margin-top: 20px;">Enviar Solicitud Completa</button>
+            </form>
+            <div style="margin-top:20px; text-align:center;">
+                <a href="index.html" style="color:var(--text-secondary); text-decoration:none; font-weight:600;"><i class="fas fa-arrow-left"></i> Volver al Inicio</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function validarFotos(input) {
+            if (input.files.length > 3) {
+                alert("Por favor, subí un máximo de 3 fotos.");
+                input.value = ""; // Limpiar selección
+            }
+        }
+
+        document.getElementById('solicitudForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('submitBtn');
+            const alertBox = document.getElementById('statusAlert');
+            const form = document.getElementById('solicitudForm');
+            const fileInput = document.getElementById('fotos');
+
+            if (fileInput.files.length > 3) {
+                alert("Solo puedes subir hasta 3 fotos.");
+                return;
+            }
+            
+            btn.textContent = 'Enviando (Puede demorar)...';
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+
+            // Usar FormData() al tener imágenes en lugar de JSON
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('backend/api/solicitud.php', {
+                    method: 'POST',
+                    body: formData // Ya no lleva headers de content-type JSON, el navegador lo calcula automático por ser FormData
+                });
+
+                const result = await response.json();
+
+                if(result.status === 'success') {
+                    alertBox.className = 'alert alert-success';
+                    alertBox.innerHTML = result.message;
+                    alertBox.style.display = 'block';
+                    form.reset();
+                } else {
+                    alertBox.className = 'alert alert-error';
+                    alertBox.innerHTML = result.message || 'Error al enviar la solicitud.';
+                    alertBox.style.display = 'block';
+                }
+            } catch (error) {
+                alertBox.className = 'alert alert-error';
+                alertBox.innerHTML = 'Ocurrió un error al enviar tu solicitud o la foto es muy grande. Intenta nuevamente.';
+                alertBox.style.display = 'block';
+            } finally {
+                btn.textContent = 'Enviar Solicitud Completa';
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                
+                // Ocultar alerta
+                setTimeout(() => {
+                    alertBox.style.display = 'none';
+                }, 8000);
+            }
+        });
+    </script>
+
+    <!-- App Bottom Nav -->
+    <nav class="mobile-nav">
+        <a href="mapa.html" class="mobile-nav-item">
+            <i class="fas fa-satellite-dish"></i>
+            <span>En Vivo</span>
+        </a>
+        <a href="radios.html" class="mobile-nav-item">
+            <i class="fas fa-radio"></i>
+            <span>Radios</span>
+        </a>
+        <a href="vuelos.html" class="mobile-nav-item">
+            <i class="fas fa-plane"></i>
+            <span>Vuelos</span>
+        </a>
+        <a href="alojamiento.html" class="mobile-nav-item">
+            <i class="fas fa-bed"></i>
+            <span>Dormir</span>
+        </a>
+        <a href="comer.html" class="mobile-nav-item">
+            <i class="fas fa-utensils"></i>
+            <span>Comer</span>
+        </a>
+    </nav>
+
+    <script src="app.js?v=2060"></script>
+</body>
+</html>

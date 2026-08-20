@@ -1,0 +1,33 @@
+{
+    "name": "Bariloche Online - Guía Patagonia",
+    "short_name": "Bariloche Online",
+    "description": "Tu guía completa en Bariloche y la Patagonia. Radios, Vuelos, Comer, Dormir y más.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#2c5f7c",
+    "theme_color": "#2c5f7c",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": [
+        "entertainment",
+        "music",
+        "news"
+    ],
+    "lang": "es-AR",
+    "dir": "ltr",
+    "scope": "/",
+    "screenshots": []
+}
