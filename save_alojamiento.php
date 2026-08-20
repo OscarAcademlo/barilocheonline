@@ -497,6 +497,79 @@ if ($action === 'delete_promo_code') {
     exit;
 }
 
+// 11. PANEL ADMIN: ASIGNAR MESES GRATIS DIRECTAMENTE A UN EMAIL
+if ($action === 'admin_grant_subscription') {
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true) ?: $_POST;
+    $adminEmail = strtolower(trim($data['admin_email'] ?? ''));
+
+    if ($adminEmail !== ADMIN_EMAIL) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
+        exit;
+    }
+
+    $targetEmail = strtolower(trim($data['target_email'] ?? ''));
+    $months = max(1, intval($data['months'] ?? 1));
+
+    if (empty($targetEmail)) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'Email de usuario requerido']);
+        exit;
+    }
+
+    $subsFile = __DIR__ . '/suscripciones.json';
+    $subs = file_exists($subsFile) ? json_decode(file_get_contents($subsFile), true) : [];
+    if (!is_array($subs)) $subs = [];
+
+    $expiresAt = date('Y-m-d\TH:i:s\Z', strtotime("+$months months"));
+
+    $updated = false;
+    foreach ($subs as &$s) {
+        if (strtolower(trim($s['email'] ?? '')) === $targetEmail) {
+            $s['active'] = true;
+            $s['expires_at'] = $expiresAt;
+            $s['plan'] = "admin_grant_{$months}m";
+            $s['months'] = $months;
+            $s['updated_at'] = date('c');
+            $updated = true;
+            break;
+        }
+    }
+    unset($s);
+
+    if (!$updated) {
+        $subs[] = [
+            'email' => $targetEmail,
+            'plan' => "admin_grant_{$months}m",
+            'months' => $months,
+            'active' => true,
+            'created_at' => date('c'),
+            'expires_at' => $expiresAt,
+            'method' => 'admin_direct'
+        ];
+    }
+
+    @file_put_contents($subsFile, json_encode($subs, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    @chmod($subsFile, 0666);
+
+    echo json_encode(['status' => 'success', 'message' => "Se otorgaron $months meses gratis a $targetEmail hasta $expiresAt"]);
+    exit;
+}
+
+// 12. PANEL ADMIN: LISTAR TODAS LAS SUSCRIPCIONES
+if ($action === 'get_all_subscriptions') {
+    $adminEmail = strtolower(trim($_GET['admin_email'] ?? ''));
+    if ($adminEmail !== ADMIN_EMAIL) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
+        exit;
+    }
+    $subsFile = __DIR__ . '/suscripciones.json';
+    echo file_exists($subsFile) ? file_get_contents($subsFile) : '[]';
+    exit;
+}
+
 http_response_code(400);
 echo json_encode(['status' => 'error', 'message' => 'Acción no reconocida']);
 ?>
