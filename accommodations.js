@@ -236,28 +236,66 @@ function closeAccommodationModal() {
     document.body.style.overflow = 'auto';
 }
 
-// 5. BARRA DE USUARIO & AUTENTICACIÓN
 function updateUserBar() {
     const userBar = document.getElementById('userAuthStatus');
-    if (!userBar) return;
+    const isAdmin = !!(currentUser && currentUser.email && currentUser.email.toLowerCase().trim() === ADMIN_EMAIL);
 
-    if (currentUser) {
-        const isAdmin = (currentUser.email === ADMIN_EMAIL);
-        userBar.innerHTML = `
-            <div class="auth-logged-pill">
-                <i class="fas fa-user-circle"></i>
-                <span>${currentUser.email}</span>
-                ${isAdmin ? '<span class="badge-admin">ADMIN</span>' : ''}
-                ${isAdmin ? '<button onclick="openAdminPanel()" class="btn-admin-pill"><i class="fas fa-key"></i> Códigos</button>' : ''}
-                <button onclick="handleLogout()" class="btn-logout-mini" title="Cerrar sesión"><i class="fas fa-sign-out-alt"></i></button>
-            </div>
-        `;
-    } else {
-        userBar.innerHTML = `
-            <button onclick="openAuthModal()" class="btn-login-header">
-                <i class="fas fa-user"></i> Ingresar / Registrarse
-            </button>
-        `;
+    if (userBar) {
+        if (currentUser) {
+            userBar.innerHTML = `
+                <div class="auth-logged-pill" style="${isAdmin ? 'border:1px solid #e74c3c; background:rgba(231, 76, 60, 0.12);' : ''}">
+                    <i class="fas ${isAdmin ? 'fa-user-shield' : 'fa-user-circle'}" style="${isAdmin ? 'color:#e74c3c;' : 'color:var(--primary);'} font-size:1.1rem;"></i>
+                    <span style="font-weight:700; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${currentUser.email}</span>
+                    ${isAdmin ? '<span class="badge-admin">ADMIN</span>' : ''}
+                    ${isAdmin ? '<a href="admin.html" class="btn-admin-pill" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px;"><i class="fas fa-shield-alt"></i> Panel Admin</a>' : ''}
+                    ${isAdmin ? '<button onclick="openAdminPanel()" class="btn-admin-pill"><i class="fas fa-key"></i> Códigos</button>' : ''}
+                    <button onclick="handleLogout()" class="btn-logout-mini" title="Cerrar sesión" style="margin-left:4px;"><i class="fas fa-sign-out-alt"></i></button>
+                </div>
+            `;
+        } else {
+            userBar.innerHTML = `
+                <button onclick="openAuthModal()" class="btn-login-header">
+                    <i class="fas fa-user"></i> Ingresar / Registrarse
+                </button>
+            `;
+        }
+    }
+
+    // Acceso exclusivo ADMIN en la navegación desktop y mobile
+    const desktopNav = document.querySelector('.nav-desktop');
+    if (desktopNav) {
+        let adminDesktopLink = document.getElementById('nav-admin-link-desktop');
+        if (isAdmin) {
+            if (!adminDesktopLink) {
+                adminDesktopLink = document.createElement('a');
+                adminDesktopLink.id = 'nav-admin-link-desktop';
+                adminDesktopLink.href = 'admin.html';
+                adminDesktopLink.className = 'nav-link';
+                adminDesktopLink.style.cssText = 'color:#e74c3c !important; font-weight:800; display:inline-flex; align-items:center; gap:6px; background:rgba(231,76,60,0.1); border-radius:10px; padding:6px 12px;';
+                adminDesktopLink.innerHTML = '<i class="fas fa-shield-alt"></i> ADMIN';
+                desktopNav.appendChild(adminDesktopLink);
+            }
+        } else if (adminDesktopLink) {
+            adminDesktopLink.remove();
+        }
+    }
+
+    const mobileNav = document.querySelector('.mobile-nav');
+    if (mobileNav) {
+        let adminMobileLink = document.getElementById('nav-admin-link-mobile');
+        if (isAdmin) {
+            if (!adminMobileLink) {
+                adminMobileLink = document.createElement('a');
+                adminMobileLink.id = 'nav-admin-link-mobile';
+                adminMobileLink.href = 'admin.html';
+                adminMobileLink.className = 'mobile-nav-item';
+                adminMobileLink.style.cssText = 'color:#e74c3c !important; font-weight:800;';
+                adminMobileLink.innerHTML = '<i class="fas fa-shield-alt"></i><span>Admin</span>';
+                mobileNav.appendChild(adminMobileLink);
+            }
+        } else if (adminMobileLink) {
+            adminMobileLink.remove();
+        }
     }
 }
 
@@ -340,24 +378,22 @@ async function handleLoginSubmit(e) {
     }
 }
 
-function togglePasswordVisibility(inputId, btnEl) {
+window.togglePasswordVisibility = function(inputId, btnEl) {
     const input = document.getElementById(inputId);
     if (!input) return;
     const icon = btnEl.querySelector('i');
     if (input.type === 'password') {
         input.type = 'text';
         if (icon) {
-            icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash');
+            icon.className = 'fas fa-eye-slash';
         }
     } else {
         input.type = 'password';
         if (icon) {
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
+            icon.className = 'fas fa-eye';
         }
     }
-}
+};
 
 async function handleSignupSubmit(e) {
     e.preventDefault();

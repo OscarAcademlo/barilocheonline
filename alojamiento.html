@@ -93,9 +93,9 @@
                     </div>
                     <div class="input-group-custom password-wrapper-relative">
                         <label><i class="fas fa-lock"></i> Contraseña</label>
-                        <div class="pass-input-box">
-                            <input type="password" id="loginPass" placeholder="••••••••" required>
-                            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('loginPass', this)">
+                        <div class="pass-input-box" style="position: relative; width: 100%; display: flex; align-items: center;">
+                            <input type="password" id="loginPass" placeholder="••••••••" style="width: 100%; padding-right: 45px; box-sizing: border-box;" required>
+                            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('loginPass', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #94a3b8; font-size: 1.1rem; padding: 4px; z-index: 10; display: flex; align-items: center; justify-content: center;">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
@@ -118,9 +118,9 @@
                     </div>
                     <div class="input-group-custom password-wrapper-relative">
                         <label><i class="fas fa-lock"></i> Crear Contraseña</label>
-                        <div class="pass-input-box">
-                            <input type="password" id="signupPass" placeholder="Mínimo 6 caracteres" minlength="6" required>
-                            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('signupPass', this)">
+                        <div class="pass-input-box" style="position: relative; width: 100%; display: flex; align-items: center;">
+                            <input type="password" id="signupPass" placeholder="Mínimo 6 caracteres" minlength="6" style="width: 100%; padding-right: 45px; box-sizing: border-box;" required>
+                            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('signupPass', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #94a3b8; font-size: 1.1rem; padding: 4px; z-index: 10; display: flex; align-items: center; justify-content: center;">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>

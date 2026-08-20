@@ -119,11 +119,50 @@
             <a href="comer.html" class="nav-link">COMER</a>
         </nav>
         <div class="header-icons">
+            <div id="userAuthStatus"></div>
             <div class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()"><i class="fas fa-moon"></i></div>
         </div>
     </header>
 
-    <main class="admin-wrap">
+    <!-- PANTALLA DE ACCESO RESTRINGIDO (SI NO ESTÁ LOGUEADO COMO oscarns@gmail.com) -->
+    <div id="adminLockScreen" style="max-width: 480px; margin: 60px auto; padding: 30px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 24px; box-shadow: var(--shadow); text-align: center;">
+        <div style="width: 70px; height: 70px; background: rgba(231, 76, 60, 0.15); color: #e74c3c; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 16px;">
+            <i class="fas fa-shield-halved"></i>
+        </div>
+        <h2 style="font-family: 'Outfit'; font-size: 1.5rem; margin: 0 0 8px;">Panel Restringido</h2>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">
+            Acceso exclusivo únicamente para el administrador principal (<b>oscarns@gmail.com</b>).
+        </p>
+
+        <div id="adminLockLoggedOther" style="display:none; background: rgba(231, 76, 60, 0.1); border: 1px solid #e74c3c; border-radius: 14px; padding: 14px; margin-bottom: 20px; text-align: left;">
+            <div style="font-size: 0.85rem; color: #e74c3c; font-weight: 700; margin-bottom: 4px;">⚠️ Acceso denegado</div>
+            <div style="font-size: 0.82rem; color: var(--text-primary);">Has iniciado sesión con una cuenta sin permisos. Cierra sesión para ingresar con la cuenta de administrador.</div>
+            <button onclick="window.authManager.logout()" class="btn-del-comp" style="margin-top: 10px; width: 100%;"><i class="fas fa-sign-out-alt"></i> Cerrar esta cuenta</button>
+        </div>
+
+        <form id="adminDirectLoginForm" onsubmit="handleAdminDirectLogin(event)">
+            <div class="input-group-custom" style="text-align:left; margin-bottom:14px;">
+                <label style="display:block; font-size:0.82rem; font-weight:700; margin-bottom:6px;"><i class="fas fa-envelope"></i> Email Administrador</label>
+                <input type="email" id="adminLockEmail" value="oscarns@gmail.com" readonly style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--border); background:var(--bg-main); color:var(--text-primary); opacity:0.85; box-sizing:border-box;">
+            </div>
+            <div class="input-group-custom" style="text-align:left; margin-bottom:16px;">
+                <label style="display:block; font-size:0.82rem; font-weight:700; margin-bottom:6px;"><i class="fas fa-lock"></i> Contraseña</label>
+                <div class="pass-input-box" style="position:relative; width:100%; display:flex; align-items:center;">
+                    <input type="password" id="adminLockPass" placeholder="Tu contraseña" required style="width:100%; padding:12px 45px 12px 14px; border-radius:12px; border:1px solid var(--border); background:var(--bg-main); color:var(--text-primary); box-sizing:border-box;">
+                    <button type="button" class="btn-toggle-pass" onclick="window.togglePasswordVisibility('adminLockPass', this)" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:#94a3b8; font-size:1.1rem; padding:4px; z-index:10; display:flex; align-items:center; justify-content:center;">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="adminLockError" style="color:#ef4444; font-size:0.82rem; font-weight:600; margin-bottom:12px;"></div>
+            <button type="submit" id="btnAdminLockLogin" class="btn-auth-primary" style="background:#e74c3c; width:100%; padding:14px; border-radius:14px; border:none; color:white; font-weight:800; cursor:pointer;">
+                <i class="fas fa-key"></i> Desbloquear Panel de Control
+            </button>
+        </form>
+    </div>
+
+    <!-- CONTENIDO AUTORIZADO (SOLO SE MUESTRA SI ES oscarns@gmail.com) -->
+    <main id="adminAuthorizedContent" class="admin-wrap" style="display:none;">
         <div class="admin-header-card">
             <div>
                 <h1 style="font-family:'Outfit'; font-size:1.6rem; margin:0 0 4px;">🛠️ Panel de Administración BariRuta</h1>
@@ -131,9 +170,9 @@
                     Configuración de Base de Datos Supabase, Empresas y Mercado Pago.
                 </p>
             </div>
-            <div>
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
                 <a href="mapa.html" style="background:var(--bg-main); border:1px solid var(--border); color:var(--text-primary); padding:10px 16px; border-radius:12px; text-decoration:none; font-weight:700; font-size:0.85rem; display:inline-flex; align-items:center; gap:8px;">
-                    <i class="fas fa-map"></i> Ver Mapa de Turistas
+                    <i class="fas fa-map"></i> Ver Mapa
                 </a>
             </div>
         </div>
@@ -287,24 +326,54 @@
 
     <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="app.js?v=2075"></script>
-    <script src="supabase_client.js?v=2075"></script>
+    <script src="auth_manager.js?v=2085"></script>
+    <script src="app.js?v=2085"></script>
+    <script src="supabase_client.js?v=2085"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Verificar rol de admin con AuthManager
+            if (window.authManager) {
+                window.authManager.onAuthChange((user, isAdmin) => {
+                    const lockScreen = document.getElementById('adminLockScreen');
+                    const authContent = document.getElementById('adminAuthorizedContent');
+                    const loggedOtherBox = document.getElementById('adminLockLoggedOther');
+                    const directForm = document.getElementById('adminDirectLoginForm');
+
+                    if (isAdmin) {
+                        if (lockScreen) lockScreen.style.display = 'none';
+                        if (authContent) authContent.style.display = 'block';
+                    } else {
+                        if (authContent) authContent.style.display = 'none';
+                        if (lockScreen) lockScreen.style.display = 'block';
+                        if (user && user.email && user.email.toLowerCase().trim() !== 'oscarns@gmail.com') {
+                            if (loggedOtherBox) loggedOtherBox.style.display = 'block';
+                            if (directForm) directForm.style.display = 'none';
+                        } else {
+                            if (loggedOtherBox) loggedOtherBox.style.display = 'none';
+                            if (directForm) directForm.style.display = 'block';
+                        }
+                    }
+                });
+            }
+
             // Cargar credenciales actuales en los inputs
             const creds = window.bariRuta.getCredentials();
-            document.getElementById('adminSbUrl').value = creds.url;
-            document.getElementById('adminSbKey').value = creds.key;
+            const urlInput = document.getElementById('adminSbUrl');
+            const keyInput = document.getElementById('adminSbKey');
+            if (urlInput) urlInput.value = creds.url;
+            if (keyInput) keyInput.value = creds.key;
 
             const badge = document.getElementById('sbStatusBadge');
-            if (window.bariRuta.isConnected) {
-                badge.textContent = '🟢 Conectado';
-                badge.style.color = '#00b894';
-                badge.style.background = 'rgba(0, 184, 148, 0.15)';
-            } else {
-                badge.textContent = '⚙️ No configurado';
-                badge.style.color = '#e17055';
-                badge.style.background = 'rgba(225, 112, 85, 0.15)';
+            if (badge) {
+                if (window.bariRuta.isConnected) {
+                    badge.textContent = '🟢 Conectado';
+                    badge.style.color = '#00b894';
+                    badge.style.background = 'rgba(0, 184, 148, 0.15)';
+                } else {
+                    badge.textContent = '⚙️ No configurado';
+                    badge.style.color = '#e17055';
+                    badge.style.background = 'rgba(225, 112, 85, 0.15)';
+                }
             }
 
             renderCompaniesTable(window.bariRuta.companies);
@@ -318,6 +387,32 @@
                 renderTelemetryTable(vehicles);
             });
         });
+
+        async function handleAdminDirectLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('adminLockEmail').value.trim();
+            const pass = document.getElementById('adminLockPass').value;
+            const btn = document.getElementById('btnAdminLockLogin');
+            const errorEl = document.getElementById('adminLockError');
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando credenciales...';
+            errorEl.textContent = '';
+
+            try {
+                if (!window.authManager || !window.authManager.supabase) {
+                    throw new Error('Servicio de autenticación no inicializado.');
+                }
+                const { data, error } = await window.authManager.supabase.auth.signInWithPassword({ email, password: pass });
+                if (error) throw error;
+                // El observador onAuthChange mostrará el panel automáticamente
+            } catch (err) {
+                errorEl.textContent = err.message || 'Contraseña incorrecta o error al iniciar sesión';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-key"></i> Desbloquear Panel de Control';
+            }
+        }
 
         function handleSaveSupabaseConfig(e) {
             e.preventDefault();

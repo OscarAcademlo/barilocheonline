@@ -69,6 +69,12 @@ body {
     display: none;
 }
 
+.header-icons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 /* HERO (Arreglado) */
 .hero {
     padding: 0;
@@ -1860,28 +1866,35 @@ body {
 }
 
 .pass-input-box {
-    position: relative;
-    display: flex;
-    align-items: center;
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
 }
 
 .pass-input-box input {
-    padding-right: 42px !important;
+    width: 100% !important;
+    padding-right: 45px !important;
+    box-sizing: border-box !important;
 }
 
 .btn-toggle-pass {
-    position: absolute;
-    right: 12px;
-    background: transparent;
-    border: none;
-    color: var(--text-secondary);
-    font-size: 1rem;
-    cursor: pointer;
-    padding: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: color 0.2s ease;
+    position: absolute !important;
+    right: 12px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: transparent !important;
+    border: none !important;
+    color: var(--text-secondary, #94a3b8) !important;
+    font-size: 1.1rem !important;
+    cursor: pointer !important;
+    padding: 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: color 0.2s ease !important;
+    z-index: 10 !important;
+    line-height: 1 !important;
 }
 
 .btn-toggle-pass:hover {

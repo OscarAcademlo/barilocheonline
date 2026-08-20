@@ -31,6 +31,7 @@
             <a href="comer.html" class="nav-link">COMER</a>
         </nav>
         <div class="header-icons">
+            <div id="userAuthStatus"></div>
             <div class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()"><i class="fas fa-moon"></i></div>
         </div>
     </header>
@@ -141,7 +142,10 @@
         </a>
     </nav>
 
-    <script src="app.js?v=2060"></script>
+    <!-- SUPABASE & AUTH SYSTEM -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="auth_manager.js?v=2085"></script>
+    <script src="app.js?v=2085"></script>
 </body>
 
 </html>
