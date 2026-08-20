@@ -1859,6 +1859,35 @@ body {
     border-color: var(--primary);
 }
 
+.pass-input-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.pass-input-box input {
+    padding-right: 42px !important;
+}
+
+.btn-toggle-pass {
+    position: absolute;
+    right: 12px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+}
+
+.btn-toggle-pass:hover {
+    color: var(--primary);
+}
+
 .btn-auth-primary {
     width: 100%;
     background: var(--primary);

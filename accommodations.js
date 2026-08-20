@@ -340,6 +340,25 @@ async function handleLoginSubmit(e) {
     }
 }
 
+function togglePasswordVisibility(inputId, btnEl) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const icon = btnEl.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        if (icon) {
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        }
+    } else {
+        input.type = 'password';
+        if (icon) {
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+}
+
 async function handleSignupSubmit(e) {
     e.preventDefault();
     const email = document.getElementById('signupEmail').value.trim();
@@ -355,17 +374,18 @@ async function handleSignupSubmit(e) {
         const { data, error } = await sbClient.auth.signUp({
             email,
             password: pass,
-            options: { emailRedirectTo: window.location.origin + '/alojamiento.html' }
+            options: {
+                emailRedirectTo: 'https://bariloche.online/alojamiento.html'
+            }
         });
         if (error) throw error;
-        alert('🎉 ¡Cuenta creada con éxito! Si te llegó un email de confirmación, verifícalo para activar tu cuenta.');
+        alert('🎉 ¡Cuenta creada con éxito! Te enviamos un correo de verificación. Revisa tu bandeja de entrada o spam.');
         closeAuthModal();
-        handlePublishClick();
     } catch (err) {
         errorEl.textContent = err.message || 'Error al registrarte';
     } finally {
         btn.disabled = false;
-        btn.innerHTML = 'Crear Cuenta';
+        btn.innerHTML = 'Registrarme';
     }
 }
 

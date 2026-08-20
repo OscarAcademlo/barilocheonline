@@ -91,9 +91,14 @@
                         <label><i class="fas fa-envelope"></i> Email</label>
                         <input type="email" id="loginEmail" placeholder="tu-email@gmail.com" required>
                     </div>
-                    <div class="input-group-custom">
+                    <div class="input-group-custom password-wrapper-relative">
                         <label><i class="fas fa-lock"></i> Contraseña</label>
-                        <input type="password" id="loginPass" placeholder="••••••••" required>
+                        <div class="pass-input-box">
+                            <input type="password" id="loginPass" placeholder="••••••••" required>
+                            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('loginPass', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
                     <div id="loginError" class="auth-error-msg"></div>
                     <button type="submit" id="btnLoginSubmit" class="btn-auth-primary">Ingresar</button>
@@ -111,9 +116,14 @@
                         <label><i class="fas fa-envelope"></i> Tu Email</label>
                         <input type="email" id="signupEmail" placeholder="tu-email@gmail.com" required>
                     </div>
-                    <div class="input-group-custom">
+                    <div class="input-group-custom password-wrapper-relative">
                         <label><i class="fas fa-lock"></i> Crear Contraseña</label>
-                        <input type="password" id="signupPass" placeholder="Mínimo 6 caracteres" minlength="6" required>
+                        <div class="pass-input-box">
+                            <input type="password" id="signupPass" placeholder="Mínimo 6 caracteres" minlength="6" required>
+                            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('signupPass', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
                     <div id="signupError" class="auth-error-msg"></div>
                     <button type="submit" id="btnSignupSubmit" class="btn-auth-primary">Registrarme</button>
