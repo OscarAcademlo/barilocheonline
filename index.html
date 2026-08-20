@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Bariloche.Online | Excursiones en Vivo y Guía Turística</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css?v=2060">
+</head>
+
+<body class="page-home native-app">
+    <!-- HEADER -->
+    <header class="main-header">
+        <a href="index.html" class="logo" style="text-decoration:none; color:inherit;"><b>B</b> BARILOCHE.ONLINE</a>
+        <nav class="nav-desktop">
+            <a href="mapa.html" class="nav-link"><i class="fas fa-satellite-dish"></i> EN VIVO</a>
+            <a href="radios.html" class="nav-link">RADIOS</a>
+            <a href="vuelos.html" class="nav-link">VUELOS</a>
+            <a href="alojamiento.html" class="nav-link">DORMIR</a>
+            <a href="comer.html" class="nav-link">COMER</a>
+        </nav>
+        <div class="header-icons">
+            <div class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()"><i class="fas fa-moon"></i></div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION RENOVADA CON BARIRUTA -->
+    <section class="hero">
+        <div class="hero-banner">
+            <img src="hero_premium.png" alt="Bariloche" class="hero-img">
+            <div class="hero-text" style="flex-direction:column; justify-content:center; gap:16px;">
+                <div style="background:rgba(0, 132, 255, 0.35); border:1px solid rgba(255,255,255,0.4); backdrop-filter:blur(10px); color:white; padding:6px 16px; border-radius:30px; font-weight:800; font-size:0.85rem; display:inline-flex; align-items:center; gap:8px;">
+                    <span class="pulse-beacon"></span> MÓDULO BARIRUTA EN VIVO
+                </div>
+                <h1 style="max-width:900px; line-height:1.15;">EXPLORÁ LA PATAGONIA A TU MANERA Y EN TIEMPO REAL</h1>
+                <p style="color:rgba(255,255,255,0.95); font-size:clamp(0.95rem, 2.5vw, 1.25rem); font-weight:600; max-width:680px; text-shadow:0 2px 10px rgba(0,0,0,0.5); margin:0;">
+                    Rastreá combis, embarcaciones y micros de excursiones en vivo por la ciudad, montañas y los lagos.
+                </p>
+                <a href="mapa.html" style="background:linear-gradient(135deg, #0084ff, #00cec9); color:white; text-decoration:none; padding:16px 28px; border-radius:20px; font-weight:800; font-size:1.1rem; display:inline-flex; align-items:center; gap:10px; box-shadow:0 10px 30px rgba(0, 132, 255, 0.4); transition:transform 0.2s ease;">
+                    <i class="fas fa-van-shuttle"></i>
+                    <span>Ver Mapa y Excursiones en Vivo</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- QUICK ACTIONS -->
+    <div class="quick-actions">
+        <a href="mapa.html" class="action-item">
+            <div class="action-circle" style="background:linear-gradient(135deg, rgba(0,132,255,0.15), rgba(0,206,201,0.15)); border-color:var(--primary); color:var(--primary);">
+                <i class="fas fa-satellite-dish"></i>
+            </div>
+            <span style="font-weight:800; color:var(--primary);">En Vivo</span>
+        </a>
+        <a href="radios.html" class="action-item">
+            <div class="action-circle"><i class="fas fa-radio"></i></div>
+            <span>Radios</span>
+        </a>
+        <a href="vuelos.html" class="action-item">
+            <div class="action-circle"><i class="fas fa-plane"></i></div>
+            <span>Vuelos</span>
+        </a>
+        <a href="alojamiento.html" class="action-item">
+            <div class="action-circle"><i class="fas fa-bed"></i></div>
+            <span>Dormir</span>
+        </a>
+        <a href="comer.html" class="action-item">
+            <div class="action-circle"><i class="fas fa-utensils"></i></div>
+            <span>Comer</span>
+        </a>
+    </div>
+
+    <!-- TARJETAS DESTACADAS DE SERVICIOS -->
+    <div style="padding: 0 5%; max-width: 1200px; margin: 10px auto 40px; display:flex; flex-direction:column; gap:20px;">
+        <!-- Banner BariRuta -->
+        <a href="mapa.html" style="display:flex; justify-content:space-between; align-items:center; background:linear-gradient(135deg, #1e272e, #0984e3); padding:24px; border-radius:24px; text-decoration:none; color:white; box-shadow:0 12px 35px rgba(9, 132, 227, 0.25); border:1px solid rgba(255,255,255,0.1);">
+            <div>
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                    <span style="background:rgba(0, 184, 148, 0.2); color:#00b894; padding:4px 10px; border-radius:12px; font-weight:800; font-size:0.75rem; display:inline-flex; align-items:center; gap:5px;">
+                        <span class="pulse-beacon"></span> GPS REALTIME ACTIVO
+                    </span>
+                </div>
+                <h3 style="margin:0; font-family:'Outfit'; font-size:1.5rem; font-weight:800;">🛰️ BariRuta: Excursiones y Combis en Vivo</h3>
+                <p style="margin:6px 0 0; font-size:0.95rem; opacity:0.9; max-width:600px;">
+                    Elegí tu excursión (Circuito Chico, Tronador, Catedral, Isla Victoria), mirá la posición del transporte y solicitá tu parada desde tu hotel.
+                </p>
+            </div>
+            <div style="background:white; color:#0984e3; width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0; margin-left:15px;">
+                <i class="fas fa-chevron-right"></i>
+            </div>
+        </a>
+
+        <!-- Banner Promocioná tu Negocio -->
+        <a href="solicitar.html" style="display:flex; justify-content:space-between; align-items:center; background:linear-gradient(135deg, var(--primary), #0056b3); padding:20px 24px; border-radius:20px; text-decoration:none; color:white; box-shadow:0 10px 30px rgba(0, 132, 255, 0.25);">
+            <div>
+                <h3 style="margin:0; font-family:'Outfit'; font-size:1.3rem; font-weight:800;">🤝 Promocioná tu Negocio o Excursión</h3>
+                <p style="margin:4px 0 0; font-size:0.9rem; opacity:0.9;">Mostrá tus cabañas, restaurante o empresa de turismo a miles de visitantes.</p>
+            </div>
+            <i class="fas fa-arrow-right" style="font-size:1.4rem;"></i>
+        </a>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+        <p>OscarSoft 2026 | Bariloche.Online & BariRuta</p>
+    </footer>
+
+    <!-- MOBILE NAV -->
+    <nav class="mobile-nav">
+        <a href="mapa.html" class="mobile-nav-item">
+            <i class="fas fa-satellite-dish"></i>
+            <span>En Vivo</span>
+        </a>
+        <a href="radios.html" class="mobile-nav-item">
+            <i class="fas fa-radio"></i>
+            <span>Radios</span>
+        </a>
+        <a href="vuelos.html" class="mobile-nav-item">
+            <i class="fas fa-plane"></i>
+            <span>Vuelos</span>
+        </a>
+        <a href="alojamiento.html" class="mobile-nav-item">
+            <i class="fas fa-bed"></i>
+            <span>Dormir</span>
+        </a>
+        <a href="comer.html" class="mobile-nav-item">
+            <i class="fas fa-utensils"></i>
+            <span>Comer</span>
+        </a>
+    </nav>
+
+    <script src="app.js?v=2060"></script>
+</body>
+
+</html>

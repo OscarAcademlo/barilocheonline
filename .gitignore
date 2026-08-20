@@ -9,10 +9,6 @@
 ccvlite/
 *ccv*
 
-# Binaries & APKs (GitHub limit is 100MB)
-*.apk
-**/*.apk
-
 # Flutter / Dart build artifacts
 **/build/
 **/.dart_tool/

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Excursiones en Vivo (BariRuta) | Bariloche.Online</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css?v=2077">
+</head>
+
+<body class="page-map native-app">
+    <!-- HEADER PRINCIPAL -->
+    <header class="main-header">
+        <a href="index.html" class="logo" style="text-decoration:none; color:inherit;"><b>B</b> BARILOCHE.ONLINE</a>
+        <nav class="nav-desktop">
+            <a href="mapa.html" class="nav-link active"><i class="fas fa-satellite-dish"></i> EN VIVO</a>
+            <a href="radios.html" class="nav-link">RADIOS</a>
+            <a href="vuelos.html" class="nav-link">VUELOS</a>
+            <a href="alojamiento.html" class="nav-link">DORMIR</a>
+            <a href="comer.html" class="nav-link">COMER</a>
+        </nav>
+        <div class="header-icons">
+            <div class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()"><i class="fas fa-moon"></i></div>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR 100% VISIBLE PARA EL TURISTA -->
+    <main class="map-layout-clean">
+        <!-- BARRA FLOTANTE SUPERIOR: SELECT EXCLUSIVO DE EMPRESAS -->
+        <div class="map-floating-bar" style="justify-content:center;">
+            <div class="company-select-box" style="max-width:450px;">
+                <i class="fas fa-building" style="color:var(--primary); font-size:1.1rem; margin-right:8px;"></i>
+                <select id="companySelect" class="clean-company-select" onchange="handleCompanyChange(this.value)">
+                    <option value="">🏢 Todas las Empresas</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- INDICADOR DISCRETO DE ESTADO EN TIEMPO REAL -->
+        <div class="live-status-pill" id="realtimeStatusPill">
+            <span class="pulse-dot"></span>
+            <span id="realtimeStatusText">BariRuta GPS</span>
+        </div>
+
+        <!-- MAPA LEAFLET A PANTALLA COMPLETA -->
+        <div id="liveMap" class="full-map-viewport"></div>
+    </main>
+
+    <!-- NAVEGACIÓN INFERIOR MOBILE -->
+    <nav class="mobile-nav">
+        <a href="mapa.html" class="mobile-nav-item active">
+            <i class="fas fa-satellite-dish"></i>
+            <span>En Vivo</span>
+        </a>
+        <a href="radios.html" class="mobile-nav-item">
+            <i class="fas fa-radio"></i>
+            <span>Radios</span>
+        </a>
+        <a href="vuelos.html" class="mobile-nav-item">
+            <i class="fas fa-plane"></i>
+            <span>Vuelos</span>
+        </a>
+        <a href="alojamiento.html" class="mobile-nav-item">
+            <i class="fas fa-bed"></i>
+            <span>Dormir</span>
+        </a>
+        <a href="comer.html" class="mobile-nav-item">
+            <i class="fas fa-utensils"></i>
+            <span>Comer</span>
+        </a>
+    </nav>
+
+    <!-- SCRIPTS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js?v=2077"></script>
+    <script src="supabase_client.js?v=2077"></script>
+    <script src="mapa.js?v=2077"></script>
+</body>
+
+</html>

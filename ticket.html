@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Comprar Ticket | Bariloche.Online & BariRuta</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css?v=2077">
+    <style>
+        .ticket-page-wrap {
+            max-width: 600px;
+            margin: 20px auto 100px;
+            padding: 0 16px;
+        }
+
+        .ticket-hero-card {
+            background: linear-gradient(135deg, #0084ff, #00cec9);
+            color: white;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 132, 255, 0.35);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ticket-hero-card::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 140px;
+            height: 140px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+        }
+
+        .ticket-badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .ticket-excursion-name {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 900;
+            margin: 0 0 10px;
+            line-height: 1.2;
+        }
+
+        .ticket-meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .ticket-meta-item {
+            font-size: 0.85rem;
+        }
+
+        .ticket-meta-item span {
+            opacity: 0.85;
+            font-size: 0.75rem;
+            display: block;
+        }
+
+        .ticket-meta-item b {
+            font-weight: 800;
+        }
+
+        .ticket-form-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1.5px solid var(--border);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+        }
+
+        .passenger-counter {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-primary);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            padding: 8px 16px;
+        }
+
+        .counter-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-size: 1.2rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .counter-value {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .price-summary-box {
+            background: rgba(0, 132, 255, 0.08);
+            border: 1.5px dashed var(--primary);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .price-label {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .price-total {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--primary);
+        }
+
+        .btn-pay-mp {
+            width: 100%;
+            padding: 16px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #0084ff, #0066cc);
+            color: white;
+            border: none;
+            font-weight: 900;
+            font-size: 1.05rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 6px 20px rgba(0, 132, 255, 0.4);
+            margin-bottom: 12px;
+            text-decoration: none;
+            box-sizing: border-box;
+        }
+
+        .btn-pay-wa {
+            width: 100%;
+            padding: 14px;
+            border-radius: 16px;
+            background: #25d366;
+            color: white;
+            border: none;
+            font-weight: 800;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.35);
+            text-decoration: none;
+            box-sizing: border-box;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: none;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body class="native-app">
+    <!-- HEADER PRINCIPAL -->
+    <header class="main-header">
+        <a href="index.html" class="logo" style="text-decoration:none; color:inherit;"><b>B</b> BARILOCHE.ONLINE</a>
+        <nav class="nav-desktop">
+            <a href="mapa.html" class="nav-link"><i class="fas fa-satellite-dish"></i> EN VIVO</a>
+            <a href="radios.html" class="nav-link">RADIOS</a>
+            <a href="vuelos.html" class="nav-link">VUELOS</a>
+            <a href="alojamiento.html" class="nav-link">DORMIR</a>
+            <a href="comer.html" class="nav-link">COMER</a>
+        </nav>
+        <div class="header-icons">
+            <div class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()"><i class="fas fa-moon"></i></div>
+        </div>
+    </header>
+
+    <div class="ticket-page-wrap">
+        <a href="mapa.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Volver al Mapa en Vivo
+        </a>
+
+        <!-- HERO DE LA EXCURSIÓN SELECCIONADA -->
+        <div class="ticket-hero-card">
+            <div class="ticket-badge-pill">
+                <i class="fas fa-satellite-dish"></i> Combi en Vivo &bull; BariRuta
+            </div>
+            <h1 class="ticket-excursion-name" id="dispExcursion">Excursión Circuito Chico</h1>
+            <div class="ticket-meta-grid">
+                <div class="ticket-meta-item">
+                    <span>Empresa</span>
+                    <b id="dispCompany">Empresa Oscar</b>
+                </div>
+                <div class="ticket-meta-item">
+                    <span>Chofer / Guía</span>
+                    <b id="dispDriver">Chofer Asignado</b>
+                </div>
+                <div class="ticket-meta-item">
+                    <span>Unidad</span>
+                    <b id="dispCombi">Combi 01</b>
+                </div>
+                <div class="ticket-meta-item">
+                    <span>Estado</span>
+                    <b>🟢 En Servicio</b>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORMULARIO DE RESERVA / COMPRA -->
+        <div class="ticket-form-card">
+            <h2 style="font-size:1.2rem; font-weight:800; margin:0 0 16px; color:var(--text-primary);">
+                <i class="fas fa-ticket-alt" style="color:var(--primary); margin-right:6px;"></i> Datos del Pasajero
+            </h2>
+
+            <div class="form-group">
+                <label>Nombre y Apellido *</label>
+                <input type="text" id="custName" class="form-control" placeholder="Ej. Juan Pérez" required>
+            </div>
+
+            <div class="form-group">
+                <label>Teléfono / WhatsApp *</label>
+                <input type="tel" id="custPhone" class="form-control" placeholder="Ej. +54 9 11 1234-5678" required>
+            </div>
+
+            <div class="form-group">
+                <label>Hotel o Punto de Encuentro</label>
+                <input type="text" id="custHotel" class="form-control" placeholder="Ej. Hotel Edelweiss / Centro Cívico">
+            </div>
+
+            <div class="form-group">
+                <label>Cantidad de Pasajeros</label>
+                <div class="passenger-counter">
+                    <span style="font-weight:700; color:var(--text-primary);">Tickets</span>
+                    <div style="display:flex; align-items:center; gap:14px;">
+                        <button type="button" class="counter-btn" onclick="updatePassengers(-1)">-</button>
+                        <span class="counter-value" id="passengerCount">1</span>
+                        <button type="button" class="counter-btn" onclick="updatePassengers(1)">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESUMEN DE PRECIO -->
+            <div class="price-summary-box">
+                <div>
+                    <div class="price-label">Total a Abonar</div>
+                    <small style="color:var(--text-secondary); font-size:0.78rem;">Tarifa oficial en pesos (ARS)</small>
+                </div>
+                <div class="price-total" id="totalPrice">$25.000</div>
+            </div>
+
+            <!-- BOTÓN DE PAGO DIRECTO -->
+            <button type="button" class="btn-pay-mp" onclick="handlePayTicket()">
+                <i class="fas fa-lock"></i> Reservar y Pagar Ticket
+            </button>
+
+            <!-- BOTÓN DE CONSULTA POR WHATSAPP -->
+            <a href="#" id="waBookingLink" target="_blank" class="btn-pay-wa">
+                <i class="fab fa-whatsapp"></i> Confirmar con la Empresa por WhatsApp
+            </a>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="app.js?v=2077"></script>
+    <script>
+        let basePrice = 25000;
+        let passengers = 1;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const excursion = params.get('excursion') || 'Circuito Turístico Bariloche';
+            const empresa = params.get('empresa') || 'Empresa Oscar';
+            const combi = params.get('combi') || 'Combi Oficial';
+            const chofer = params.get('chofer') || 'Chofer Asignado';
+
+            document.getElementById('dispExcursion').textContent = excursion;
+            document.getElementById('dispCompany').textContent = empresa;
+            document.getElementById('dispCombi').textContent = combi;
+            document.getElementById('dispDriver').textContent = chofer;
+
+            updatePriceDisplay();
+            updateWhatsAppLink();
+        });
+
+        function updatePassengers(delta) {
+            passengers = Math.max(1, Math.min(15, passengers + delta));
+            document.getElementById('passengerCount').textContent = passengers;
+            updatePriceDisplay();
+            updateWhatsAppLink();
+        }
+
+        function updatePriceDisplay() {
+            const total = basePrice * passengers;
+            document.getElementById('totalPrice').textContent = '$' + total.toLocaleString('es-AR');
+        }
+
+        function updateWhatsAppLink() {
+            const params = new URLSearchParams(window.location.search);
+            const excursion = params.get('excursion') || 'Circuito Chico';
+            const empresa = params.get('empresa') || 'Empresa Oscar';
+            const combi = params.get('combi') || 'Combi';
+            const total = (basePrice * passengers).toLocaleString('es-AR');
+
+            const name = document.getElementById('custName')?.value || 'Pasajero';
+            const hotel = document.getElementById('custHotel')?.value || 'A confirmar';
+
+            const msg = `¡Hola ${empresa}! Quiero reservar ${passengers} ticket(s) para ${excursion} (Combi ${combi}). Total estimado: $${total}. Nombre: ${name}. Hotel/Parada: ${hotel}.`;
+
+            const link = document.getElementById('waBookingLink');
+            if (link) {
+                link.href = `https://wa.me/5492944123456?text=${encodeURIComponent(msg)}`;
+            }
+        }
+
+        function handlePayTicket() {
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+
+            if (!name || !phone) {
+                alert('Por favor completá tu Nombre y WhatsApp para continuar con la reserva.');
+                return;
+            }
+
+            // Redirigir a WhatsApp con los datos completos
+            updateWhatsAppLink();
+            const waLink = document.getElementById('waBookingLink').href;
+            window.location.href = waLink;
+        }
+
+        document.getElementById('custName').addEventListener('input', updateWhatsAppLink);
+        document.getElementById('custHotel').addEventListener('input', updateWhatsAppLink);
+    </script>
+</body>
+
+</html>
