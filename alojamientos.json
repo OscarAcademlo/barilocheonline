@@ -10,10 +10,12 @@
     "lat": -41.053,
     "lng": -71.537,
     "images": [
-      "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&q=80&w=800"
+      "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&q=80&w=800"
     ],
     "description": "Hermosa cabaña con vista panorámica al Lago Nahuel Huapi. 3 dormitorios, cocina equipada, parrilla y deck con vista al lago.",
-    "amenities": ["Wi-Fi", "Parrilla", "Deck", "Vista al lago", "Calefacción", "Estacionamiento"],
+    "amenities": ["Wi-Fi", "Parrilla", "Deck", "Vista al lago", "Calefacción", "Estacionamiento", "Pet friendly"],
     "phone": "5492944123456",
     "created_at": "2026-08-20T12:00:00Z"
   },
@@ -28,7 +30,9 @@
     "lat": -41.134,
     "lng": -71.310,
     "images": [
-      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=800"
+      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&q=80&w=800"
     ],
     "description": "Moderno loft en pleno centro de Bariloche. A pasos de restaurantes, tiendas y transporte público. Ideal para parejas.",
     "amenities": ["Wi-Fi", "Smart TV", "Cocina", "Calefacción", "Ubicación central"],
@@ -46,10 +50,12 @@
     "lat": -41.171,
     "lng": -71.395,
     "images": [
-      "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=800"
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=800"
     ],
     "description": "A minutos del centro de ski Cerro Catedral. Casa completa con 4 dormitorios, chimenea y jacuzzi. Perfecta para familias.",
-    "amenities": ["Wi-Fi", "Jacuzzi", "Chimenea", "Parrilla", "4 dormitorios", "Calefacción"],
+    "amenities": ["Wi-Fi", "Jacuzzi", "Chimenea", "Parrilla", "4 dormitorios", "Calefacción", "Pet friendly"],
     "phone": "5492944345678",
     "created_at": "2026-08-20T12:00:00Z"
   },
@@ -64,7 +70,9 @@
     "lat": -41.082,
     "lng": -71.447,
     "images": [
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&q=80&w=800"
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=800"
     ],
     "description": "Departamento luminoso sobre Av. Bustillo con vista directa al lago. 2 dormitorios, balcón amplio y todas las comodidades.",
     "amenities": ["Wi-Fi", "Balcón", "Vista al lago", "Cocina completa", "Estacionamiento"],
@@ -82,10 +90,12 @@
     "lat": -41.075,
     "lng": -71.511,
     "images": [
-      "https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?auto=format&fit=crop&q=80&w=800"
+      "https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=800"
     ],
     "description": "Inmersa en el bosque del Circuito Chico. Tranquilidad absoluta, contacto con la naturaleza. 2 dormitorios y hogar a leña.",
-    "amenities": ["Hogar a leña", "Bosque", "Tranquilidad", "Parrilla", "Wi-Fi"],
+    "amenities": ["Hogar a leña", "Bosque", "Tranquilidad", "Parrilla", "Wi-Fi", "Pet friendly"],
     "phone": "5492944567890",
     "created_at": "2026-08-20T12:00:00Z"
   }
