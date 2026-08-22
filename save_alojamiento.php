@@ -94,6 +94,7 @@ if ($action === 'redeem_code') {
                 }
                 $found = true;
                 $months = max(1, intval($c['months'] ?? 1));
+                $promoService = trim($c['service'] ?? 'all');
                 $c['used_count'] = ($c['used_count'] ?? 0) + 1;
                 break;
             }
@@ -125,6 +126,7 @@ if ($action === 'redeem_code') {
             $s['expires_at'] = $expiresAt;
             $s['plan'] = "promo_{$months}m";
             $s['months'] = $months;
+            $s['service'] = $promoService;
             $s['code_used'] = $code;
             $s['updated_at'] = date('c');
             $updated = true;
@@ -138,11 +140,12 @@ if ($action === 'redeem_code') {
             'email' => $email,
             'plan' => "promo_{$months}m",
             'months' => $months,
+            'service' => $promoService,
             'active' => true,
+            'code_used' => $code,
             'created_at' => date('c'),
             'expires_at' => $expiresAt,
-            'method' => 'promo_code',
-            'code_used' => $code
+            'method' => 'promo_code'
         ];
     }
 
@@ -434,6 +437,7 @@ if ($action === 'create_promo_code') {
     $code = strtoupper(trim($data['code'] ?? ''));
     $months = intval($data['months'] ?? 3);
     $maxUses = intval($data['max_uses'] ?? 50);
+    $service = trim($data['service'] ?? 'all');
 
     if (empty($code)) {
         http_response_code(400);
@@ -447,6 +451,7 @@ if ($action === 'create_promo_code') {
     $codes[] = [
         'code' => $code,
         'months' => $months,
+        'service' => $service,
         'created_by' => $adminEmail,
         'max_uses' => $maxUses,
         'used_count' => 0,
@@ -455,7 +460,7 @@ if ($action === 'create_promo_code') {
     ];
 
     file_put_contents($codesFile, json_encode($codes, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-    echo json_encode(['status' => 'success', 'message' => "Código $code creado para $months meses", 'data' => $codes]);
+    echo json_encode(['status' => 'success', 'message' => "Código $code creado para $months meses ($service)", 'data' => $codes]);
     exit;
 }
 

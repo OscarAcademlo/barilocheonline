@@ -107,8 +107,17 @@ function initMapGasto() {
             iconAnchor: [30, 16]
         });
 
-        const marker = L.marker([rest.lat, rest.lng], { icon: priceIcon }).addTo(mapGasto);
-        marker.on('click', () => showGastronomyDetails(rest.id));
+        const marker = L.marker([rest.lat, rest.lng], { icon: priceIcon })
+            .bindPopup(`
+                <div class="map-popup-mini">
+                    <img src="${rest.image || 'https://images.unsplash.com/photo-1574096079513-a82f09919cf7?auto=format&fit=crop&q=80&w=400'}" style="width:100%; height:90px; object-fit:cover; border-radius:8px; margin-bottom:6px;">
+                    <b style="font-size:0.95rem; display:block;">${rest.name}</b>
+                    <small style="color:#64748b;"><i class="fas fa-utensils"></i> ${rest.type || 'Gastronomía'}</small><br>
+                    <b style="color:#e67e22; font-size:1rem;">${rest.price_level || '$$'}</b><br>
+                    <button onclick="showGastronomyDetails('${rest.id}')" style="margin-top:6px; background:#e67e22; color:white; border:none; border-radius:6px; padding:6px 12px; font-weight:bold; cursor:pointer; width:100%;">Ver Detalles</button>
+                </div>
+            `, { maxWidth: 220 })
+            .addTo(mapGasto);
         markersGasto.push(marker);
     });
 }
@@ -139,6 +148,9 @@ function renderGastronomy() {
 }
 
 function showGastronomyDetails(id) {
+    if (mapGasto) {
+        mapGasto.closePopup();
+    }
     const rest = GASTRONOMY.find(a => String(a.id) === String(id));
     if (!rest) return;
 

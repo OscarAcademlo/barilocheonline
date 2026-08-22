@@ -328,12 +328,12 @@
             </div>
         </div>
 
-        <!-- 5. SECCIÓN DE TELEMETRÍA EN VIVO DE VEHÍCULOS (APP ANDROID) -->
+        <!-- 5. SECCIÓN DE ESTADO DE CONEXIÓN DE VEHÍCULOS / COMBIS -->
         <div class="admin-card">
             <div class="section-header-row">
                 <div>
-                    <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-satellite-dish" style="color:#00b894;"></i> Posiciones GPS en Vivo (App Android)</h2>
-                    <small style="color:var(--text-secondary);">Coordenadas transmitidas en tiempo real a la tabla `vehicles` de Supabase.</small>
+                    <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-signal" style="color:#00b894;"></i> Estado de Conexión de Vehículos / Combis</h2>
+                    <small style="color:var(--text-secondary);">Muestra si cada unidad está transmitiendo en vivo o inactiva (sin cargar mapas ni consumir datos).</small>
                 </div>
             </div>
 
@@ -341,18 +341,17 @@
                 <table class="company-table">
                     <thead>
                         <tr>
-                            <th>Unidad</th>
+                            <th>Móvil / Unidad</th>
                             <th>Empresa</th>
-                            <th>Latitud</th>
-                            <th>Longitud</th>
+                            <th>Estado de Transmisión</th>
                             <th>Velocidad</th>
-                            <th>Última Transmisión</th>
+                            <th>Última Actividad</th>
                         </tr>
                     </thead>
                     <tbody id="telemetryTableBody">
                         <tr>
-                            <td colspan="6" style="text-align:center; padding:30px; color:var(--text-secondary);">
-                                Esperando transmisión GPS desde la aplicación Android...
+                            <td colspan="5" style="text-align:center; padding:30px; color:var(--text-secondary);">
+                                Esperando datos de unidades...
                             </td>
                         </tr>
                     </tbody>
@@ -365,7 +364,7 @@
             <div class="section-header-row">
                 <div>
                     <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-gift" style="color:#e67e22;"></i> Códigos de Gratuidad (Promociones)</h2>
-                    <small style="color:var(--text-secondary);">Regala meses de publicación sin cargo. El usuario publica gratis y no se le cobrará hasta que venza el plazo.</small>
+                    <small style="color:var(--text-secondary);">Regala meses de publicación sin cargo discriminados por servicio. El usuario publica gratis hasta vencer el plazo.</small>
                 </div>
                 <button class="btn-add-comp" style="background:#e67e22;" onclick="openAddPromoModal()">
                     <i class="fas fa-plus"></i> Crear Código de Gratuidad
@@ -378,6 +377,7 @@
                         <tr>
                             <th>Código</th>
                             <th>Meses Gratis</th>
+                            <th>Servicio Aplicable</th>
                             <th>Usos Actuales</th>
                             <th>Límite de Usos</th>
                             <th>Creado</th>
@@ -386,7 +386,7 @@
                     </thead>
                     <tbody id="promoCodesTableBody">
                         <tr>
-                            <td colspan="6" style="text-align:center; padding:30px; color:var(--text-secondary);">
+                            <td colspan="7" style="text-align:center; padding:30px; color:var(--text-secondary);">
                                 Cargando códigos promocionales...
                             </td>
                         </tr>
@@ -404,7 +404,7 @@
             <div class="modal-header-section">
                 <div class="modal-icon-badge" style="background:rgba(230, 126, 34, 0.15); color:#e67e22;"><i class="fas fa-gift"></i></div>
                 <h2>Nuevo Código de Gratuidad</h2>
-                <p>Define el código y la cantidad de meses de servicio gratuito.</p>
+                <p>Define el código, la cantidad de meses y el servicio aplicable.</p>
             </div>
 
             <form onsubmit="handleSavePromoCode(event)">
@@ -416,6 +416,16 @@
                             🎲 Generar
                         </button>
                     </div>
+                </div>
+
+                <div class="form-group-custom">
+                    <label>Servicio Aplicable al Beneficio</label>
+                    <select id="newPromoService" class="form-control-custom">
+                        <option value="all" selected>🌟 Todos los Servicios (Combo Completo)</option>
+                        <option value="excursiones">🚐 Excursiones / Combis (BariRuta)</option>
+                        <option value="alojamiento">🏡 Alojamiento (Dónde Dormir)</option>
+                        <option value="gastronomia">🍽️ Gastronomía (Dónde Comer)</option>
+                    </select>
                 </div>
 
                 <div class="form-group-custom">
@@ -630,20 +640,30 @@
             if (!tbody) return;
 
             if (!vehicles || vehicles.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-secondary);">No hay vehículos transmitiendo actualmente.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-secondary);">No hay vehículos registrados o transmitiendo.</td></tr>';
                 return;
             }
 
-            tbody.innerHTML = vehicles.map(v => `
-                <tr>
-                    <td><b>🚐 ${v.vehicle_code}</b></td>
-                    <td>${v.company_name}</td>
-                    <td>${v.lat ? v.lat.toFixed(5) : '-'}</td>
-                    <td>${v.lng ? v.lng.toFixed(5) : '-'}</td>
-                    <td><b style="color:var(--primary);">${Math.round(v.speed || 0)} km/h</b></td>
-                    <td><small>${v.updated_at ? new Date(v.updated_at).toLocaleTimeString() : 'Reciente'}</small></td>
-                </tr>
-            `).join('');
+            const now = Date.now();
+            tbody.innerHTML = vehicles.map(v => {
+                const updatedTime = new Date(v.updated_at || 0).getTime();
+                const isOnline = (now - updatedTime) < 35000;
+                const speed = Math.round(v.speed || 0);
+
+                return `
+                    <tr>
+                        <td><b>🚐 ${v.vehicle_code || 'Combi'}</b></td>
+                        <td>${v.company_name || '-'}</td>
+                        <td>
+                            <span class="badge-active" style="background:${isOnline ? 'rgba(0, 184, 148, 0.15)' : 'rgba(148, 163, 184, 0.15)'}; color:${isOnline ? '#00b894' : '#64748b'}; font-weight:800; padding:4px 10px; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
+                                <i class="fas ${isOnline ? 'fa-satellite-dish' : 'fa-moon'}"></i> ${isOnline ? 'Transmitiendo en Vivo' : 'Inactivo / En espera'}
+                            </span>
+                        </td>
+                        <td><b style="color:var(--primary);">${speed > 0 ? `${speed} km/h` : 'Detenido'}</b></td>
+                        <td><small style="color:var(--text-secondary);">${v.updated_at ? new Date(v.updated_at).toLocaleTimeString() : 'Reciente'}</small></td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         function openAddCompanyModal() {
@@ -705,13 +725,19 @@
             if (!tbody) return;
 
             if (!codes || codes.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:25px; color:var(--text-secondary);">No hay códigos de gratuidad activos. Crea uno con el botón de arriba.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:25px; color:var(--text-secondary);">No hay códigos de gratuidad activos. Crea uno con el botón de arriba.</td></tr>';
                 return;
             }
 
             tbody.innerHTML = codes.map(c => {
                 const createdDate = c.created_at ? new Date(c.created_at).toLocaleDateString() : 'Activo';
                 const isExhausted = (c.max_uses && c.used_count >= c.max_uses);
+                const srv = c.service || 'all';
+                let serviceBadge = '<span style="background:rgba(108,92,231,0.15); color:#6c5ce7; font-weight:800; font-size:0.75rem; padding:3px 8px; border-radius:6px;">🌟 Todos</span>';
+                if (srv === 'excursiones') serviceBadge = '<span style="background:rgba(0,132,255,0.15); color:#0084ff; font-weight:800; font-size:0.75rem; padding:3px 8px; border-radius:6px;">🚐 Excursiones</span>';
+                if (srv === 'alojamiento') serviceBadge = '<span style="background:rgba(230,126,34,0.15); color:#e67e22; font-weight:800; font-size:0.75rem; padding:3px 8px; border-radius:6px;">🏡 Alojamiento</span>';
+                if (srv === 'gastronomia') serviceBadge = '<span style="background:rgba(231,76,60,0.15); color:#e74c3c; font-weight:800; font-size:0.75rem; padding:3px 8px; border-radius:6px;">🍽️ Gastronomía</span>';
+
                 return `
                     <tr>
                         <td>
@@ -721,6 +747,7 @@
                             </div>
                         </td>
                         <td><b style="color:#00b894; font-size:0.95rem;">${c.months} ${c.months === 1 ? 'Mes' : 'Meses'} Gratis</b></td>
+                        <td>${serviceBadge}</td>
                         <td>${c.used_count || 0}</td>
                         <td>${c.max_uses || 'Ilimitado'} ${isExhausted ? '<span style="color:#e74c3c; font-size:0.75rem; font-weight:700;">(Agotado)</span>' : ''}</td>
                         <td><small style="color:var(--text-secondary);">${createdDate}</small></td>
@@ -755,40 +782,37 @@
         async function handleSavePromoCode(e) {
             e.preventDefault();
             const code = document.getElementById('newPromoCode').value.trim().toUpperCase();
+            const service = document.getElementById('newPromoService').value;
             const months = parseInt(document.getElementById('newPromoMonths').value);
             const maxUses = parseInt(document.getElementById('newPromoMaxUses').value);
             const btn = document.getElementById('btnSavePromoCode');
 
-            if (!code) {
-                alert('Ingresá un código');
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
-
             try {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
                 const res = await fetch('save_alojamiento.php?action=create_promo_code', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         admin_email: 'oscarns@gmail.com',
-                        code: code,
-                        months: months,
+                        code,
+                        service,
+                        months,
                         max_uses: maxUses
                     })
                 });
+
                 const data = await res.json();
                 if (data.status === 'success') {
                     closeAddPromoModal();
-                    document.getElementById('newPromoCode').value = '';
-                    alert(`🎉 Código "${code}" creado con éxito por ${months} meses gratis.`);
                     loadPromoCodes();
+                    alert(`¡Código ${code} creado con éxito para ${months} meses (${service})!`);
                 } else {
-                    alert('Error: ' + (data.message || 'No se pudo crear el código'));
+                    alert('Error: ' + data.message);
                 }
             } catch (err) {
-                alert('Error de conexión al guardar código');
+                alert('Error al crear código: ' + err.message);
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-check-circle"></i> Guardar y Habilitar Código';

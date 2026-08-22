@@ -100,7 +100,6 @@ function renderMapMarkers(list) {
             `, { maxWidth: 220 })
             .addTo(map);
 
-        marker.on('click', () => showAccommodationDetails(acc.id));
         markers.push(marker);
     });
 }
@@ -159,6 +158,9 @@ function renderAccommodations(list) {
 
 // 4. MODAL DETALLES DEL ALOJAMIENTO + WHATSAPP DIRECTO
 function showAccommodationDetails(id) {
+    if (map) {
+        map.closePopup();
+    }
     const acc = accommodations.find(a => String(a.id) === String(id));
     if (!acc) return;
 
