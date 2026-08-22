@@ -275,13 +275,24 @@ class AuthManager {
     toggleMode(mode) {
         const loginForm = document.getElementById('loginFormContainer') || document.getElementById('globalLoginFormContainer');
         const signupForm = document.getElementById('signupFormContainer') || document.getElementById('globalSignupFormContainer');
+        const titleEl = document.querySelector('#authModal .auth-header-title h2') || document.querySelector('#globalAuthModal .auth-header-title h2');
+        const noticeEl = document.getElementById('authNoticeMsg') || document.getElementById('globalAuthNotice');
+        const iconEl = document.querySelector('#authModal .auth-header-title i') || document.querySelector('#globalAuthModal .auth-header-title i');
+
         if (!loginForm || !signupForm) return;
+
         if (mode === 'signup') {
             loginForm.style.display = 'none';
             signupForm.style.display = 'block';
+            if (titleEl) titleEl.textContent = 'Crear Cuenta de Prestador';
+            if (noticeEl) noticeEl.textContent = 'Registrate y elegí tus servicios para empezar a publicar en Bariloche.Online';
+            if (iconEl) iconEl.className = 'fas fa-user-plus';
         } else {
             loginForm.style.display = 'block';
             signupForm.style.display = 'none';
+            if (titleEl) titleEl.textContent = 'Iniciar Sesión';
+            if (noticeEl) noticeEl.textContent = 'Accede a tu cuenta para administrar tus publicaciones y servicios';
+            if (iconEl) iconEl.className = 'fas fa-user-circle';
         }
     }
 

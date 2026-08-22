@@ -433,12 +433,22 @@ function closeAuthModal() {
 function toggleAuthMode(mode) {
     const loginForm = document.getElementById('loginFormContainer');
     const signupForm = document.getElementById('signupFormContainer');
+    const titleEl = document.querySelector('#authModal .auth-header-title h2');
+    const noticeEl = document.getElementById('authNoticeMsg');
+    const iconEl = document.querySelector('#authModal .auth-header-title i');
+
     if (mode === 'signup') {
         loginForm.style.display = 'none';
         signupForm.style.display = 'block';
+        if (titleEl) titleEl.textContent = 'Crear Cuenta de Prestador';
+        if (noticeEl) noticeEl.textContent = 'Registrate y elegí tus servicios para empezar a publicar en Bariloche.Online';
+        if (iconEl) iconEl.className = 'fas fa-user-plus';
     } else {
         loginForm.style.display = 'block';
         signupForm.style.display = 'none';
+        if (titleEl) titleEl.textContent = 'Portal de Propietarios';
+        if (noticeEl) noticeEl.textContent = 'Iniciá sesión para administrar tus publicaciones y servicios.';
+        if (iconEl) iconEl.className = 'fas fa-hotel';
     }
 }
 
