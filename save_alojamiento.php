@@ -557,16 +557,344 @@ if ($action === 'admin_grant_subscription') {
     exit;
 }
 
-// 12. PANEL ADMIN: LISTAR TODAS LAS SUSCRIPCIONES
-if ($action === 'get_all_subscriptions') {
+// 13. OBTENER TARIFAS Y PRECIOS DE SUSCRIPCIÓN
+if ($action === 'get_service_prices') {
+    $pricesFile = __DIR__ . '/precios_servicios.json';
+    if (!file_exists($pricesFile)) {
+        $defaultPrices = [
+            'excursiones' => 10000,
+            'alojamiento' => 10000,
+            'gastronomia' => 10000,
+            'combo_2_descuento' => 10,
+            'combo_3_descuento' => 20,
+            'updated_at' => date('c')
+        ];
+        file_put_contents($pricesFile, json_encode($defaultPrices, JSON_PRETTY_PRINT));
+    }
+    echo file_get_contents($pricesFile);
+    exit;
+}
+
+// 14. PANEL ADMIN: GUARDAR TARIFAS Y PRECIOS
+if ($action === 'save_service_prices') {
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true) ?: $_POST;
+    $adminEmail = strtolower(trim($data['admin_email'] ?? ''));
+
+    if ($adminEmail !== ADMIN_EMAIL) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
+        exit;
+    }
+
+    $pricesFile = __DIR__ . '/precios_servicios.json';
+    $prices = [
+        'excursiones' => max(0, intval($data['excursiones'] ?? 10000)),
+        'alojamiento' => max(0, intval($data['alojamiento'] ?? 10000)),
+        'gastronomia' => max(0, intval($data['gastronomia'] ?? 10000)),
+        'combo_2_descuento' => max(0, min(100, intval($data['combo_2_descuento'] ?? 10))),
+        'combo_3_descuento' => max(0, min(100, intval($data['combo_3_descuento'] ?? 20))),
+        'updated_at' => date('c'),
+        'updated_by' => $adminEmail
+    ];
+
+    file_put_contents($pricesFile, json_encode($prices, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    @chmod($pricesFile, 0666);
+    echo json_encode(['status' => 'success', 'message' => 'Tarifas actualizadas con éxito', 'data' => $prices]);
+    exit;
+}
+
+// 15. OBTENER GASTRONOMÍA DINÁMICA
+if ($action === 'get_gastronomia') {
+    $file = __DIR__ . '/gastronomia.json';
+    if (!file_exists($file)) {
+        file_put_contents($file, '[]');
+    }
+    echo file_get_contents($file);
+    exit;
+}
+
+// 16. GUARDAR / EDITAR PROVEEDOR MULTISERVICIO Y FLOTA DE COMBO/MÓVILES
+if ($action === 'save_multiservice_provider') {
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true) ?: $_POST;
+    $email = strtolower(trim($data['email'] ?? ''));
+
+    if (empty($email)) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'Email requerido']);
+        exit;
+    }
+
+    $provFile = __DIR__ . '/proveedores_servicios.json';
+    $providers = file_exists($provFile) ? json_decode(file_get_contents($provFile), true) : [];
+    if (!is_array($providers)) $providers = [];
+
+    $businessName = trim($data['business_name'] ?? '');
+    $phone = trim($data['phone'] ?? '');
+    $selectedServices = is_array($data['services'] ?? null) ? $data['services'] : [];
+    $moviles = is_array($data['moviles'] ?? null) ? $data['moviles'] : [];
+
+    // Limpiar y formatear móviles (Marca, Color, 3 últimos dígitos de patente)
+    $cleanMoviles = [];
+    foreach ($moviles as $m) {
+        $cleanMoviles[] = [
+            'id' => $m['id'] ?? ('movil_' . uniqid()),
+            'codigo' => trim($m['codigo'] ?? 'Combi'),
+            'marca' => trim($m['marca'] ?? ''),
+            'color' => trim($m['color'] ?? 'Blanco'),
+            'patente_ultimos3' => strtoupper(trim(substr($m['patente_ultimos3'] ?? '', -3))),
+            'is_active' => isset($m['is_active']) ? (bool)$m['is_active'] : true
+        ];
+    }
+
+    $updated = false;
+    foreach ($providers as &$p) {
+        if (strtolower(trim($p['email'] ?? '')) === $email) {
+            $p['business_name'] = $businessName ?: ($p['business_name'] ?? '');
+            $p['phone'] = $phone ?: ($p['phone'] ?? '');
+            $p['services'] = $selectedServices;
+            $p['moviles'] = $cleanMoviles;
+            $p['cantidad_moviles'] = count($cleanMoviles);
+            $p['updated_at'] = date('c');
+            $updated = true;
+            break;
+        }
+    }
+    unset($p);
+
+    if (!$updated) {
+        $providers[] = [
+            'id' => 'prov_' . uniqid(),
+            'email' => $email,
+            'business_name' => $businessName,
+            'phone' => $phone,
+            'services' => $selectedServices,
+            'moviles' => $cleanMoviles,
+            'cantidad_moviles' => count($cleanMoviles),
+            'is_active' => true,
+            'created_at' => date('c'),
+            'updated_at' => date('c')
+        ];
+    }
+
+    file_put_contents($provFile, json_encode($providers, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    @chmod($provFile, 0666);
+
+    echo json_encode(['status' => 'success', 'message' => 'Perfil de servicios y flota guardados con éxito', 'data' => $data]);
+    exit;
+}
+
+// 17. OBTENER PERFIL DE PROVEEDOR DEL USUARIO
+if ($action === 'get_my_provider_profile') {
+    $email = strtolower(trim($_GET['email'] ?? $_POST['email'] ?? ''));
+    if (empty($email)) {
+        echo json_encode(['status' => 'error', 'message' => 'Email requerido']);
+        exit;
+    }
+
+    $provFile = __DIR__ . '/proveedores_servicios.json';
+    $providers = file_exists($provFile) ? json_decode(file_get_contents($provFile), true) : [];
+    
+    $myProfile = null;
+    if (is_array($providers)) {
+        foreach ($providers as $p) {
+            if (strtolower(trim($p['email'] ?? '')) === $email) {
+                $myProfile = $p;
+                break;
+            }
+        }
+    }
+
+    // Alojamiento del usuario
+    $accFile = __DIR__ . '/alojamientos.json';
+    $accs = file_exists($accFile) ? json_decode(file_get_contents($accFile), true) : [];
+    $myAccs = is_array($accs) ? array_values(array_filter($accs, fn($a) => strtolower(trim($a['owner_email'] ?? '')) === $email)) : [];
+
+    // Gastronomía del usuario
+    $gastoFile = __DIR__ . '/gastronomia.json';
+    $gastos = file_exists($gastoFile) ? json_decode(file_get_contents($gastoFile), true) : [];
+    $myGastos = is_array($gastos) ? array_values(array_filter($gastos, fn($g) => strtolower(trim($g['owner_email'] ?? '')) === $email)) : [];
+
+    echo json_encode([
+        'status' => 'success',
+        'provider' => $myProfile,
+        'accommodations' => $myAccs,
+        'gastronomy' => $myGastos
+    ]);
+    exit;
+}
+
+// 18. PANEL ADMIN: OBTENER TODOS LOS PROVEEDORES, SERVICIOS Y FLOTA
+if ($action === 'admin_get_all_providers') {
     $adminEmail = strtolower(trim($_GET['admin_email'] ?? ''));
     if ($adminEmail !== ADMIN_EMAIL) {
         http_response_code(403);
         echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
         exit;
     }
+
+    $provFile = __DIR__ . '/proveedores_servicios.json';
+    $providers = file_exists($provFile) ? json_decode(file_get_contents($provFile), true) : [];
+
     $subsFile = __DIR__ . '/suscripciones.json';
-    echo file_exists($subsFile) ? file_get_contents($subsFile) : '[]';
+    $subs = file_exists($subsFile) ? json_decode(file_get_contents($subsFile), true) : [];
+
+    $accFile = __DIR__ . '/alojamientos.json';
+    $accs = file_exists($accFile) ? json_decode(file_get_contents($accFile), true) : [];
+
+    $gastoFile = __DIR__ . '/gastronomia.json';
+    $gastos = file_exists($gastoFile) ? json_decode(file_get_contents($gastoFile), true) : [];
+
+    echo json_encode([
+        'status' => 'success',
+        'providers' => is_array($providers) ? $providers : [],
+        'subscriptions' => is_array($subs) ? $subs : [],
+        'accommodations' => is_array($accs) ? $accs : [],
+        'gastronomy' => is_array($gastos) ? $gastos : []
+    ]);
+    exit;
+}
+
+// 19. PANEL ADMIN: PAUSAR / ACTIVAR PROVEEDOR O MÓVIL
+if ($action === 'admin_toggle_pause') {
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true) ?: $_POST;
+    $adminEmail = strtolower(trim($data['admin_email'] ?? ''));
+
+    if ($adminEmail !== ADMIN_EMAIL) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
+        exit;
+    }
+
+    $targetEmail = strtolower(trim($data['target_email'] ?? ''));
+    $movilId = trim($data['movil_id'] ?? '');
+    $type = trim($data['type'] ?? 'provider'); // provider, movil, accommodation, gastronomy
+
+    if ($type === 'movil' && $targetEmail && $movilId) {
+        $provFile = __DIR__ . '/proveedores_servicios.json';
+        $providers = file_exists($provFile) ? json_decode(file_get_contents($provFile), true) : [];
+        foreach ($providers as &$p) {
+            if (strtolower(trim($p['email'] ?? '')) === $targetEmail && !empty($p['moviles'])) {
+                foreach ($p['moviles'] as &$m) {
+                    if (($m['id'] ?? '') === $movilId) {
+                        $m['is_active'] = !($m['is_active'] ?? true);
+                        break;
+                    }
+                }
+            }
+        }
+        file_put_contents($provFile, json_encode($providers, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        echo json_encode(['status' => 'success', 'message' => 'Estado del móvil actualizado']);
+        exit;
+    }
+
+    if ($type === 'provider' && $targetEmail) {
+        $provFile = __DIR__ . '/proveedores_servicios.json';
+        $providers = file_exists($provFile) ? json_decode(file_get_contents($provFile), true) : [];
+        foreach ($providers as &$p) {
+            if (strtolower(trim($p['email'] ?? '')) === $targetEmail) {
+                $p['is_active'] = !($p['is_active'] ?? true);
+                break;
+            }
+        }
+        file_put_contents($provFile, json_encode($providers, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        echo json_encode(['status' => 'success', 'message' => 'Estado de la empresa actualizado']);
+        exit;
+    }
+
+    http_response_code(400);
+    echo json_encode(['status' => 'error', 'message' => 'Parámetros inválidos']);
+    exit;
+}
+
+// 20. PANEL ADMIN: ENVIAR MENSAJE A USUARIO
+if ($action === 'admin_send_user_message') {
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true) ?: $_POST;
+    $adminEmail = strtolower(trim($data['admin_email'] ?? ''));
+
+    if ($adminEmail !== ADMIN_EMAIL) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
+        exit;
+    }
+
+    $targetEmail = strtolower(trim($data['target_email'] ?? ''));
+    $title = trim($data['title'] ?? 'Aviso del Administrador');
+    $message = trim($data['message'] ?? '');
+    $msgType = trim($data['type'] ?? 'info'); // info, warning, success, alert
+
+    if (empty($targetEmail) || empty($message)) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'Email y mensaje son obligatorios']);
+        exit;
+    }
+
+    $msgFile = __DIR__ . '/mensajes_admin.json';
+    $messages = file_exists($msgFile) ? json_decode(file_get_contents($msgFile), true) : [];
+    if (!is_array($messages)) $messages = [];
+
+    $newMsg = [
+        'id' => 'msg_' . uniqid(),
+        'target_email' => $targetEmail,
+        'title' => $title,
+        'message' => $message,
+        'type' => $msgType,
+        'created_at' => date('c'),
+        'read' => false
+    ];
+
+    $messages[] = $newMsg;
+    file_put_contents($msgFile, json_encode($messages, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    @chmod($msgFile, 0666);
+
+    echo json_encode(['status' => 'success', 'message' => 'Mensaje enviado al usuario con éxito', 'data' => $newMsg]);
+    exit;
+}
+
+// 21. OBTENER MENSAJES DEL USUARIO
+if ($action === 'get_user_messages') {
+    $email = strtolower(trim($_GET['email'] ?? $_POST['email'] ?? ''));
+    if (empty($email)) {
+        echo json_encode([]);
+        exit;
+    }
+
+    $msgFile = __DIR__ . '/mensajes_admin.json';
+    $messages = file_exists($msgFile) ? json_decode(file_get_contents($msgFile), true) : [];
+    if (!is_array($messages)) $messages = [];
+
+    $userMsgs = array_values(array_filter($messages, function($m) use ($email) {
+        $target = strtolower(trim($m['target_email'] ?? ''));
+        return $target === $email || $target === 'all';
+    }));
+
+    echo json_encode($userMsgs);
+    exit;
+}
+
+// 22. ELIMINAR / MARCAR MENSAJE COMO LEÍDO
+if ($action === 'delete_user_message') {
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true) ?: $_POST;
+    $msgId = trim($data['id'] ?? '');
+
+    if (empty($msgId)) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'ID de mensaje requerido']);
+        exit;
+    }
+
+    $msgFile = __DIR__ . '/mensajes_admin.json';
+    $messages = file_exists($msgFile) ? json_decode(file_get_contents($msgFile), true) : [];
+    if (!is_array($messages)) $messages = [];
+
+    $newMsgs = array_values(array_filter($messages, fn($m) => ($m['id'] ?? '') !== $msgId));
+    file_put_contents($msgFile, json_encode($newMsgs, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+    echo json_encode(['status' => 'success', 'message' => 'Mensaje descartado']);
     exit;
 }
 

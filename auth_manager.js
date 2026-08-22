@@ -111,11 +111,12 @@ class AuthManager {
 
                 userBar.innerHTML = `
                     <div class="auth-logged-pill" style="${isAdmin ? 'border:1px solid #e74c3c; background:rgba(231, 76, 60, 0.12);' : ''} display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                        <div style="display:flex; align-items:center; gap:6px;">
+                        <a href="perfil.html" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:6px;" title="Ir a Mi Panel de Prestador">
                             <i class="fas ${isAdmin ? 'fa-user-shield' : 'fa-user-circle'}" style="${isAdmin ? 'color:#e74c3c;' : 'color:var(--primary);'} font-size:1.1rem;"></i>
                             <span style="font-weight:700; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${this.currentUser.email}</span>
-                        </div>
+                        </a>
                         ${subBadge}
+                        <a href="perfil.html" class="btn-owner-edit" style="text-decoration:none; font-size:0.75rem; padding:4px 8px; font-weight:700; display:inline-flex; align-items:center; gap:4px;"><i class="fas fa-sliders"></i> Mi Panel</a>
                         ${isAdmin ? '<a href="admin.html" class="btn-admin-pill" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px;"><i class="fas fa-shield-alt"></i> Panel Admin</a>' : ''}
                         <button onclick="window.authManager.logout()" class="btn-logout-mini" title="Cerrar sesión" style="margin-left:4px;">
                             <i class="fas fa-sign-out-alt"></i>

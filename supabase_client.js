@@ -104,12 +104,10 @@ class BariRutaSupabaseClient {
                 .eq('is_active', true)
                 .order('created_at', { ascending: true });
 
-            if (!error && data && data.length > 0) {
+            if (!error && data) {
                 this.companies = data;
-            } else if (this.companies.length === 0) {
-                this.companies = [{ id: '1', name: 'Empresa Oscar', phone: '+5492944123456', category: 'combi' }];
             }
-            this.notifyCompanies(this.companies);
+            this.notifyCompanies(this.companies || []);
         } catch (e) {
             console.error('Error al consultar companies en Supabase:', e);
         }

@@ -206,42 +206,129 @@
             </form>
         </div>
 
-        <!-- 2. SECCIÓN DE EMPRESAS REGISTRADAS -->
+        <!-- 2. SECCIÓN: TARIFAS Y PRECIOS DE SUSCRIPCIÓN (EDITABLE POR ADMIN) -->
         <div class="admin-card">
             <div class="section-header-row">
                 <div>
-                    <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-building" style="color:var(--primary);"></i> Empresas de Transporte</h2>
-                    <small style="color:var(--text-secondary);">Las empresas dadas de alta aparecen automáticamente en el selector del mapa del turista.</small>
+                    <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-tags" style="color:#00b894;"></i> Tarifas y Precios de Suscripción</h2>
+                    <small style="color:var(--text-secondary);">Define el valor mensual de cada servicio y los descuentos automáticos por paquetes combinados.</small>
                 </div>
-                <button class="btn-add-comp" onclick="openAddCompanyModal()">
-                    <i class="fas fa-plus"></i> Nueva Empresa
+            </div>
+
+            <form onsubmit="handleSaveServicePrices(event)">
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <div class="form-group-custom">
+                        <label><i class="fas fa-van-shuttle" style="color:#0084ff;"></i> Excursiones / Combis (ARS)</label>
+                        <input type="number" id="priceExcursiones" class="form-control-custom" min="0" step="500" required>
+                    </div>
+                    <div class="form-group-custom">
+                        <label><i class="fas fa-bed" style="color:#e67e22;"></i> Alojamiento (ARS)</label>
+                        <input type="number" id="priceAlojamiento" class="form-control-custom" min="0" step="500" required>
+                    </div>
+                    <div class="form-group-custom">
+                        <label><i class="fas fa-utensils" style="color:#e74c3c;"></i> Gastronomía (ARS)</label>
+                        <input type="number" id="priceGastronomia" class="form-control-custom" min="0" step="500" required>
+                    </div>
+                    <div class="form-group-custom">
+                        <label><i class="fas fa-percent" style="color:#00cec9;"></i> Descuento 2 Servicios (%)</label>
+                        <input type="number" id="discount2Services" class="form-control-custom" min="0" max="100" required>
+                    </div>
+                    <div class="form-group-custom">
+                        <label><i class="fas fa-percent" style="color:#6c5ce7;"></i> Descuento 3 Servicios (%)</label>
+                        <input type="number" id="discount3Services" class="form-control-custom" min="0" max="100" required>
+                    </div>
+                </div>
+
+                <button type="submit" id="btnSavePrices" class="btn-submit-pickup" style="background:#00b894; color:white; font-weight:800; width:auto; padding:12px 24px;">
+                    <i class="fas fa-floppy-disk"></i> Guardar Tarifas
+                </button>
+            </form>
+        </div>
+
+        <!-- 3. SECCIÓN: PROVEEDORES MULTISERVICIO Y GESTIÓN DE FLOTA DE COMBIS -->
+        <div class="admin-card">
+            <div class="section-header-row">
+                <div>
+                    <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-users-gear" style="color:var(--primary);"></i> Proveedores y Flota de Vehículos</h2>
+                    <small style="color:var(--text-secondary);">Supervisa cada empresa, sus servicios contratados y cada combi/móvil (marca, color, 3 dígitos patente). Puedes pausar o eliminar.</small>
+                </div>
+                <button class="btn-add-comp" onclick="loadAllProvidersAdmin()">
+                    <i class="fas fa-rotate"></i> Actualizar Lista
                 </button>
             </div>
 
+            <div id="providersFleetContainer" style="display:flex; flex-direction:column; gap:20px;">
+                <div style="text-align:center; padding:30px; color:var(--text-secondary);">
+                    Cargando proveedores y flotas registradas...
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. SECCIÓN: MENSAJERÍA Y AVISOS A PANELES DE USUARIOS -->
+        <div class="admin-card">
+            <div class="section-header-row">
+                <div>
+                    <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-envelope-open-text" style="color:#6c5ce7;"></i> Enviar Mensaje / Notificación a Usuarios</h2>
+                    <small style="color:var(--text-secondary);">El mensaje aparecerá destacado en el panel de control del usuario destinatario.</small>
+                </div>
+            </div>
+
+            <form onsubmit="handleSendAdminMessage(event)" style="margin-bottom:25px;">
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                    <div class="form-group-custom">
+                        <label>Destinatario (Email del Usuario)</label>
+                        <input type="text" id="msgTargetEmail" class="form-control-custom" placeholder="usuario@gmail.com o 'all' para todos" required>
+                    </div>
+                    <div class="form-group-custom">
+                        <label>Tipo de Mensaje</label>
+                        <select id="msgType" class="form-control-custom">
+                            <option value="info">ℹ️ Información / Noticia</option>
+                            <option value="warning">⚠️ Aviso / Vencimiento</option>
+                            <option value="success">🎉 Promoción / Beneficio</option>
+                            <option value="alert">⛔ Alerta Importante</option>
+                        </select>
+                    </div>
+                    <div class="form-group-custom">
+                        <label>Título del Mensaje</label>
+                        <input type="text" id="msgTitle" class="form-control-custom" placeholder="Ej. Actualización de servicios" required>
+                    </div>
+                </div>
+
+                <div class="form-group-custom" style="margin-bottom: 15px;">
+                    <label>Contenido del Mensaje</label>
+                    <textarea id="msgBody" class="form-control-custom" rows="3" placeholder="Escribe el mensaje que verá el usuario en su panel..." required style="resize:vertical;"></textarea>
+                </div>
+
+                <button type="submit" id="btnSendAdminMsg" class="btn-submit-pickup" style="background:#6c5ce7; color:white; font-weight:800; width:auto; padding:12px 24px;">
+                    <i class="fas fa-paper-plane"></i> Enviar Mensaje al Usuario
+                </button>
+            </form>
+
+            <div class="section-header-row" style="margin-top:20px; border-bottom:1px solid var(--border); padding-bottom:8px;">
+                <h3 style="font-size:1.05rem; margin:0;"><i class="fas fa-clock-rotate-left"></i> Mensajes Enviados Recientes</h3>
+            </div>
             <div style="overflow-x:auto;">
                 <table class="company-table">
                     <thead>
                         <tr>
-                            <th>Nombre Empresa</th>
+                            <th>Destinatario</th>
                             <th>Tipo</th>
-                            <th>Teléfono / WhatsApp</th>
-                            <th>Mercado Pago</th>
-                            <th>Estado</th>
+                            <th>Título</th>
+                            <th>Mensaje</th>
+                            <th>Fecha</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="companiesTableBody">
+                    <tbody id="sentMessagesTableBody">
                         <tr>
-                            <td colspan="6" style="text-align:center; padding:30px; color:var(--text-secondary);">
-                                Cargando empresas desde Supabase...
-                            </td>
+                            <td colspan="6" style="text-align:center; padding:20px; color:var(--text-secondary);">No hay mensajes enviados.</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- 3. SECCIÓN DE TELEMETRÍA EN VIVO DE VEHÍCULOS (APP ANDROID) -->
+        <!-- 5. SECCIÓN DE TELEMETRÍA EN VIVO DE VEHÍCULOS (APP ANDROID) -->
         <div class="admin-card">
             <div class="section-header-row">
                 <div>
@@ -273,7 +360,7 @@
             </div>
         </div>
 
-        <!-- 4. SECCIÓN DE CÓDIGOS DE GRATUIDAD (PROMOS & MESES GRATIS) -->
+        <!-- 6. SECCIÓN DE CÓDIGOS DE GRATUIDAD (PROMOS & MESES GRATIS) -->
         <div class="admin-card">
             <div class="section-header-row">
                 <div>
@@ -423,6 +510,9 @@
                     if (isAdmin) {
                         if (lockScreen) lockScreen.style.display = 'none';
                         if (authContent) authContent.style.display = 'block';
+                        loadServicePrices();
+                        loadAllProvidersAdmin();
+                        loadSentMessages();
                         loadPromoCodes();
                     } else {
                         if (authContent) authContent.style.display = 'none';
@@ -732,6 +822,288 @@
             navigator.clipboard.writeText(code).then(() => {
                 alert(`Código "${code}" copiado al portapapeles.`);
             });
+        }
+
+        // ==========================================
+        // 1. GESTIÓN DE TARIFAS Y PRECIOS
+        // ==========================================
+        async function loadServicePrices() {
+            try {
+                const res = await fetch('save_alojamiento.php?action=get_service_prices&t=' + Date.now());
+                const prices = await res.json();
+                if (prices) {
+                    document.getElementById('priceExcursiones').value = prices.excursiones || 10000;
+                    document.getElementById('priceAlojamiento').value = prices.alojamiento || 10000;
+                    document.getElementById('priceGastronomia').value = prices.gastronomia || 10000;
+                    document.getElementById('discount2Services').value = prices.combo_2_descuento || 10;
+                    document.getElementById('discount3Services').value = prices.combo_3_descuento || 20;
+                }
+            } catch (e) {
+                console.error('Error al cargar tarifas:', e);
+            }
+        }
+
+        async function handleSaveServicePrices(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSavePrices');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
+            const payload = {
+                admin_email: 'oscarns@gmail.com',
+                excursiones: parseInt(document.getElementById('priceExcursiones').value) || 10000,
+                alojamiento: parseInt(document.getElementById('priceAlojamiento').value) || 10000,
+                gastronomia: parseInt(document.getElementById('priceGastronomia').value) || 10000,
+                combo_2_descuento: parseInt(document.getElementById('discount2Services').value) || 10,
+                combo_3_descuento: parseInt(document.getElementById('discount3Services').value) || 20
+            };
+
+            try {
+                const res = await fetch('save_alojamiento.php?action=save_service_prices', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    alert('✅ Tarifas de suscripción actualizadas con éxito.');
+                } else {
+                    alert('Error: ' + (data.message || 'No se pudieron guardar las tarifas'));
+                }
+            } catch (err) {
+                alert('Error de conexión al guardar tarifas.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-floppy-disk"></i> Guardar Tarifas';
+            }
+        }
+
+        // ==========================================
+        // 2. GESTIÓN DE PROVEEDORES Y FLOTAS
+        // ==========================================
+        let allProvidersData = [];
+
+        async function loadAllProvidersAdmin() {
+            const container = document.getElementById('providersFleetContainer');
+            if (!container) return;
+
+            try {
+                const res = await fetch('save_alojamiento.php?action=admin_get_all_providers&admin_email=oscarns@gmail.com&t=' + Date.now());
+                const data = await res.json();
+                allProvidersData = data.providers || [];
+                renderProvidersFleetList(data);
+            } catch (e) {
+                console.error('Error al cargar proveedores:', e);
+                container.innerHTML = '<div style="color:#e74c3c; text-align:center; padding:20px;">Error al cargar proveedores.</div>';
+            }
+        }
+
+        function renderProvidersFleetList(data) {
+            const container = document.getElementById('providersFleetContainer');
+            if (!container) return;
+
+            const providers = data.providers || [];
+            const subs = data.subscriptions || [];
+
+            if (providers.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding:30px; color:var(--text-secondary); background:var(--bg-main); border-radius:16px; border:1px dashed var(--border);">
+                        <i class="fas fa-building-circle-check" style="font-size:2rem; margin-bottom:10px; opacity:0.5;"></i>
+                        <p>No hay proveedores registrados aún.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = providers.map(p => {
+                const sub = subs.find(s => (s.email || '').toLowerCase().trim() === (p.email || '').toLowerCase().trim());
+                const expiresAt = sub?.expires_at ? new Date(sub.expires_at).toLocaleDateString() : 'Sin suscripción';
+                const isPaused = p.is_active === false;
+                const services = p.services || ['excursiones'];
+                const moviles = p.moviles || [];
+
+                return `
+                    <div style="background:var(--bg-main); border:1px solid ${isPaused ? '#e74c3c' : 'var(--border)'}; border-radius:16px; padding:20px; box-shadow:var(--shadow);">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px; margin-bottom:15px;">
+                            <div>
+                                <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                                    <h3 style="margin:0; font-family:'Outfit'; font-size:1.2rem;">${p.business_name || 'Sin Nombre Comercial'}</h3>
+                                    <span class="badge-active" style="background:${isPaused ? 'rgba(231,76,60,0.15)' : 'rgba(0,184,148,0.15)'}; color:${isPaused ? '#e74c3c' : '#00b894'};">
+                                        ${isPaused ? '⛔ Pausado por Admin' : '🟢 Activo'}
+                                    </span>
+                                </div>
+                                <div style="font-size:0.85rem; color:var(--text-secondary); display:flex; gap:15px; flex-wrap:wrap;">
+                                    <span><i class="fas fa-envelope"></i> ${p.email}</span>
+                                    <span><i class="fab fa-whatsapp"></i> ${p.phone || '-'}</span>
+                                    <span><i class="fas fa-calendar"></i> Vigente hasta: <b>${expiresAt}</b></span>
+                                </div>
+                                <div style="display:flex; gap:6px; margin-top:8px;">
+                                    ${services.map(s => `
+                                        <span style="font-size:0.75rem; font-weight:700; background:rgba(0,132,255,0.12); color:#0084ff; padding:3px 8px; border-radius:8px; text-transform:capitalize;">
+                                            ${s === 'excursiones' ? '🚐 Excursiones' : s === 'alojamiento' ? '🏡 Alojamiento' : '🍽️ Gastronomía'}
+                                        </span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:8px;">
+                                <button onclick="togglePauseProvider('${p.email}', 'provider')" class="btn-del-comp" style="background:${isPaused ? '#e8f8f5' : '#ffebee'}; color:${isPaused ? '#00b894' : '#e74c3c'}; border-color:${isPaused ? '#a3e4d7' : '#ffcdd2'};">
+                                    <i class="fas ${isPaused ? 'fa-play' : 'fa-pause'}"></i> ${isPaused ? 'Reanudar' : 'Pausar'}
+                                </button>
+                                <button onclick="openSendMessageToUser('${p.email}')" class="btn-add-comp" style="background:#6c5ce7; font-size:0.8rem; padding:6px 12px;">
+                                    <i class="fas fa-message"></i> Mensaje
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- FLOTA DE MÓVILES/COMBIS -->
+                        <div style="background:var(--bg-secondary); border-radius:12px; padding:12px; margin-top:12px; border:1px solid var(--border);">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                <b style="font-size:0.88rem; color:var(--text-primary);"><i class="fas fa-van-shuttle"></i> Flota de Móviles (${moviles.length})</b>
+                            </div>
+                            ${moviles.length === 0 ? `
+                                <small style="color:var(--text-secondary);">No tiene combis o móviles registrados aún.</small>
+                            ` : `
+                                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px;">
+                                    ${moviles.map(m => `
+                                        <div style="background:var(--bg-main); border:1px solid ${m.is_active === false ? '#e74c3c' : 'var(--border)'}; border-radius:10px; padding:10px; display:flex; justify-content:space-between; align-items:center;">
+                                            <div>
+                                                <b style="font-size:0.9rem; display:block;">🚐 ${m.codigo || 'Combi'}</b>
+                                                <small style="color:var(--text-secondary); display:block;">
+                                                    ${m.marca || 'Marca n/d'} • ${m.color || 'Blanco'} • Pat: <b>...${m.patente_ultimos3 || '---'}</b>
+                                                </small>
+                                            </div>
+                                            <div>
+                                                <button onclick="togglePauseProvider('${p.email}', 'movil', '${m.id}')" title="${m.is_active === false ? 'Reanudar móvil' : 'Pausar móvil'}" style="background:none; border:none; color:${m.is_active === false ? '#e74c3c' : '#00b894'}; font-size:1rem; cursor:pointer;">
+                                                    <i class="fas ${m.is_active === false ? 'fa-toggle-off' : 'fa-toggle-on'}"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function togglePauseProvider(targetEmail, type, movilId = '') {
+            try {
+                const res = await fetch('save_alojamiento.php?action=admin_toggle_pause', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        admin_email: 'oscarns@gmail.com',
+                        target_email: targetEmail,
+                        type: type,
+                        movil_id: movilId
+                    })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    loadAllProvidersAdmin();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (e) {
+                alert('Error de conexión');
+            }
+        }
+
+        function openSendMessageToUser(email) {
+            document.getElementById('msgTargetEmail').value = email;
+            document.getElementById('msgTitle').focus();
+            window.scrollTo({ top: document.getElementById('msgTargetEmail').offsetTop - 100, behavior: 'smooth' });
+        }
+
+        // ==========================================
+        // 3. MENSAJERÍA A USUARIOS
+        // ==========================================
+        async function handleSendAdminMessage(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSendAdminMsg');
+            const target_email = document.getElementById('msgTargetEmail').value.trim();
+            const title = document.getElementById('msgTitle').value.trim();
+            const message = document.getElementById('msgBody').value.trim();
+            const type = document.getElementById('msgType').value;
+
+            if (!target_email || !message) return;
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
+            try {
+                const res = await fetch('save_alojamiento.php?action=admin_send_user_message', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        admin_email: 'oscarns@gmail.com',
+                        target_email,
+                        title,
+                        message,
+                        type
+                    })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    document.getElementById('msgTitle').value = '';
+                    document.getElementById('msgBody').value = '';
+                    alert(`✉️ Mensaje enviado con éxito a ${target_email}.`);
+                    loadSentMessages();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (err) {
+                alert('Error de conexión al enviar mensaje');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Mensaje al Usuario';
+            }
+        }
+
+        async function loadSentMessages() {
+            const tbody = document.getElementById('sentMessagesTableBody');
+            if (!tbody) return;
+
+            try {
+                const res = await fetch('save_alojamiento.php?action=get_user_messages&email=all&t=' + Date.now());
+                const msgs = await res.json();
+                if (!msgs || msgs.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-secondary);">No hay mensajes enviados.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = msgs.map(m => `
+                    <tr>
+                        <td><b>${m.target_email}</b></td>
+                        <td><span class="badge-active" style="text-transform:capitalize;">${m.type}</span></td>
+                        <td><b>${m.title}</b></td>
+                        <td style="max-width:260px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${m.message}</td>
+                        <td><small>${new Date(m.created_at).toLocaleString()}</small></td>
+                        <td>
+                            <button class="btn-del-comp" onclick="deleteSentMessage('${m.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error('Error al cargar mensajes:', e);
+            }
+        }
+
+        async function deleteSentMessage(id) {
+            if (!confirm('¿Eliminar este mensaje?')) return;
+            try {
+                await fetch('save_alojamiento.php?action=delete_user_message', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id })
+                });
+                loadSentMessages();
+            } catch (e) {
+                alert('Error de conexión');
+            }
         }
     </script>
 </body>
