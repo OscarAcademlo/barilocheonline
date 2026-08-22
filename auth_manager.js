@@ -201,12 +201,12 @@ class AuthManager {
                     <form onsubmit="window.authManager.handleLoginSubmit(event)">
                         <div class="input-group-custom" style="margin-bottom:16px;">
                             <label style="display:block; font-size:0.85rem; font-weight:700; margin-bottom:8px; color:#e2e8f0;"><i class="fas fa-envelope"></i> Email</label>
-                            <input type="email" id="globalLoginEmail" name="user_email" placeholder="tu-email@ejemplo.com" autocomplete="email" spellcheck="false" required style="width:100% !important; height:48px !important; padding:12px 16px !important; border-radius:14px !important; border:1px solid #334155 !important; background:#0f172a !important; color:#ffffff !important; font-size:0.95rem !important; box-sizing:border-box !important; outline:none !important; display:block !important;">
+                            <input type="email" id="globalLoginEmail" name="login_user_email" placeholder="tu-email@gmail.com" autocomplete="off" data-lpignore="true" spellcheck="false" required style="width:100% !important; height:48px !important; padding:12px 16px !important; border-radius:14px !important; border:1px solid #334155 !important; background:#0f172a !important; background-repeat:no-repeat !important; color:#ffffff !important; font-size:0.95rem !important; box-sizing:border-box !important; outline:none !important; display:block !important;">
                         </div>
                         <div class="input-group-custom" style="margin-bottom:16px;">
                             <label style="display:block; font-size:0.85rem; font-weight:700; margin-bottom:8px; color:#e2e8f0;"><i class="fas fa-lock"></i> Contraseña</label>
                             <div class="pass-input-box" style="position:relative !important; width:100% !important; display:flex !important; align-items:center !important; margin:0 !important; padding:0 !important;">
-                                <input type="password" id="globalLoginPass" name="user_password" placeholder="••••••••" autocomplete="current-password" required style="width:100% !important; height:48px !important; padding:12px 45px 12px 16px !important; border-radius:14px !important; border:1px solid #334155 !important; background:#0f172a !important; color:#ffffff !important; font-size:0.95rem !important; box-sizing:border-box !important; outline:none !important; display:block !important;">
+                                <input type="password" id="globalLoginPass" name="login_user_password" placeholder="••••••••" autocomplete="off" data-lpignore="true" required style="width:100% !important; height:48px !important; padding:12px 45px 12px 16px !important; border-radius:14px !important; border:1px solid #334155 !important; background:#0f172a !important; color:#ffffff !important; font-size:0.95rem !important; box-sizing:border-box !important; outline:none !important; display:block !important;">
                                 <button type="button" class="btn-toggle-pass" onclick="window.togglePasswordVisibility('globalLoginPass', this)" style="position:absolute !important; right:12px !important; top:50% !important; transform:translateY(-50%) !important; background:transparent !important; border:none !important; cursor:pointer !important; color:#94a3b8 !important; font-size:1.15rem !important; padding:6px !important; z-index:10 !important; display:flex !important; align-items:center !important; justify-content:center !important; line-height:1 !important;">
                                     <i class="fas fa-eye"></i>
                                 </button>
@@ -226,16 +226,25 @@ class AuthManager {
                     <form onsubmit="window.authManager.handleSignupSubmit(event)">
                         <div class="input-group-custom" style="margin-bottom:16px;">
                             <label style="display:block; font-size:0.85rem; font-weight:700; margin-bottom:8px; color:#e2e8f0;"><i class="fas fa-envelope"></i> Tu Email</label>
-                            <input type="email" id="globalSignupEmail" name="signup_email" placeholder="tu-email@ejemplo.com" autocomplete="email" spellcheck="false" required style="width:100% !important; height:48px !important; padding:12px 16px !important; border-radius:14px !important; border:1px solid #334155 !important; background:#0f172a !important; color:#ffffff !important; font-size:0.95rem !important; box-sizing:border-box !important; outline:none !important; display:block !important;">
+                            <input type="email" id="globalSignupEmail" name="reg_user_email" placeholder="tu-email@gmail.com" autocomplete="off" data-lpignore="true" spellcheck="false" required style="width:100% !important; height:48px !important; padding:12px 16px !important; border-radius:14px !important; border:1px solid #334155 !important; background:#0f172a !important; background-repeat:no-repeat !important; color:#ffffff !important; font-size:0.95rem !important; box-sizing:border-box !important; outline:none !important; display:block !important;">
                         </div>
                         <div class="input-group-custom" style="margin-bottom:16px;">
                             <label style="display:block; font-size:0.85rem; font-weight:700; margin-bottom:8px; color:#e2e8f0;"><i class="fas fa-lock"></i> Crear Contraseña</label>
                             <div class="pass-input-box" style="position:relative !important; width:100% !important; display:flex !important; align-items:center !important; margin:0 !important; padding:0 !important;">
-                                <input type="password" id="globalSignupPass" name="signup_password" placeholder="Mínimo 6 caracteres" minlength="6" autocomplete="new-password" required style="width:100% !important; height:48px !important; padding:12px 45px 12px 16px !important; border-radius:14px !important; border:1px solid #334155 !important; background:#0f172a !important; color:#ffffff !important; font-size:0.95rem !important; box-sizing:border-box !important; outline:none !important; display:block !important;">
+                                <input type="password" id="globalSignupPass" name="reg_user_password" placeholder="Mínimo 6 caracteres" minlength="6" autocomplete="off" data-lpignore="true" required style="width:100% !important; height:48px !important; padding:12px 45px 12px 16px !important; border-radius:14px !important; border:1px solid #334155 !important; background:#0f172a !important; color:#ffffff !important; font-size:0.95rem !important; box-sizing:border-box !important; outline:none !important; display:block !important;">
                                 <button type="button" class="btn-toggle-pass" onclick="window.togglePasswordVisibility('globalSignupPass', this)" style="position:absolute !important; right:12px !important; top:50% !important; transform:translateY(-50%) !important; background:transparent !important; border:none !important; cursor:pointer !important; color:#94a3b8 !important; font-size:1.15rem !important; padding:6px !important; z-index:10 !important; display:flex !important; align-items:center !important; justify-content:center !important; line-height:1 !important;">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
+                        </div>
+                        <div class="input-group-custom" style="margin-bottom:16px;">
+                            <label style="display:block; font-size:0.85rem; font-weight:700; margin-bottom:8px; color:#e2e8f0;"><i class="fas fa-layer-group"></i> Servicio Principal a Registrar</label>
+                            <select id="globalSignupServiceSelect" style="width:100% !important; height:48px !important; border-radius:14px !important; border:1px solid #334155 !important; background:#0f172a !important; color:#ffffff !important; font-size:0.95rem !important; padding:0 14px !important; font-weight:700 !important;">
+                                <option value="alojamiento" selected>🏡 Alojamiento (Dónde Dormir)</option>
+                                <option value="excursiones">🚐 Excursiones / Combis (BariRuta GPS en vivo)</option>
+                                <option value="gastronomia">🍽️ Gastronomía (Dónde Comer)</option>
+                                <option value="todos">🌟 Todos los Servicios (Combo Completo)</option>
+                            </select>
                         </div>
                         <div id="globalSignupError" class="auth-error-msg" style="color:#ef4444; font-size:0.85rem; margin-bottom:12px; text-align:center; font-weight:600;"></div>
                         <button type="submit" id="btnGlobalSignupSubmit" class="btn-auth-primary" style="width:100%; background:var(--primary, #0084ff); color:white; border:none; padding:14px; border-radius:14px; font-weight:800; font-size:0.95rem; cursor:pointer; margin-top:6px;">Registrarme</button>
@@ -336,8 +345,29 @@ class AuthManager {
                 }
             });
             if (error) throw error;
-            alert('🎉 ¡Cuenta creada con éxito! Si tienes la verificación activa, revisa tu correo.');
+
+            // Guardar servicio elegido en el perfil de prestador
+            const srvSelect = document.getElementById('signupServiceSelect') || document.getElementById('globalSignupServiceSelect');
+            const chosenSrv = srvSelect ? srvSelect.value : 'alojamiento';
+            const servicesArray = chosenSrv === 'todos' ? ['excursiones', 'alojamiento', 'gastronomia'] : [chosenSrv];
+
+            try {
+                await fetch('save_alojamiento.php?action=save_multiservice_provider', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: email,
+                        services: servicesArray,
+                        business_name: '',
+                        phone: '',
+                        moviles: []
+                    })
+                });
+            } catch (e) {}
+
+            alert('🎉 ¡Cuenta creada con éxito! Ya puedes ingresar y administrar tus publicaciones.');
             this.closeModal();
+            this.toggleMode('login');
         } catch (err) {
             if (errorEl) errorEl.textContent = err.message || 'Error al registrarte';
         } finally {
