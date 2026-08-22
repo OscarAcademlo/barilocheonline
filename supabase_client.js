@@ -54,6 +54,12 @@ class BariRutaSupabaseClient {
                 this.fetchData();
                 this.setupRealtime();
 
+                // Limpieza automática de empresas dummy/mock antiguas en Supabase
+                try {
+                    this.supabase.from('companies').delete().ilike('name', '%empresa oscar%').then(() => {});
+                    this.supabase.from('vehicles').delete().ilike('company_name', '%empresa oscar%').then(() => {});
+                } catch (e) {}
+
                 // Polling automático cada 1.5 segundos como respaldo instantáneo
                 if (this.pollingInterval) clearInterval(this.pollingInterval);
                 this.pollingInterval = setInterval(() => {
@@ -105,7 +111,12 @@ class BariRutaSupabaseClient {
                 .order('created_at', { ascending: true });
 
             if (!error && data) {
-                this.companies = data;
+                // Filtrar cualquier empresa mock o de prueba
+                this.companies = data.filter(c => 
+                    c.name && 
+                    !c.name.toLowerCase().includes('empresa oscar') && 
+                    !c.name.toLowerCase().includes('test')
+                );
             }
             this.notifyCompanies(this.companies || []);
         } catch (e) {
@@ -123,8 +134,14 @@ class BariRutaSupabaseClient {
                 .order('updated_at', { ascending: false });
 
             if (!error && data) {
+                // Filtrar vehículos de prueba
+                const cleanData = data.filter(v => 
+                    v.company_name && 
+                    !v.company_name.toLowerCase().includes('empresa oscar')
+                );
+
                 // 1. Actualizar o insertar los que vinieron de DB
-                data.forEach(dbVehicle => {
+                cleanData.forEach(dbVehicle => {
                     dbVehicle._lastSeen = Date.now();
                     const idx = this.vehicles.findIndex(
                         v => this._vehicleKey(v) === this._vehicleKey(dbVehicle)
@@ -136,7 +153,7 @@ class BariRutaSupabaseClient {
                     }
                 });
 
-                this.syncCompaniesFromVehicles(data);
+                this.syncCompaniesFromVehicles(cleanData);
                 this.filterAndNotifyVehicles();
             }
         } catch (e) {
@@ -148,14 +165,17 @@ class BariRutaSupabaseClient {
         let changed = false;
         vehicleList.forEach(v => {
             if (!v.company_name) return;
+            const cName = v.company_name.trim();
+            if (cName.toLowerCase().includes('empresa oscar') || cName.toLowerCase().includes('test')) return;
+
             const exists = this.companies.some(
-                c => c.name.toLowerCase().trim() === v.company_name.toLowerCase().trim()
+                c => c.name.toLowerCase().trim() === cName.toLowerCase()
             );
             if (!exists) {
                 this.companies.push({
-                    id: 'auto-' + v.company_name,
-                    name: v.company_name,
-                    phone: '+5492944123456',
+                    id: 'auto-' + cName,
+                    name: cName,
+                    phone: v.phone || '',
                     category: 'combi'
                 });
                 changed = true;
