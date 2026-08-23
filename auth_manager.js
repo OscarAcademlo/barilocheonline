@@ -84,16 +84,16 @@ class AuthManager {
                 if (shortEmail.length > 12) shortEmail = shortEmail.substring(0, 10) + '…';
 
                 userBar.innerHTML = `
-                    <div class="auth-logged-pill" style="${isAdmin ? 'border:1px solid #e74c3c; background:rgba(231, 76, 60, 0.12);' : 'background:var(--bg-main); border:1px solid var(--border);'} display:inline-flex; align-items:center; gap:8px; padding:4px 10px; border-radius:20px; flex-shrink:0;">
-                        <a href="perfil.html" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:6px; font-weight:700; font-size:0.85rem;" title="${this.currentUser.email}">
-                            <i class="fas ${isAdmin ? 'fa-user-shield' : 'fa-user-circle'}" style="${isAdmin ? 'color:#e74c3c;' : 'color:var(--primary);'} font-size:1.15rem;"></i>
-                            <span style="max-width:110px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${shortEmail}</span>
+                    <div class="auth-logged-pill" style="${isAdmin ? 'border:1px solid rgba(231,76,60,0.6); background:rgba(231, 76, 60, 0.12);' : 'background:var(--bg-main); border:1px solid var(--border);'} display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border-radius:20px; flex-shrink:0;">
+                        <a href="perfil.html" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:5px; font-weight:700; font-size:0.8rem;" title="${this.currentUser.email}">
+                            <i class="fas ${isAdmin ? 'fa-user-shield' : 'fa-user-circle'}" style="${isAdmin ? 'color:#e74c3c;' : 'color:var(--primary);'} font-size:1.05rem;"></i>
+                            <span style="max-width:85px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${shortEmail}</span>
                         </a>
-                        <a href="perfil.html" class="btn-owner-edit" style="text-decoration:none; font-size:0.75rem; padding:4px 10px; font-weight:700; display:inline-flex; align-items:center; gap:5px; border-radius:12px; background:rgba(0,132,255,0.15); color:var(--primary);">
-                            <i class="fas fa-sliders"></i> Mi Panel
+                        <a href="perfil.html" class="btn-owner-edit" style="text-decoration:none; font-size:0.72rem; padding:3px 8px; font-weight:700; display:inline-flex; align-items:center; gap:4px; border-radius:10px; background:rgba(0,132,255,0.15); color:var(--primary);">
+                            <i class="fas fa-sliders"></i> Panel
                         </a>
-                        ${isAdmin ? '<a href="admin.html" class="btn-admin-pill" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px; font-size:0.75rem; padding:4px 8px; border-radius:10px; background:#e74c3c; color:white; font-weight:800;"><i class="fas fa-shield-alt"></i> Admin</a>' : ''}
-                        <button onclick="window.authManager.logout()" class="btn-logout-mini" title="Cerrar sesión" style="background:transparent; border:none; color:var(--text-secondary); cursor:pointer; font-size:0.95rem; padding:4px; display:flex; align-items:center;">
+                        ${isAdmin ? '<a href="admin.html" class="btn-admin-pill" style="text-decoration:none; display:inline-flex; align-items:center; gap:3px; font-size:0.72rem; padding:3px 7px; border-radius:8px; background:#e74c3c; color:white; font-weight:800;"><i class="fas fa-shield-alt"></i> Admin</a>' : ''}
+                        <button onclick="window.authManager.logout()" class="btn-logout-mini" title="Cerrar sesión" style="background:transparent; border:none; color:var(--text-secondary); cursor:pointer; font-size:0.85rem; padding:2px; display:flex; align-items:center;">
                             <i class="fas fa-sign-out-alt"></i>
                         </button>
                     </div>

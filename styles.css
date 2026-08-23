@@ -435,26 +435,39 @@ body {
     }
 
     .main-header {
-        padding: 0 4% !important;
+        padding: 0 24px !important;
         display: flex !important;
         justify-content: space-between !important;
         align-items: center !important;
-        gap: 15px !important;
+        gap: 12px !important;
         flex-wrap: nowrap !important;
+        height: 64px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .main-header .logo {
+        flex-shrink: 0 !important;
+        white-space: nowrap !important;
     }
 
     .nav-desktop {
         display: flex !important;
-        gap: 18px !important;
+        gap: 14px !important;
         align-items: center !important;
-        flex-shrink: 1 !important;
+        flex-shrink: 0 !important;
+        white-space: nowrap !important;
     }
 
     .nav-link {
         font-weight: 700;
-        font-size: 0.9rem;
+        font-size: 0.82rem;
         text-decoration: none;
         color: var(--text-secondary);
+        white-space: nowrap !important;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
     }
 
     .nav-link.active {
