@@ -111,26 +111,17 @@ function initMapGasto() {
         if ((rest.type || '').includes('Pizza') || (rest.type || '').includes('Pastas')) emoji = '🍕';
 
         // Pin con el Nombre del Local y Emoji (Sin signos de pesos)
-        const nameClean = rest.name.replace('Cervecería ', '').replace('Chocolatería ', '').replace('Restaurante ', '');
         const nameIcon = L.divIcon({
-            className: 'custom-price-marker',
-            html: `<div class="price-marker-content" style="background:#e67e22; color:white; border-color:white; padding: 4px 10px; font-weight:800; white-space:nowrap; font-size:0.82rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.3);">${emoji} ${nameClean}</div>`,
-            iconSize: [120, 32],
-            iconAnchor: [60, 16]
+            className: 'gasto-map-marker-wrap',
+            html: `<div class="gasto-map-badge" style="background:#e67e22; color:white; border:2px solid #ffffff; padding:5px 12px; font-weight:800; white-space:nowrap; font-size:0.85rem; border-radius:18px; box-shadow:0 4px 15px rgba(0,0,0,0.35); display:inline-flex; align-items:center; gap:6px; cursor:pointer; transform:translate(-50%, -50%);">${emoji} ${rest.name}</div>`,
+            iconSize: [0, 0],
+            iconAnchor: [0, 0]
         });
 
-        const coverImg = (rest.images && rest.images[0]) || rest.image || 'https://images.unsplash.com/photo-1574096079513-a82f09919cf7?auto=format&fit=crop&q=80&w=400';
-
         const marker = L.marker([rest.lat, rest.lng], { icon: nameIcon })
-            .bindPopup(`
-                <div class="map-popup-mini">
-                    <img src="${coverImg}" style="width:100%; height:90px; object-fit:cover; border-radius:8px; margin-bottom:6px;">
-                    <b style="font-size:0.95rem; display:block;">${rest.name}</b>
-                    <small style="color:#64748b;"><i class="fas fa-utensils"></i> ${rest.type || 'Gastronomía'}</small><br>
-                    <small style="color:#e67e22; font-weight:700; display:block; margin:4px 0;">${rest.promo || rest.specialty || 'Especialidades caseras'}</small>
-                    <button onclick="showGastronomyDetails('${rest.id}')" style="margin-top:6px; background:#e67e22; color:white; border:none; border-radius:6px; padding:6px 12px; font-weight:bold; cursor:pointer; width:100%;">Ver Detalles</button>
-                </div>
-            `, { maxWidth: 230 })
+            .on('click', () => {
+                showGastronomyDetails(rest.id);
+            })
             .addTo(mapGasto);
         markersGasto.push(marker);
     });
@@ -264,6 +255,60 @@ function closeGastronomyModal() {
     const modal = document.getElementById('gastronomyModal');
     if (modal) modal.style.display = 'none';
     document.body.style.overflow = 'auto';
+}
+
+function filterGastronomyByType(type, chipEl) {
+    document.querySelectorAll('.gasto-filter-chip').forEach(c => {
+        c.style.background = 'var(--bg-secondary)';
+        c.style.color = 'var(--text-primary)';
+        c.classList.remove('active');
+    });
+    if (chipEl) {
+        chipEl.style.background = 'var(--primary)';
+        chipEl.style.color = 'white';
+        chipEl.classList.add('active');
+    }
+
+    let filtered = GASTRONOMY;
+    if (type !== 'all') {
+        filtered = GASTRONOMY.filter(g => (g.type || '').toLowerCase().includes(type.toLowerCase()));
+    }
+
+    renderFilteredGastronomy(filtered);
+}
+
+function renderFilteredGastronomy(listToRender) {
+    const list = document.getElementById('gastronomyList');
+    const count = document.getElementById('gastronomy-count');
+    if (!list) return;
+
+    if (count) count.textContent = `${listToRender.length} opciones gastronómicas en Bariloche`;
+
+    if (listToRender.length === 0) {
+        list.innerHTML = `<div style="padding:40px 20px; text-align:center; color:var(--text-secondary);">No se encontraron locales en esta categoría.</div>`;
+        return;
+    }
+
+    list.innerHTML = listToRender.map(rest => {
+        const coverImg = (rest.images && rest.images.length > 0 && rest.images[0]) ? rest.images[0] : (rest.image || 'https://images.unsplash.com/photo-1574096079513-a82f09919cf7?auto=format&fit=crop&q=80&w=800');
+
+        return `
+            <div class="accommodation-card-airbnb" onclick="showGastronomyDetails('${rest.id}')">
+                <div class="accommodation-img-wrapper">
+                    <img src="${coverImg}" alt="${rest.name}">
+                    <div class="accommodation-price-badge" style="background:#e67e22; border-radius: 10px; font-size:0.75rem; font-weight:800;">${rest.type || 'Gastronomía'}</div>
+                </div>
+                <div class="accommodation-info-airbnb">
+                    <div class="accommodation-header-row">
+                        <h3 class="accommodation-name" style="font-size: 1.05rem;">${rest.name}</h3>
+                        <span class="accommodation-rating-star"><i class="fas fa-star"></i> ${rest.rating || 4.8}</span>
+                    </div>
+                    <p class="accommodation-location-text" style="color: #e67e22; font-weight:700; font-size: 0.82rem; margin-top:2px; margin-bottom:4px;">${rest.specialty || 'Especialidades de montaña'}</p>
+                    <p class="accommodation-location-text"><i class="fas fa-map-marker-alt"></i> ${rest.location}</p>
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
 if (document.getElementById('gastronomyList')) {

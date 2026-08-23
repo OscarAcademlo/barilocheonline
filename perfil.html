@@ -813,6 +813,8 @@
             }
         }
 
+        let userSubscriptionActive = false;
+
         async function checkUserSubscriptionState(email) {
             const banner = document.getElementById('panelSubBanner');
             const title = document.getElementById('subNoticeTitle');
@@ -824,6 +826,7 @@
                 const data = await res.json();
 
                 if (data && (data.is_admin || (data.active && data.expires_at))) {
+                    userSubscriptionActive = true;
                     if (data.is_admin) {
                         title.textContent = 'Cuenta de Administrador Vitalicia';
                         details.textContent = 'Acceso total permanente e ilimitado para gestionar todos los servicios.';
@@ -840,13 +843,16 @@
                         icon.style.color = '#10b981';
                     }
                 } else {
+                    userSubscriptionActive = false;
                     title.textContent = 'Suscripción No Activa / Vencida';
                     details.textContent = 'Pagá con Mercado Pago ($10.000) o canjeá tu código promocional para que tus fichas aparezcan en el mapa.';
                     title.style.color = '#ef4444';
                     icon.className = 'fas fa-exclamation-circle';
                     icon.style.color = '#ef4444';
                 }
-            } catch (e) {}
+            } catch (e) {
+                userSubscriptionActive = false;
+            }
         }
 
         function openRedeemCodeBox() {
@@ -1355,6 +1361,14 @@
                 formData.append('images[]', file);
             });
 
+            if (!userSubscriptionActive && email !== 'oscarns@gmail.com') {
+                alert('⛔ Para publicar en el mapa necesitas tener una suscripción activa ($10.000) o canjear un código de gratuidad en tu panel.');
+                openRedeemCodeBox();
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check"></i> Guardar Local Gastronómico';
+                return;
+            }
+
             try {
                 const res = await fetch('save_alojamiento.php?action=save_gastronomia', {
                     method: 'POST',
@@ -1366,7 +1380,10 @@
                     closeGastronomyEditor();
                     loadUserDashboard(email);
                 } else {
-                    alert('Error: ' + data.message);
+                    alert(data.message || 'Error al guardar');
+                    if (data.code === 'SUBSCRIPTION_REQUIRED') {
+                        openRedeemCodeBox();
+                    }
                 }
             } catch (err) {
                 alert('Error al guardar local gastronómico');

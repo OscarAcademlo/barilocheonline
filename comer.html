@@ -17,14 +17,14 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="styles.css?v=2180">
+    <link rel="stylesheet" href="styles.css?v=2280">
 </head>
 
 <body class="page-accommodations native-app">
     <header class="main-header">
         <a href="index.html" class="logo" style="text-decoration:none; color:inherit;"><b>B</b> BARILOCHE.ONLINE</a>
         <nav class="nav-desktop">
-            <a href="mapa.html" class="nav-link"><i class="fas fa-satellite-dish"></i> EN VIVO</a>
+            <a href="mapa.html" class="nav-link"><i class="fas fa-satellite-dish"></i> EXCURSIONES EN VIVO</a>
             <a href="radios.html" class="nav-link">RADIOS</a>
             <a href="vuelos.html" class="nav-link">VUELOS</a>
             <a href="alojamiento.html" class="nav-link">DORMIR</a>
@@ -44,16 +44,18 @@
                 <p id="gastronomy-count">Cargando restaurantes...</p>
             </div>
 
-            <div
+            <div id="gastoCategoryFilters"
                 style="padding: 0 5%; margin-bottom: 20px; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none;">
-                <span
-                    style="background: var(--primary); color: white; padding: 5px 15px; border-radius: 20px; font-weight: 600; font-size: 0.9rem; white-space: nowrap; cursor:pointer;">Todos</span>
-                <span
-                    style="background: var(--bg-secondary); border: 1px solid var(--border); padding: 5px 15px; border-radius: 20px; font-weight: 600; font-size: 0.9rem; white-space: nowrap; cursor:pointer;">Cervecerías</span>
-                <span
-                    style="background: var(--bg-secondary); border: 1px solid var(--border); padding: 5px 15px; border-radius: 20px; font-weight: 600; font-size: 0.9rem; white-space: nowrap; cursor:pointer;">Parrillas</span>
-                <span
-                    style="background: var(--bg-secondary); border: 1px solid var(--border); padding: 5px 15px; border-radius: 20px; font-weight: 600; font-size: 0.9rem; white-space: nowrap; cursor:pointer;">Chocolaterías</span>
+                <span class="gasto-filter-chip active" onclick="filterGastronomyByType('all', this)"
+                    style="background: var(--primary); color: white; padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; white-space: nowrap; cursor:pointer;">Todos</span>
+                <span class="gasto-filter-chip" onclick="filterGastronomyByType('Cervecería', this)"
+                    style="background: var(--bg-secondary); border: 1px solid var(--border); color:var(--text-primary); padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; white-space: nowrap; cursor:pointer;">🍺 Cervecerías</span>
+                <span class="gasto-filter-chip" onclick="filterGastronomyByType('Parrilla', this)"
+                    style="background: var(--bg-secondary); border: 1px solid var(--border); color:var(--text-primary); padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; white-space: nowrap; cursor:pointer;">🥩 Parrillas</span>
+                <span class="gasto-filter-chip" onclick="filterGastronomyByType('Chocolatería', this)"
+                    style="background: var(--bg-secondary); border: 1px solid var(--border); color:var(--text-primary); padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; white-space: nowrap; cursor:pointer;">🍫 Chocolaterías</span>
+                <span class="gasto-filter-chip" onclick="filterGastronomyByType('Bodegón', this)"
+                    style="background: var(--bg-secondary); border: 1px solid var(--border); color:var(--text-primary); padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; white-space: nowrap; cursor:pointer;">🥘 Bodegones</span>
             </div>
 
             <div id="gastronomyList" class="accommodations-list"></div>
@@ -77,7 +79,7 @@
     <nav class="mobile-nav">
         <a href="mapa.html" class="mobile-nav-item">
             <i class="fas fa-satellite-dish"></i>
-            <span>En Vivo</span>
+            <span>Excursiones</span>
         </a>
         <a href="radios.html" class="mobile-nav-item">
             <i class="fas fa-radio"></i>
@@ -100,9 +102,9 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="auth_manager.js?v=2180"></script>
-    <script src="app.js?v=2180"></script>
-    <script src="gastronomy.js?v=2180"></script>
+    <script src="auth_manager.js?v=2280"></script>
+    <script src="app.js?v=2280"></script>
+    <script src="gastronomy.js?v=2280"></script>
 </body>
 
 </html>

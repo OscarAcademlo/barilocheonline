@@ -1018,30 +1018,19 @@ body {
 }
 
 /* MARKERS DE PRECIO EN MAPA - ESTILO AIRBNB */
-.custom-price-marker {
+.gasto-map-marker-wrap {
     background: none !important;
     border: none !important;
 }
 
-.price-marker-content {
-    background: white;
-    color: #222;
-    font-weight: 700;
-    font-size: 0.85rem;
-    padding: 6px 12px;
-    border-radius: 20px;
-    border: 1px solid rgba(0,0,0,0.1);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    white-space: nowrap;
-    cursor: pointer;
-    transition: all 0.2s ease;
+.gasto-map-badge {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.price-marker-content:hover {
-    background: #222;
-    color: white;
-    transform: scale(1.1);
-    z-index: 1000;
+.gasto-map-badge:hover {
+    transform: translate(-50%, -50%) scale(1.1) !important;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.5) !important;
+    z-index: 10000 !important;
 }
 
 /* ==============================================================================

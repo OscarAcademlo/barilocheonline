@@ -912,10 +912,37 @@ if ($action === 'save_gastronomia') {
         exit;
     }
 
+    // 1. VALIDACIÓN ESTRICTA DE SUSCRIPCIÓN ACTIVA O ADMIN
+    $isAdmin = ($email === ADMIN_EMAIL);
+    if (!$isAdmin) {
+        $subsFile = __DIR__ . '/suscripciones.json';
+        $subs = file_exists($subsFile) ? json_decode(file_get_contents($subsFile), true) : [];
+        $hasActiveSub = false;
+        $now = time();
+        if (is_array($subs)) {
+            foreach ($subs as $sub) {
+                if (strtolower(trim($sub['email'] ?? '')) === $email && !empty($sub['active']) && strtotime($sub['expires_at'] ?? '') > $now) {
+                    $hasActiveSub = true;
+                    break;
+                }
+            }
+        }
+        if (!$hasActiveSub) {
+            http_response_code(403);
+            echo json_encode([
+                'status' => 'error',
+                'code' => 'SUBSCRIPTION_REQUIRED',
+                'message' => '⛔ No tienes una suscripción activa ni código de gratuidad válido. Por favor abona tu suscripción ($10.000) o canjea tu código en Mi Panel antes de publicar.'
+            ]);
+            exit;
+        }
+    }
+
     $uploadDir = __DIR__ . '/img/gastronomia/';
     if (!file_exists($uploadDir)) {
-        @mkdir($uploadDir, 0755, true);
+        @mkdir($uploadDir, 0777, true);
     }
+    @chmod($uploadDir, 0777);
 
     $uploadedImages = [];
     if (!empty($_FILES['images'])) {
@@ -931,7 +958,9 @@ if ($action === 'save_gastronomia') {
                 $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
                 if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp'])) {
                     $newFilename = 'gasto_' . uniqid() . '_' . time() . '.' . $ext;
-                    if (move_uploaded_file($tmpName, $uploadDir . $newFilename)) {
+                    $targetPath = $uploadDir . $newFilename;
+                    if (move_uploaded_file($tmpName, $targetPath)) {
+                        @chmod($targetPath, 0666);
                         $uploadedImages[] = 'img/gastronomia/' . $newFilename;
                     }
                 }
