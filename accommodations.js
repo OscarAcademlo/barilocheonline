@@ -67,21 +67,29 @@ function getAmenityIcon(amenity) {
     return 'fas fa-check';
 }
 
-function filterAccommodationsCategory(cat) {
+function filterAccommodationsCategory(cat, el) {
     currentCategoryFilter = cat;
     currentAmenityFilter = 'all';
-    document.querySelectorAll('.dormir-chip-btn').forEach(b => b.classList.remove('active'));
-    const btn = document.getElementById(cat === 'all' ? 'chip-acc-all' : cat === 'Cabaña' ? 'chip-acc-cabana' : cat === 'Departamento' ? 'chip-acc-depto' : cat === 'Casa' ? 'chip-acc-casa' : 'chip-acc-hotel');
-    if (btn) btn.classList.add('active');
+    document.querySelectorAll('.airbnb-pill-btn, .dormir-chip-btn').forEach(b => b.classList.remove('active'));
+    if (el) {
+        el.classList.add('active');
+    } else {
+        const btn = document.getElementById(cat === 'all' ? 'chip-acc-all' : cat === 'Cabaña' ? 'chip-acc-cabana' : cat === 'Departamento' ? 'chip-acc-depto' : cat === 'Casa' ? 'chip-acc-casa' : 'chip-acc-hotel');
+        if (btn) btn.classList.add('active');
+    }
     applyFilters();
 }
 
-function filterAccommodationsAmenity(amenity) {
+function filterAccommodationsAmenity(amenity, el) {
     currentAmenityFilter = amenity;
     currentCategoryFilter = 'all';
-    document.querySelectorAll('.dormir-chip-btn').forEach(b => b.classList.remove('active'));
-    const btn = document.getElementById(amenity === 'Pet friendly' ? 'chip-acc-pet' : amenity === 'Vista al lago' ? 'chip-acc-lake' : amenity === 'Pileta' ? 'chip-acc-pool' : amenity === 'Parrilla' ? 'chip-acc-grill' : 'chip-acc-jacuzzi');
-    if (btn) btn.classList.add('active');
+    document.querySelectorAll('.airbnb-pill-btn, .dormir-chip-btn').forEach(b => b.classList.remove('active'));
+    if (el) {
+        el.classList.add('active');
+    } else {
+        const btn = document.getElementById(amenity === 'Pet friendly' ? 'chip-acc-pet' : amenity === 'Vista al lago' ? 'chip-acc-lake' : amenity === 'Pileta' ? 'chip-acc-pool' : amenity === 'Parrilla' ? 'chip-acc-grill' : amenity === 'Jacuzzi' ? 'chip-acc-jacuzzi' : amenity === 'Hogar a leña' ? 'chip-acc-fire' : amenity === 'Wi-Fi' ? 'chip-acc-wifi' : amenity === 'Calefacción' ? 'chip-acc-heat' : 'chip-acc-park');
+        if (btn) btn.classList.add('active');
+    }
     applyFilters();
 }
 

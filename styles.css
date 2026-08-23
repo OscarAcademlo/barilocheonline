@@ -2861,12 +2861,13 @@ body {
 .dormir-chips-wrapper,
 .category-chips-row {
     display: flex !important;
-    gap: 10px !important;
+    gap: 8px !important;
     overflow-x: auto !important;
     padding: 6px 2px 14px !important;
     margin-bottom: 12px !important;
     scrollbar-width: none !important;
     -webkit-overflow-scrolling: touch !important;
+    align-items: center !important;
 }
 
 .dormir-chips-wrapper::-webkit-scrollbar,
@@ -2874,57 +2875,62 @@ body {
     display: none !important;
 }
 
+.airbnb-pill-btn,
 .dormir-chip-btn,
 .category-chips-row .chip-filter {
-    background: #1e293b !important;
-    border: 1px solid #334155 !important;
-    color: #cbd5e1 !important;
-    padding: 0 16px !important;
-    border-radius: 999px !important;
-    font-size: 0.85rem !important;
-    font-weight: 700 !important;
+    background: transparent !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    color: #e2e8f0 !important;
+    padding: 7px 16px !important;
+    border-radius: 30px !important;
+    font-size: 0.82rem !important;
+    font-weight: 500 !important;
+    font-family: inherit !important;
     white-space: nowrap !important;
     cursor: pointer !important;
     display: inline-flex !important;
     flex-direction: row !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 8px !important;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    gap: 6px !important;
+    transition: all 0.15s ease-in-out !important;
     flex-shrink: 0 !important;
     height: 38px !important;
     min-width: auto !important;
     width: auto !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+    box-shadow: none !important;
 }
 
+.airbnb-pill-btn i,
 .dormir-chip-btn i,
 .category-chips-row .chip-filter i {
-    font-size: 0.95rem !important;
-    color: #38bdf8 !important;
+    font-size: 0.85rem !important;
+    color: inherit !important;
     margin: 0 !important;
 }
 
+.airbnb-pill-btn:hover,
 .dormir-chip-btn:hover,
 .category-chips-row .chip-filter:hover {
-    background: #334155 !important;
-    border-color: #38bdf8 !important;
+    border-color: #ffffff !important;
     color: #ffffff !important;
-    transform: translateY(-1px) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
 }
 
+.airbnb-pill-btn.active,
 .dormir-chip-btn.active,
 .category-chips-row .chip-filter.active {
-    background: #0084ff !important;
-    border-color: #0084ff !important;
-    color: #ffffff !important;
-    font-weight: 800 !important;
-    box-shadow: 0 4px 12px rgba(0, 132, 255, 0.4) !important;
+    background: #ffffff !important;
+    border-color: #ffffff !important;
+    color: #0f172a !important;
+    font-weight: 700 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
 }
 
+.airbnb-pill-btn.active i,
 .dormir-chip-btn.active i,
 .category-chips-row .chip-filter.active i {
-    color: #ffffff !important;
+    color: #0f172a !important;
 }
 
 /* NAVBAR ALIGNMENT FIX */

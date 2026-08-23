@@ -50,18 +50,24 @@
                 </button>
             </div>
 
-            <!-- FILTROS POR CATEGORÍA Y AMENITIES ESTILO AIRBNB SUPER ESTÉTICOS -->
+            <!-- FILTROS POR CATEGORÍA Y AMENITIES ESTILO AIRBNB -->
             <div class="dormir-chips-wrapper">
-                <button onclick="filterAccommodationsCategory('all')" class="dormir-chip-btn active" id="chip-acc-all"><i class="fas fa-sparkles"></i> Todos</button>
-                <button onclick="filterAccommodationsCategory('Cabaña')" class="dormir-chip-btn" id="chip-acc-cabana"><i class="fas fa-house-chimney"></i> Cabañas</button>
-                <button onclick="filterAccommodationsCategory('Departamento')" class="dormir-chip-btn" id="chip-acc-depto"><i class="fas fa-building"></i> Deptos</button>
-                <button onclick="filterAccommodationsCategory('Casa')" class="dormir-chip-btn" id="chip-acc-casa"><i class="fas fa-house"></i> Casas</button>
-                <button onclick="filterAccommodationsCategory('Hotel')" class="dormir-chip-btn" id="chip-acc-hotel"><i class="fas fa-hotel"></i> Hoteles</button>
-                <button onclick="filterAccommodationsAmenity('Pet friendly')" class="dormir-chip-btn" id="chip-acc-pet"><i class="fas fa-paw"></i> Pet friendly</button>
-                <button onclick="filterAccommodationsAmenity('Vista al lago')" class="dormir-chip-btn" id="chip-acc-lake"><i class="fas fa-water"></i> Vista al Lago</button>
-                <button onclick="filterAccommodationsAmenity('Pileta')" class="dormir-chip-btn" id="chip-acc-pool"><i class="fas fa-person-swimming"></i> Pileta</button>
-                <button onclick="filterAccommodationsAmenity('Parrilla')" class="dormir-chip-btn" id="chip-acc-grill"><i class="fas fa-fire"></i> Parrilla</button>
-                <button onclick="filterAccommodationsAmenity('Jacuzzi')" class="dormir-chip-btn" id="chip-acc-jacuzzi"><i class="fas fa-hot-tub-person"></i> Jacuzzi</button>
+                <button onclick="filterAccommodationsCategory('all', this)" class="airbnb-pill-btn active" id="chip-acc-all">
+                    <i class="fas fa-sliders-h"></i> Todos
+                </button>
+                <button onclick="filterAccommodationsAmenity('Estacionamiento', this)" class="airbnb-pill-btn" id="chip-acc-park">Estacionamiento gratis</button>
+                <button onclick="filterAccommodationsAmenity('Wi-Fi', this)" class="airbnb-pill-btn" id="chip-acc-wifi">Wifi</button>
+                <button onclick="filterAccommodationsAmenity('Pet friendly', this)" class="airbnb-pill-btn" id="chip-acc-pet">Se admiten mascotas</button>
+                <button onclick="filterAccommodationsAmenity('Vista al lago', this)" class="airbnb-pill-btn" id="chip-acc-lake">Vista al lago</button>
+                <button onclick="filterAccommodationsCategory('Cabaña', this)" class="airbnb-pill-btn" id="chip-acc-cabana">Cabañas</button>
+                <button onclick="filterAccommodationsCategory('Departamento', this)" class="airbnb-pill-btn" id="chip-acc-depto">Departamentos</button>
+                <button onclick="filterAccommodationsCategory('Casa', this)" class="airbnb-pill-btn" id="chip-acc-casa">Casas</button>
+                <button onclick="filterAccommodationsCategory('Hotel', this)" class="airbnb-pill-btn" id="chip-acc-hotel">Hoteles</button>
+                <button onclick="filterAccommodationsAmenity('Parrilla', this)" class="airbnb-pill-btn" id="chip-acc-grill">Parrilla / Asador</button>
+                <button onclick="filterAccommodationsAmenity('Pileta', this)" class="airbnb-pill-btn" id="chip-acc-pool">Pileta</button>
+                <button onclick="filterAccommodationsAmenity('Jacuzzi', this)" class="airbnb-pill-btn" id="chip-acc-jacuzzi">Jacuzzi</button>
+                <button onclick="filterAccommodationsAmenity('Hogar a leña', this)" class="airbnb-pill-btn" id="chip-acc-fire">Hogar a leña</button>
+                <button onclick="filterAccommodationsAmenity('Calefacción', this)" class="airbnb-pill-btn" id="chip-acc-heat">Calefacción</button>
             </div>
 
             <!-- LISTADO DINÁMICO AIRBNB -->
