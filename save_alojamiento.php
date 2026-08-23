@@ -190,6 +190,7 @@ if ($action === 'create_mp_preference') {
             'failure' => "https://bariloche.online/alojamiento.html?payment=failure",
             'pending' => "https://bariloche.online/alojamiento.html?payment=pending&email=" . urlencode($email)
         ],
+        'notification_url' => "https://bariloche.online/save_alojamiento.php?action=webhook",
         'auto_return' => 'approved',
         'external_reference' => "sub_{$email}_" . time()
     ];
@@ -239,7 +240,7 @@ if ($action === 'confirm_payment') {
 
     $updated = false;
     foreach ($subs as &$s) {
-        if (strtolower($s['email']) === $email) {
+        if (strtolower($s['email'] ?? '') === $email) {
             $s['active'] = true;
             $s['expires_at'] = $expiresAt;
             $s['plan'] = 'mercadopago_1m';
@@ -263,6 +264,73 @@ if ($action === 'confirm_payment') {
 
     file_put_contents($subsFile, json_encode($subs, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
     echo json_encode(['status' => 'success', 'message' => 'Suscripción activada', 'expires_at' => $expiresAt]);
+    exit;
+}
+
+// 5.1 WEBHOOK / IPN MERCADO PAGO (PROCESAMIENTO AUTOMÁTICO)
+if ($action === 'webhook' || $action === 'mp_webhook' || isset($_GET['data_id']) || (isset($_GET['topic']) && $_GET['topic'] === 'payment')) {
+    $paymentId = $_GET['data_id'] ?? $_GET['id'] ?? null;
+    if (!$paymentId) {
+        $raw = file_get_contents('php://input');
+        $body = json_decode($raw, true);
+        $paymentId = $body['data']['id'] ?? $body['id'] ?? null;
+    }
+
+    if ($paymentId) {
+        $ch = curl_init("https://api.mercadopago.com/v1/payments/" . $paymentId);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Authorization: Bearer ' . MP_ACCESS_TOKEN
+        ]);
+        $res = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode === 200) {
+            $paymentInfo = json_decode($res, true);
+            if (($paymentInfo['status'] ?? '') === 'approved') {
+                $payerEmail = strtolower(trim($paymentInfo['payer']['email'] ?? ''));
+                $extRef = $paymentInfo['external_reference'] ?? '';
+                if (preg_match('/sub_([^_]+)_/', $extRef, $matches)) {
+                    $payerEmail = strtolower(trim($matches[1]));
+                }
+
+                if (!empty($payerEmail)) {
+                    $subsFile = __DIR__ . '/suscripciones.json';
+                    $subs = file_exists($subsFile) ? json_decode(file_get_contents($subsFile), true) : [];
+                    if (!is_array($subs)) $subs = [];
+                    $expiresAt = date('Y-m-d\TH:i:s\Z', strtotime("+1 month"));
+                    $updated = false;
+                    foreach ($subs as &$s) {
+                        if (strtolower($s['email'] ?? '') === $payerEmail) {
+                            $s['active'] = true;
+                            $s['expires_at'] = $expiresAt;
+                            $s['plan'] = 'mercadopago_1m';
+                            $s['updated_at'] = date('c');
+                            $s['payment_id'] = $paymentId;
+                            $updated = true;
+                            break;
+                        }
+                    }
+                    if (!$updated) {
+                        $subs[] = [
+                            'email' => $payerEmail,
+                            'plan' => 'mercadopago_1m',
+                            'months' => 1,
+                            'active' => true,
+                            'created_at' => date('c'),
+                            'expires_at' => $expiresAt,
+                            'method' => 'mercadopago_webhook',
+                            'payment_id' => $paymentId
+                        ];
+                    }
+                    file_put_contents($subsFile, json_encode($subs, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                }
+            }
+        }
+    }
+    http_response_code(200);
+    echo json_encode(['status' => 'success', 'message' => 'Webhook procesado con éxito']);
     exit;
 }
 
