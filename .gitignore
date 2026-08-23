@@ -8,6 +8,7 @@
 .vscode/
 ccvlite/
 *ccv*
+proveedores_servicios.json
 
 # Flutter / Dart build artifacts
 **/build/
