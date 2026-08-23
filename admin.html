@@ -4,106 +4,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administración Total | Bariloche.Online & BariRuta</title>
+    <title>Panel de Administración | Bariloche.Online & BariRuta</title>
     <link rel="icon" type="image/png" href="favicon.png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css?v=2090">
+    <link rel="stylesheet" href="styles.css?v=2095">
     <style>
-        :root {
-            --admin-nav-bg: rgba(255, 255, 255, 0.85);
-            --admin-card-bg: var(--bg-secondary);
-        }
-        [data-theme="dark"] {
-            --admin-nav-bg: rgba(15, 23, 42, 0.85);
-        }
-
         .admin-wrap {
-            max-width: 1200px;
-            margin: 25px auto;
-            padding: 0 20px 120px;
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px 100px;
         }
 
-        /* Top Header */
         .admin-header-card {
             background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: 20px;
-            padding: 24px 28px;
+            padding: 25px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 16px;
-            margin-bottom: 20px;
+            gap: 15px;
+            margin-bottom: 25px;
             box-shadow: var(--shadow);
         }
 
-        /* Admin Tab Navigation */
-        .admin-nav-bar {
-            display: flex;
-            gap: 8px;
-            background: var(--admin-nav-bg);
-            backdrop-filter: blur(12px);
-            padding: 8px;
-            border-radius: 18px;
-            border: 1px solid var(--border);
-            margin-bottom: 25px;
-            overflow-x: auto;
-            scrollbar-width: none;
-            position: sticky;
-            top: 75px;
-            z-index: 90;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-        }
-        .admin-nav-bar::-webkit-scrollbar {
-            display: none;
-        }
-
-        .admin-tab-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 18px;
-            border-radius: 12px;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            font-weight: 700;
-            font-size: 0.88rem;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.2s ease;
-            font-family: inherit;
-        }
-        .admin-tab-btn:hover {
-            color: var(--text-primary);
-            background: rgba(0, 132, 255, 0.08);
-        }
-        .admin-tab-btn.active {
-            background: var(--primary);
-            color: #ffffff;
-            box-shadow: 0 4px 14px rgba(0, 132, 255, 0.35);
-        }
-        .tab-counter-badge {
-            background: rgba(0,0,0,0.12);
-            padding: 2px 7px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 800;
-        }
-        .admin-tab-btn.active .tab-counter-badge {
-            background: rgba(255,255,255,0.25);
-            color: white;
-        }
-
-        /* Admin Cards */
         .admin-card {
             background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: 20px;
-            padding: 26px;
-            margin-bottom: 24px;
+            padding: 30px;
+            margin-bottom: 25px;
             box-shadow: var(--shadow);
         }
 
@@ -113,190 +45,49 @@
             align-items: center;
             margin-bottom: 20px;
             border-bottom: 2px solid var(--border);
-            padding-bottom: 14px;
+            padding-bottom: 12px;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 10px;
         }
 
-        /* Metric KPI grid */
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        .kpi-card {
-            background: var(--bg-main);
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            transition: transform 0.2s, box-shadow 0.2s;
-            cursor: pointer;
-        }
-        .kpi-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-            border-color: var(--primary);
-        }
-        .kpi-icon {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-        .kpi-num {
-            font-family: 'Outfit';
-            font-size: 1.7rem;
-            font-weight: 800;
-            line-height: 1.1;
-            color: var(--text-primary);
-        }
-        .kpi-title {
-            font-size: 0.82rem;
-            color: var(--text-secondary);
-            font-weight: 600;
-        }
-
-        /* Search & Filter Toolbars */
-        .toolbar-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 18px;
-        }
-        .search-box-admin {
-            position: relative;
-            flex: 1;
-            min-width: 250px;
-            max-width: 400px;
-        }
-        .search-box-admin input {
-            width: 100%;
-            height: 42px;
-            padding: 8px 14px 8px 38px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            background: var(--bg-main);
-            color: var(--text-primary);
-            font-family: inherit;
-            box-sizing: border-box;
-        }
-        .search-box-admin i {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-secondary);
-        }
-
-        /* Tables */
         .company-table {
             width: 100%;
             border-collapse: collapse;
             text-align: left;
         }
+
         .company-table th, .company-table td {
-            padding: 14px 14px;
+            padding: 12px 14px;
             border-bottom: 1px solid var(--border);
-            font-size: 0.88rem;
-            vertical-align: middle;
+            font-size: 0.9rem;
         }
+
         .company-table th {
             font-weight: 800;
             color: var(--text-secondary);
             text-transform: uppercase;
-            font-size: 0.74rem;
-            letter-spacing: 0.5px;
-            background: rgba(0,0,0,0.02);
+            font-size: 0.75rem;
         }
 
-        /* Items Grid (Alojamientos & Gastronomia) */
-        .cards-admin-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 18px;
-        }
-        .card-item-admin {
-            background: var(--bg-main);
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-shadow: var(--shadow);
-            transition: border-color 0.2s;
-        }
-        .card-item-admin.paused {
-            opacity: 0.75;
-            border-color: #ef4444;
-            background: rgba(239, 68, 68, 0.03);
-        }
-        .card-item-thumb {
-            height: 150px;
-            background-size: cover;
-            background-position: center;
-            position: relative;
-        }
-        .card-item-body {
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-        }
-        .card-item-footer {
-            padding: 12px 16px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bg-secondary);
-            gap: 8px;
-        }
-
-        /* Action Buttons */
         .btn-add-comp {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 10px 18px;
-            border-radius: 12px;
+            padding: 12px 20px;
+            border-radius: 14px;
             font-weight: 800;
-            font-size: 0.88rem;
+            font-size: 0.9rem;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            transition: background 0.2s;
+            text-decoration: none;
         }
+
         .btn-add-comp:hover {
             opacity: 0.92;
         }
-        .btn-action-icon {
-            background: var(--bg-main);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-            width: 34px;
-            height: 34px;
-            border-radius: 10px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-        }
-        .btn-action-icon:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
+
         .btn-del-comp {
             background: rgba(239, 68, 68, 0.1);
             color: #ef4444;
@@ -308,10 +99,30 @@
             font-size: 0.8rem;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
+
         .btn-del-comp:hover {
             background: #ef4444;
+            color: white;
+        }
+
+        .btn-edit-comp {
+            background: rgba(0, 132, 255, 0.1);
+            color: #0084ff;
+            border: 1px solid rgba(0, 132, 255, 0.2);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-edit-comp:hover {
+            background: #0084ff;
             color: white;
         }
 
@@ -319,64 +130,71 @@
             background: rgba(0, 184, 148, 0.15);
             color: #00b894;
             padding: 4px 10px;
-            border-radius: 8px;
+            border-radius: 10px;
             font-weight: 800;
             font-size: 0.75rem;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
+
         .badge-paused {
             background: rgba(239, 68, 68, 0.15);
             color: #ef4444;
             padding: 4px 10px;
-            border-radius: 8px;
+            border-radius: 10px;
             font-weight: 800;
             font-size: 0.75rem;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
 
-        /* Modal Styles */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(8px);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
+        /* Grid para items de Gastronomía y Alojamientos */
+        .admin-items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 16px;
         }
-        .modal-content.glass-modal {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            max-width: 650px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 28px;
-            position: relative;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-        }
-        .modal-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+
+        .admin-item-box {
             background: var(--bg-main);
             border: 1px solid var(--border);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            cursor: pointer;
+            border-radius: 16px;
+            overflow: hidden;
             display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow);
+            transition: border-color 0.2s;
+        }
+
+        .admin-item-box.is-paused {
+            border-color: #ef4444;
+            opacity: 0.8;
+        }
+
+        .admin-item-thumb {
+            height: 140px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .admin-item-content {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .admin-item-actions {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            color: var(--text-secondary);
-            font-size: 1rem;
+            background: rgba(0,0,0,0.02);
+            gap: 6px;
         }
     </style>
 </head>
@@ -438,441 +256,292 @@
     <main id="adminAuthorizedContent" class="admin-wrap" style="display:none;">
         <div class="admin-header-card">
             <div>
-                <h1 style="font-family:'Outfit'; font-size:1.6rem; margin:0 0 4px;">👑 Panel de Administración Total</h1>
+                <h1 style="font-family:'Outfit'; font-size:1.6rem; margin:0 0 4px;">🛠️ Panel de Administración BariRuta</h1>
                 <p style="margin:0; color:var(--text-secondary); font-size:0.9rem;">
-                    Control integral de Clientes, Gastronomía, Alojamientos, Excursiones, Mensajería y Tarifas.
+                    Control total de Base de Datos Supabase, Clientes, Gastronomía, Alojamientos, Excursiones y Mensajería.
                 </p>
             </div>
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
                 <a href="mapa.html" style="background:var(--bg-main); border:1px solid var(--border); color:var(--text-primary); padding:10px 16px; border-radius:12px; text-decoration:none; font-weight:700; font-size:0.85rem; display:inline-flex; align-items:center; gap:8px;">
                     <i class="fas fa-map"></i> Ver Mapa
                 </a>
-                <button onclick="refreshAllAdminData()" class="btn-add-comp" style="background:var(--bg-main); border:1px solid var(--border); color:var(--text-primary);">
-                    <i class="fas fa-rotate"></i> Actualizar Todo
+            </div>
+        </div>
+
+        <!-- 1. SECCIÓN DE CONFIGURACIÓN DE SUPABASE -->
+        <div class="admin-card">
+            <div class="section-header-row">
+                <div>
+                    <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-gear" style="color:var(--primary);"></i> Conexión con Supabase</h2>
+                    <small style="color:var(--text-secondary);">Ingresá la URL de tu proyecto y tu API Key de Supabase para activar el Realtime.</small>
+                </div>
+                <div id="sbStatusBadge" class="badge-active" style="background:rgba(0, 132, 255, 0.15); color:var(--primary);">
+                    Cargando...
+                </div>
+            </div>
+
+            <form onsubmit="handleSaveSupabaseConfig(event)">
+                <div class="form-group-custom">
+                    <label>Project URL (ej. https://[tu-ref].supabase.co)</label>
+                    <input type="text" id="adminSbUrl" class="form-control-custom" placeholder="https://xxxxxxxx.supabase.co" required>
+                </div>
+
+                <div class="form-group-custom">
+                    <label>Publishable API Key (o Legacy Anon Key)</label>
+                    <input type="password" id="adminSbKey" class="form-control-custom" placeholder="sb_publishable_... o eyJhbGci..." required>
+                </div>
+
+                <button type="submit" class="btn-submit-pickup" style="background:#00cec9; color:#111; font-weight:800; width:auto; padding:12px 24px;">
+                    <i class="fas fa-floppy-disk"></i> Guardar y Conectar Supabase
                 </button>
-            </div>
+            </form>
         </div>
 
-        <!-- BARRA DE PESTAÑAS DEL PANEL DE CONTROL -->
-        <nav class="admin-nav-bar" id="adminNavBar">
-            <button class="admin-tab-btn active" onclick="switchAdminTab('dashboard')">
-                <i class="fas fa-chart-pie"></i> Resumen
-            </button>
-            <button class="admin-tab-btn" onclick="switchAdminTab('clients')">
-                <i class="fas fa-users"></i> Clientes / Anunciantes <span class="tab-counter-badge" id="badgeCountClients">0</span>
-            </button>
-            <button class="admin-tab-btn" onclick="switchAdminTab('gastronomia')">
-                <i class="fas fa-utensils"></i> Gastronomía <span class="tab-counter-badge" id="badgeCountGasto">0</span>
-            </button>
-            <button class="admin-tab-btn" onclick="switchAdminTab('alojamientos')">
-                <i class="fas fa-bed"></i> Alojamientos <span class="tab-counter-badge" id="badgeCountAloj">0</span>
-            </button>
-            <button class="admin-tab-btn" onclick="switchAdminTab('excursiones')">
-                <i class="fas fa-van-shuttle"></i> Excursiones & BariRuta <span class="tab-counter-badge" id="badgeCountExc">0</span>
-            </button>
-            <button class="admin-tab-btn" onclick="switchAdminTab('mensajes')">
-                <i class="fas fa-message"></i> Mensajería <span class="tab-counter-badge" id="badgeCountMsg">0</span>
-            </button>
-            <button class="admin-tab-btn" onclick="switchAdminTab('tarifas')">
-                <i class="fas fa-tags"></i> Tarifas & Promos
-            </button>
-            <button class="admin-tab-btn" onclick="switchAdminTab('config')">
-                <i class="fas fa-gear"></i> Supabase
-            </button>
-        </nav>
-
-        <!-- ========================================== -->
-        <!-- PESTAÑA 1: RESUMEN / DASHBOARD GENERAL -->
-        <!-- ========================================== -->
-        <div id="tabAdminDashboard" class="admin-tab-content">
-            <div class="kpi-grid">
-                <div class="kpi-card" onclick="switchAdminTab('clients')">
-                    <div class="kpi-icon" style="background:rgba(108, 92, 231, 0.15); color:#6c5ce7;"><i class="fas fa-users"></i></div>
-                    <div>
-                        <div class="kpi-num" id="kpiClients">0</div>
-                        <div class="kpi-title">Clientes / Anunciantes</div>
-                    </div>
-                </div>
-                <div class="kpi-card" onclick="switchAdminTab('gastronomia')">
-                    <div class="kpi-icon" style="background:rgba(231, 76, 60, 0.15); color:#e74c3c;"><i class="fas fa-utensils"></i></div>
-                    <div>
-                        <div class="kpi-num" id="kpiGasto">0</div>
-                        <div class="kpi-title">Locales Gastronómicos</div>
-                    </div>
-                </div>
-                <div class="kpi-card" onclick="switchAdminTab('alojamientos')">
-                    <div class="kpi-icon" style="background:rgba(230, 126, 34, 0.15); color:#e67e22;"><i class="fas fa-bed"></i></div>
-                    <div>
-                        <div class="kpi-num" id="kpiAloj">0</div>
-                        <div class="kpi-title">Alojamientos Publicados</div>
-                    </div>
-                </div>
-                <div class="kpi-card" onclick="switchAdminTab('excursiones')">
-                    <div class="kpi-icon" style="background:rgba(0, 132, 255, 0.15); color:#0084ff;"><i class="fas fa-van-shuttle"></i></div>
-                    <div>
-                        <div class="kpi-num" id="kpiMóviles">0</div>
-                        <div class="kpi-title">Móviles BariRuta GPS</div>
-                    </div>
+        <!-- 2. SECCIÓN: TARIFAS Y PRECIOS DE SUSCRIPCIÓN -->
+        <div class="admin-card">
+            <div class="section-header-row">
+                <div>
+                    <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-tags" style="color:#00b894;"></i> Tarifas y Precios de Suscripción</h2>
+                    <small style="color:var(--text-secondary);">Define el valor mensual de cada servicio y los descuentos automáticos por paquetes combinados.</small>
                 </div>
             </div>
 
-            <!-- Accesos Rápidos -->
-            <div class="admin-card">
-                <div class="section-header-row">
-                    <h2 style="font-family:'Outfit'; font-size:1.2rem; margin:0;"><i class="fas fa-bolt" style="color:#fdcb6e;"></i> Acciones Rápidas</h2>
+            <form onsubmit="handleSaveServicePrices(event)">
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <div class="form-group-custom">
+                        <label><i class="fas fa-van-shuttle" style="color:#0084ff;"></i> Excursiones / Combis (ARS)</label>
+                        <input type="number" id="priceExcursiones" class="form-control-custom" min="0" step="500" required>
+                    </div>
+                    <div class="form-group-custom">
+                        <label><i class="fas fa-bed" style="color:#e67e22;"></i> Alojamiento (ARS)</label>
+                        <input type="number" id="priceAlojamiento" class="form-control-custom" min="0" step="500" required>
+                    </div>
+                    <div class="form-group-custom">
+                        <label><i class="fas fa-utensils" style="color:#e74c3c;"></i> Gastronomía (ARS)</label>
+                        <input type="number" id="priceGastronomia" class="form-control-custom" min="0" step="500" required>
+                    </div>
+                    <div class="form-group-custom">
+                        <label><i class="fas fa-percent" style="color:#00cec9;"></i> Descuento 2 Servicios (%)</label>
+                        <input type="number" id="discount2Services" class="form-control-custom" min="0" max="100" required>
+                    </div>
+                    <div class="form-group-custom">
+                        <label><i class="fas fa-percent" style="color:#6c5ce7;"></i> Descuento 3 Servicios (%)</label>
+                        <input type="number" id="discount3Services" class="form-control-custom" min="0" max="100" required>
+                    </div>
                 </div>
-                <div style="display:flex; gap:12px; flex-wrap:wrap;">
-                    <button class="btn-add-comp" onclick="openAddGastronomiaModal()" style="background:#e74c3c;">
-                        <i class="fas fa-plus"></i> + Agregar Local Gastronómico
-                    </button>
-                    <button class="btn-add-comp" onclick="openAddAlojamientoModal()" style="background:#e67e22;">
-                        <i class="fas fa-plus"></i> + Agregar Alojamiento
-                    </button>
-                    <button class="btn-add-comp" onclick="openAddCompanyModal()" style="background:#0084ff;">
-                        <i class="fas fa-plus"></i> + Dar de Alta Empresa Excursión
-                    </button>
-                    <button class="btn-add-comp" onclick="openAddPromoModal()" style="background:#00b894;">
-                        <i class="fas fa-gift"></i> + Crear Código Gratuidad
-                    </button>
-                </div>
-            </div>
+
+                <button type="submit" id="btnSavePrices" class="btn-submit-pickup" style="background:#00b894; color:white; font-weight:800; width:auto; padding:12px 24px;">
+                    <i class="fas fa-floppy-disk"></i> Guardar Tarifas
+                </button>
+            </form>
         </div>
 
-        <!-- ========================================== -->
-        <!-- PESTAÑA 2: CLIENTES Y ANUNCIANTES -->
-        <!-- ========================================== -->
-        <div id="tabAdminClients" class="admin-tab-content" style="display:none;">
-            <div class="admin-card">
-                <div class="section-header-row">
-                    <div>
-                        <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-users" style="color:#6c5ce7;"></i> Gestión de Clientes y Anunciantes</h2>
-                        <small style="color:var(--text-secondary);">Supervisa el estado, servicios asignados, vencimiento de suscripciones y mensajes de cada cliente.</small>
-                    </div>
-                    <button class="btn-add-comp" onclick="openEditProviderModal('', true)">
+        <!-- 3. SECCIÓN: PROVEEDORES MULTISERVICIO Y GESTIÓN DE FLOTA DE COMBIS -->
+        <div class="admin-card">
+            <div class="section-header-row">
+                <div>
+                    <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-users-gear" style="color:var(--primary);"></i> Proveedores y Flota de Vehículos</h2>
+                    <small style="color:var(--text-secondary);">Supervisa cada empresa, sus servicios contratados y cada combi/móvil (marca, color, 3 dígitos patente). Puedes modificar, pausar o eliminar.</small>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-add-comp" onclick="openEditProviderModal('', true)" style="background:#6c5ce7; font-size:0.85rem; padding:8px 14px;">
                         <i class="fas fa-user-plus"></i> + Registrar Cliente
                     </button>
-                </div>
-
-                <div class="toolbar-row">
-                    <div class="search-box-admin">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="searchClientInput" placeholder="Buscar por nombre, email o rubro..." onkeyup="filterClientsTable()">
-                    </div>
-                </div>
-
-                <div style="overflow-x:auto;">
-                    <table class="company-table">
-                        <thead>
-                            <tr>
-                                <th>Nombre / Negocio</th>
-                                <th>Email</th>
-                                <th>Teléfono</th>
-                                <th>Servicios</th>
-                                <th>Vencimiento</th>
-                                <th>Estado</th>
-                                <th style="text-align:right;">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="clientsTableBody">
-                            <tr><td colspan="7" style="text-align:center; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Cargando clientes...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- ========================================== -->
-        <!-- PESTAÑA 3: GASTRONOMÍA -->
-        <!-- ========================================== -->
-        <div id="tabAdminGastronomia" class="admin-tab-content" style="display:none;">
-            <div class="admin-card">
-                <div class="section-header-row">
-                    <div>
-                        <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-utensils" style="color:#e74c3c;"></i> Gestión de Locales Gastronómicos</h2>
-                        <small style="color:var(--text-secondary);">Agrega, modifica, pausa o elimina restaurantes, cervecerías, parrillas y chocolaterías.</small>
-                    </div>
-                    <button class="btn-add-comp" onclick="openAddGastronomiaModal()" style="background:#e74c3c;">
-                        <i class="fas fa-plus"></i> + Agregar Local Gastronómico
+                    <button class="btn-add-comp" onclick="loadAllProvidersAdmin()" style="font-size:0.85rem; padding:8px 14px;">
+                        <i class="fas fa-rotate"></i> Actualizar
                     </button>
                 </div>
+            </div>
 
-                <div class="toolbar-row">
-                    <div class="search-box-admin">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="searchGastoInput" placeholder="Buscar por nombre o tipo..." onkeyup="filterGastronomiaCards()">
-                    </div>
-                </div>
-
-                <div id="gastronomiaAdminCardsGrid" class="cards-admin-grid">
-                    <!-- Dinámico -->
-                </div>
+            <div id="providersFleetContainer" style="display:flex; flex-direction:column; gap:20px;">
+                <!-- Dinámico -->
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- PESTAÑA 4: ALOJAMIENTOS -->
-        <!-- ========================================== -->
-        <div id="tabAdminAlojamientos" class="admin-tab-content" style="display:none;">
-            <div class="admin-card">
-                <div class="section-header-row">
-                    <div>
-                        <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-bed" style="color:#e67e22;"></i> Gestión de Alojamientos</h2>
-                        <small style="color:var(--text-secondary);">Agrega, modifica, pausa o elimina cabañas, hoteles, casas y departamentos.</small>
-                    </div>
-                    <button class="btn-add-comp" onclick="openAddAlojamientoModal()" style="background:#e67e22;">
-                        <i class="fas fa-plus"></i> + Agregar Alojamiento
-                    </button>
+        <!-- 4. SECCIÓN NUEVA: GESTIÓN DE GASTRONOMÍA (CRUD TOTAL) -->
+        <div class="admin-card">
+            <div class="section-header-row">
+                <div>
+                    <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-utensils" style="color:#e74c3c;"></i> Gestión de Gastronomía (Dónde Comer)</h2>
+                    <small style="color:var(--text-secondary);">Administra todos los restaurantes, cervecerías, parrillas y chocolaterías del portal.</small>
                 </div>
+                <button class="btn-add-comp" onclick="openAddGastronomiaModal()" style="background:#e74c3c;">
+                    <i class="fas fa-plus"></i> + Agregar Local Gastronómico
+                </button>
+            </div>
 
-                <div class="toolbar-row">
-                    <div class="search-box-admin">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="searchAlojInput" placeholder="Buscar por nombre o ubicación..." onkeyup="filterAlojamientosCards()">
-                    </div>
-                </div>
-
-                <div id="alojamientosAdminCardsGrid" class="cards-admin-grid">
-                    <!-- Dinámico -->
-                </div>
+            <div id="adminGastronomiaContainer" class="admin-items-grid">
+                <!-- Dinámico -->
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- PESTAÑA 5: EXCURSIONES Y BARIRUTA GPS -->
-        <!-- ========================================== -->
-        <div id="tabAdminExcursiones" class="admin-tab-content" style="display:none;">
-            <div class="admin-card">
-                <div class="section-header-row">
-                    <div>
-                        <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-van-shuttle" style="color:#0084ff;"></i> Empresas de Excursión y Transporte</h2>
-                        <small style="color:var(--text-secondary);">Empresas con integración de Mercado Pago directo y cobro automático.</small>
-                    </div>
-                    <button class="btn-add-comp" onclick="openAddCompanyModal()" style="background:#0084ff;">
-                        <i class="fas fa-plus"></i> + Dar de Alta Empresa
-                    </button>
+        <!-- 5. SECCIÓN NUEVA: GESTIÓN DE ALOJAMIENTOS (CRUD TOTAL) -->
+        <div class="admin-card">
+            <div class="section-header-row">
+                <div>
+                    <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-bed" style="color:#e67e22;"></i> Gestión de Alojamientos (Dónde Dormir)</h2>
+                    <small style="color:var(--text-secondary);">Administra cabañas, departamentos, casas y hoteles publicados.</small>
                 </div>
-
-                <div style="overflow-x:auto;">
-                    <table class="company-table">
-                        <thead>
-                            <tr>
-                                <th>Empresa</th>
-                                <th>Tipo</th>
-                                <th>WhatsApp</th>
-                                <th>Mercado Pago</th>
-                                <th>Estado</th>
-                                <th style="text-align:right;">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="companiesTableBody">
-                            <tr><td colspan="6" style="text-align:center; padding:20px;">Cargando empresas...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+                <button class="btn-add-comp" onclick="openAddAlojamientoModal()" style="background:#e67e22;">
+                    <i class="fas fa-plus"></i> + Agregar Alojamiento
+                </button>
             </div>
 
-            <!-- Telemetría BariRuta en Vivo -->
-            <div class="admin-card">
-                <div class="section-header-row">
-                    <div>
-                        <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-satellite-dish" style="color:#00cec9;"></i> Telemetría BariRuta (Combis en Vivo)</h2>
-                        <small style="color:var(--text-secondary);">Monitoreo satelital de vehículos transmitiendo velocidad y ubicación.</small>
-                    </div>
-                </div>
-
-                <div style="overflow-x:auto;">
-                    <table class="company-table">
-                        <thead>
-                            <tr>
-                                <th>Móvil</th>
-                                <th>Empresa</th>
-                                <th>Estado Satelital</th>
-                                <th>Velocidad</th>
-                                <th>Última Transmisión</th>
-                            </tr>
-                        </thead>
-                        <tbody id="telemetryTableBody">
-                            <tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-secondary);">No hay vehículos transmitiendo en este momento.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div id="adminAlojamientosContainer" class="admin-items-grid">
+                <!-- Dinámico -->
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- PESTAÑA 6: CENTRO DE MENSAJERÍA -->
-        <!-- ========================================== -->
-        <div id="tabAdminMensajes" class="admin-tab-content" style="display:none;">
-            <div class="admin-card">
-                <div class="section-header-row">
-                    <div>
-                        <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-paper-plane" style="color:#6c5ce7;"></i> Enviar Mensaje a Cliente</h2>
-                        <small style="color:var(--text-secondary);">El usuario verá este aviso de forma destacada al ingresar a su panel personal.</small>
-                    </div>
+        <!-- 6. SECCIÓN: EMPRESAS DE EXCURSIÓN Y TRANSPORTE -->
+        <div class="admin-card">
+            <div class="section-header-row">
+                <div>
+                    <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-van-shuttle" style="color:#0084ff;"></i> Empresas de Transporte y Excursión</h2>
+                    <small style="color:var(--text-secondary);">Empresas registradas en Supabase con cobro directo de Mercado Pago.</small>
                 </div>
+                <button class="btn-add-comp" onclick="openAddCompanyModal()" style="background:#0084ff;">
+                    <i class="fas fa-plus"></i> + Dar de Alta Empresa
+                </button>
+            </div>
 
-                <form onsubmit="handleSendAdminMessage(event)">
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 15px;">
-                        <div class="form-group-custom">
-                            <label>Destinatario (Email o "all" para todos)</label>
-                            <input type="text" id="msgTargetEmail" class="form-control-custom" placeholder="usuario@gmail.com o 'all'" required>
-                        </div>
-                        <div class="form-group-custom">
-                            <label>Tipo de Mensaje</label>
-                            <select id="msgType" class="form-control-custom">
-                                <option value="info">ℹ️ Notificación General</option>
-                                <option value="warning">⚠️ Aviso / Vencimiento</option>
-                                <option value="success">🎉 Felicitación / Promo</option>
-                                <option value="alert">🚨 Alerta Importante</option>
-                            </select>
-                        </div>
-                        <div class="form-group-custom">
-                            <label>Título del Mensaje</label>
-                            <input type="text" id="msgTitle" class="form-control-custom" placeholder="Ej. Tu suscripción está activa" required>
-                        </div>
-                    </div>
+            <div style="overflow-x:auto;">
+                <table class="company-table">
+                    <thead>
+                        <tr>
+                            <th>Empresa</th>
+                            <th>Tipo</th>
+                            <th>WhatsApp</th>
+                            <th>Mercado Pago</th>
+                            <th>Estado</th>
+                            <th style="text-align:right;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="companiesTableBody">
+                        <tr><td colspan="6" style="text-align:center; padding:20px;">Cargando empresas...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
+        <!-- 7. SECCIÓN: MENSAJERÍA / AVISOS A USUARIOS -->
+        <div class="admin-card">
+            <div class="section-header-row">
+                <div>
+                    <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-paper-plane" style="color:#6c5ce7;"></i> Enviar Mensaje / Notificación a Usuarios</h2>
+                    <small style="color:var(--text-secondary);">El mensaje aparecerá destacado en el panel de control del usuario destinatario.</small>
+                </div>
+            </div>
+
+            <form onsubmit="handleSendAdminMessage(event)">
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
                     <div class="form-group-custom">
-                        <label>Cuerpo del Mensaje</label>
-                        <textarea id="msgBody" class="form-control-custom" rows="3" placeholder="Escribe el mensaje que verá el usuario en su panel..." required style="resize:vertical;"></textarea>
+                        <label>Destinatario (Email del Usuario)</label>
+                        <input type="text" id="msgTargetEmail" class="form-control-custom" placeholder="usuario@gmail.com o 'all' para todos" required>
                     </div>
-
-                    <button type="submit" id="btnSendAdminMsg" class="btn-submit-pickup" style="background:#6c5ce7; color:white; font-weight:800; width:auto; padding:12px 24px;">
-                        <i class="fas fa-paper-plane"></i> Enviar Mensaje al Usuario
-                    </button>
-                </form>
-
-                <!-- Historial de mensajes -->
-                <div class="section-header-row" style="margin-top:35px; border-bottom:1px solid var(--border); padding-bottom:8px;">
-                    <h3 style="font-family:'Outfit'; font-size:1.1rem; margin:0;"><i class="fas fa-clock-rotate-left"></i> Historial de Mensajes Enviados</h3>
+                    <div class="form-group-custom">
+                        <label>Tipo de Mensaje</label>
+                        <select id="msgType" class="form-control-custom">
+                            <option value="info">ℹ️ Información / Noticia</option>
+                            <option value="warning">⚠️ Advertencia / Vencimiento</option>
+                            <option value="success">🎉 Felicitación / Descuento</option>
+                            <option value="alert">🚨 Alerta Importante</option>
+                        </select>
+                    </div>
+                    <div class="form-group-custom">
+                        <label>Título del Mensaje</label>
+                        <input type="text" id="msgTitle" class="form-control-custom" placeholder="Ej. Actualización de servicios" required>
+                    </div>
                 </div>
 
-                <div style="overflow-x:auto;">
-                    <table class="company-table">
-                        <thead>
-                            <tr>
-                                <th>Destinatario</th>
-                                <th>Tipo</th>
-                                <th>Título</th>
-                                <th>Mensaje</th>
-                                <th>Fecha</th>
-                                <th style="text-align:right;">Eliminar</th>
-                            </tr>
-                        </thead>
-                        <tbody id="sentMessagesTableBody">
-                            <tr><td colspan="6" style="text-align:center; padding:20px;">Cargando mensajes...</td></tr>
-                        </tbody>
-                    </table>
+                <div class="form-group-custom">
+                    <label>Contenido del Mensaje</label>
+                    <textarea id="msgBody" class="form-control-custom" rows="3" placeholder="Escribe el mensaje que verá el usuario en su panel..." required style="resize:vertical;"></textarea>
                 </div>
+
+                <button type="submit" id="btnSendAdminMsg" class="btn-submit-pickup" style="background:#6c5ce7; color:white; font-weight:800; width:auto; padding:12px 24px;">
+                    <i class="fas fa-paper-plane"></i> Enviar Mensaje al Usuario
+                </button>
+            </form>
+
+            <div class="section-header-row" style="margin-top:20px; border-bottom:1px solid var(--border); padding-bottom:8px;">
+                <h3 style="font-family:'Outfit'; font-size:1.1rem; margin:0;"><i class="fas fa-clock-rotate-left"></i> Mensajes Enviados Recientes</h3>
+            </div>
+
+            <div style="overflow-x:auto;">
+                <table class="company-table">
+                    <thead>
+                        <tr>
+                            <th>Destinatario</th>
+                            <th>Tipo</th>
+                            <th>Título</th>
+                            <th>Mensaje</th>
+                            <th>Fecha</th>
+                            <th style="text-align:right;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sentMessagesTableBody">
+                        <tr><td colspan="6" style="text-align:center; padding:20px;">Cargando mensajes...</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- PESTAÑA 7: TARIFAS Y CÓDIGOS PROMO -->
-        <!-- ========================================== -->
-        <div id="tabAdminTarifas" class="admin-tab-content" style="display:none;">
-            <!-- Tarifas de Suscripción -->
-            <div class="admin-card">
-                <div class="section-header-row">
-                    <div>
-                        <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-tags" style="color:#00b894;"></i> Tarifas y Precios de Suscripción</h2>
-                        <small style="color:var(--text-secondary);">Define el valor mensual de cada rubro y los descuentos para paquetes combinados.</small>
-                    </div>
+        <!-- 8. SECCIÓN: TELEMETRÍA BARIRUTA (COMBIS EN VIVO) -->
+        <div class="admin-card">
+            <div class="section-header-row">
+                <div>
+                    <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-satellite-dish" style="color:var(--primary);"></i> Telemetría BariRuta (Combis en Vivo)</h2>
+                    <small style="color:var(--text-secondary);">Visualizá los móviles conectados transmitiendo datos satelitales en tiempo real a Supabase.</small>
                 </div>
-
-                <form onsubmit="handleSaveServicePrices(event)">
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
-                        <div class="form-group-custom">
-                            <label><i class="fas fa-van-shuttle" style="color:#0084ff;"></i> Excursiones (ARS)</label>
-                            <input type="number" id="priceExcursiones" class="form-control-custom" min="0" step="500" required>
-                        </div>
-                        <div class="form-group-custom">
-                            <label><i class="fas fa-bed" style="color:#e67e22;"></i> Alojamiento (ARS)</label>
-                            <input type="number" id="priceAlojamiento" class="form-control-custom" min="0" step="500" required>
-                        </div>
-                        <div class="form-group-custom">
-                            <label><i class="fas fa-utensils" style="color:#e74c3c;"></i> Gastronomía (ARS)</label>
-                            <input type="number" id="priceGastronomia" class="form-control-custom" min="0" step="500" required>
-                        </div>
-                        <div class="form-group-custom">
-                            <label><i class="fas fa-percent" style="color:#00cec9;"></i> Descuento 2 Servicios (%)</label>
-                            <input type="number" id="discount2Services" class="form-control-custom" min="0" max="100" required>
-                        </div>
-                        <div class="form-group-custom">
-                            <label><i class="fas fa-percent" style="color:#6c5ce7;"></i> Descuento 3 Servicios (%)</label>
-                            <input type="number" id="discount3Services" class="form-control-custom" min="0" max="100" required>
-                        </div>
-                    </div>
-
-                    <button type="submit" id="btnSavePrices" class="btn-submit-pickup" style="background:#00b894; color:white; font-weight:800; width:auto; padding:12px 24px;">
-                        <i class="fas fa-floppy-disk"></i> Guardar Tarifas
-                    </button>
-                </form>
             </div>
 
-            <!-- Códigos Promocionales -->
-            <div class="admin-card">
-                <div class="section-header-row">
-                    <div>
-                        <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-gift" style="color:#e67e22;"></i> Códigos de Gratuidad (Promos)</h2>
-                        <small style="color:var(--text-secondary);">Crea cupones para regalar 1, 3 o 6 meses gratis a clientes seleccionados.</small>
-                    </div>
-                    <button class="btn-add-comp" onclick="openAddPromoModal()" style="background:#e67e22;">
-                        <i class="fas fa-plus"></i> + Crear Código
-                    </button>
-                </div>
-
-                <div style="overflow-x:auto;">
-                    <table class="company-table">
-                        <thead>
-                            <tr>
-                                <th>Código</th>
-                                <th>Beneficio</th>
-                                <th>Servicio</th>
-                                <th>Usos</th>
-                                <th>Límite</th>
-                                <th>Creado</th>
-                                <th style="text-align:right;">Eliminar</th>
-                            </tr>
-                        </thead>
-                        <tbody id="promoCodesTableBody">
-                            <tr><td colspan="7" style="text-align:center; padding:20px;">Cargando códigos...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div style="overflow-x:auto;">
+                <table class="company-table">
+                    <thead>
+                        <tr>
+                            <th>Móvil</th>
+                            <th>Empresa</th>
+                            <th>Estado Satelital</th>
+                            <th>Velocidad</th>
+                            <th>Última Transmisión</th>
+                        </tr>
+                    </thead>
+                    <tbody id="telemetryTableBody">
+                        <tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-secondary);">No hay vehículos registrados o transmitiendo.</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- PESTAÑA 8: CONFIGURACIÓN SUPABASE -->
-        <!-- ========================================== -->
-        <div id="tabAdminConfig" class="admin-tab-content" style="display:none;">
-            <div class="admin-card">
-                <div class="section-header-row">
-                    <div>
-                        <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-gear" style="color:var(--primary);"></i> Conexión con Supabase Realtime</h2>
-                        <small style="color:var(--text-secondary);">Ingresá la URL del proyecto y la clave API para sincronizar el GPS de BariRuta.</small>
-                    </div>
-                    <div id="sbStatusBadge" class="badge-active" style="background:rgba(0, 132, 255, 0.15); color:var(--primary);">
-                        Cargando...
-                    </div>
+        <!-- 9. SECCIÓN: CÓDIGOS DE GRATUIDAD (PROMOS) -->
+        <div class="admin-card">
+            <div class="section-header-row">
+                <div>
+                    <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-gift" style="color:#e67e22;"></i> Códigos de Gratuidad (Promociones)</h2>
+                    <small style="color:var(--text-secondary);">Regala meses de publicación sin cargo discriminados por servicio. El usuario publica gratis hasta vencer el plazo.</small>
                 </div>
+                <button class="btn-add-comp" onclick="openAddPromoModal()" style="background:#e67e22;">
+                    <i class="fas fa-plus"></i> + Crear Código de Gratuidad
+                </button>
+            </div>
 
-                <form onsubmit="handleSaveSupabaseConfig(event)">
-                    <div class="form-group-custom">
-                        <label>Project URL (ej. https://xxxxxxxx.supabase.co)</label>
-                        <input type="text" id="adminSbUrl" class="form-control-custom" placeholder="https://xxxxxxxx.supabase.co" required>
-                    </div>
-
-                    <div class="form-group-custom">
-                        <label>Publishable API Key (o Legacy Anon Key)</label>
-                        <input type="password" id="adminSbKey" class="form-control-custom" placeholder="sb_publishable_... o eyJhbGci..." required>
-                    </div>
-
-                    <button type="submit" class="btn-submit-pickup" style="background:#00cec9; color:#111; font-weight:800; width:auto; padding:12px 24px;">
-                        <i class="fas fa-floppy-disk"></i> Guardar y Conectar Supabase
-                    </button>
-                </form>
+            <div style="overflow-x:auto;">
+                <table class="company-table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Meses Gratis</th>
+                            <th>Servicio Aplicable</th>
+                            <th>Usos Actuales</th>
+                            <th>Límite de Usos</th>
+                            <th>Creado</th>
+                            <th style="text-align:right;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="promoCodesTableBody">
+                        <tr><td colspan="7" style="text-align:center; padding:20px;">Cargando códigos...</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </main>
@@ -936,7 +605,7 @@
         </div>
     </div>
 
-    <!-- ==================== MODAL: GASTRONOMÍA (CREAR / EDITAR) ==================== -->
+    <!-- ==================== MODAL: GASTRONOMÍA ==================== -->
     <div id="editGastronomiaModal" class="modal-overlay" onclick="closeEditGastronomiaModal()">
         <div class="modal-content glass-modal" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeEditGastronomiaModal()"><i class="fas fa-times"></i></button>
@@ -1014,7 +683,7 @@
         </div>
     </div>
 
-    <!-- ==================== MODAL: ALOJAMIENTO (CREAR / EDITAR) ==================== -->
+    <!-- ==================== MODAL: ALOJAMIENTO ==================== -->
     <div id="editAlojamientoModal" class="modal-overlay" onclick="closeEditAlojamientoModal()">
         <div class="modal-content glass-modal" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeEditAlojamientoModal()"><i class="fas fa-times"></i></button>
@@ -1092,7 +761,7 @@
         <div class="modal-content glass-modal" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeAddCompanyModal()"><i class="fas fa-times"></i></button>
             
-            <div class="modal-header-section" style="margin-bottom:20px;">
+            <div class="modal-header-section">
                 <div class="modal-icon-badge" style="background:rgba(0, 132, 255, 0.15); color:var(--primary);"><i class="fas fa-building"></i></div>
                 <h2>Dar de Alta Empresa</h2>
                 <p>Completá los datos de la empresa y sus credenciales de cobro de Mercado Pago.</p>
@@ -1130,7 +799,7 @@
                     <input type="password" id="newCompMpToken" class="form-control-custom" placeholder="APP_USR-xxxx...">
                 </div>
 
-                <button type="submit" class="btn-submit-pickup" style="background:#0084ff; color:white; font-weight:800;">
+                <button type="submit" class="btn-submit-pickup">
                     <i class="fas fa-floppy-disk"></i> Guardar Empresa en Supabase
                 </button>
             </form>
@@ -1141,8 +810,9 @@
     <div id="addPromoModal" class="modal-overlay" onclick="closeAddPromoModal()">
         <div class="modal-content glass-modal" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeAddPromoModal()"><i class="fas fa-times"></i></button>
-            <div class="modal-header-section" style="margin-bottom:20px;">
-                <div class="modal-icon-badge" style="background:rgba(0, 184, 148, 0.15); color:#00b894;"><i class="fas fa-gift"></i></div>
+            
+            <div class="modal-header-section">
+                <div class="modal-icon-badge" style="background:rgba(230, 126, 34, 0.15); color:#e67e22;"><i class="fas fa-gift"></i></div>
                 <h2>Crear Código de Gratuidad</h2>
                 <p>Generá un código para regalar meses de suscripción a un cliente.</p>
             </div>
@@ -1151,7 +821,7 @@
                 <div class="form-group-custom">
                     <label>Código del Cupón</label>
                     <div style="display:flex; gap:8px;">
-                        <input type="text" id="newPromoCode" class="form-control-custom" required placeholder="Ej. BARI3M-VIP" style="text-transform:uppercase; font-weight:800; letter-spacing:1px;">
+                        <input type="text" id="newPromoCode" class="form-control-custom" required placeholder="Ej. REGALO3M" style="text-transform:uppercase; font-weight:800; letter-spacing:1px;">
                         <button type="button" onclick="generateRandomPromoCode()" class="btn-add-comp" style="background:#00cec9; color:#111; padding:0 14px; font-size:0.8rem;">
                             <i class="fas fa-dice"></i> Generar
                         </button>
@@ -1192,22 +862,18 @@
 
     <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="auth_manager.js?v=2090"></script>
-    <script src="app.js?v=2090"></script>
-    <script src="supabase_client.js?v=2090"></script>
+    <script src="auth_manager.js?v=2095"></script>
+    <script src="app.js?v=2095"></script>
+    <script src="supabase_client.js?v=2095"></script>
     <script>
-        // ESTADO GLOBAL DEL PANEL
-        let stateAdmin = {
-            providers: [],
-            subscriptions: [],
-            accommodations: [],
-            gastronomy: [],
-            messages: [],
-            promoCodes: [],
-            prices: {}
-        };
+        let allProvidersData = [];
+        let allGastronomiaData = [];
+        let allAlojamientosData = [];
+        let allSubscriptionsData = [];
+        let adminPromoCodes = [];
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Verificar rol de admin con AuthManager
             if (window.authManager) {
                 window.authManager.onAuthChange((user, isAdmin) => {
                     const lockScreen = document.getElementById('adminLockScreen');
@@ -1218,7 +884,10 @@
                     if (isAdmin) {
                         if (lockScreen) lockScreen.style.display = 'none';
                         if (authContent) authContent.style.display = 'block';
-                        refreshAllAdminData();
+                        loadServicePrices();
+                        loadAllProvidersAdmin();
+                        loadSentMessages();
+                        loadPromoCodes();
                     } else {
                         if (authContent) authContent.style.display = 'none';
                         if (lockScreen) lockScreen.style.display = 'block';
@@ -1233,162 +902,536 @@
                 });
             }
 
-            // Supabase creds
-            const creds = window.bariRuta ? window.bariRuta.getCredentials() : { url: '', key: '' };
-            const urlInput = document.getElementById('adminSbUrl');
-            const keyInput = document.getElementById('adminSbKey');
-            if (urlInput) urlInput.value = creds.url;
-            if (keyInput) keyInput.value = creds.key;
-
+            // Cargar credenciales actuales en los inputs
             if (window.bariRuta) {
+                const creds = window.bariRuta.getCredentials();
+                const urlInput = document.getElementById('adminSbUrl');
+                const keyInput = document.getElementById('adminSbKey');
+                if (urlInput) urlInput.value = creds.url;
+                if (keyInput) keyInput.value = creds.key;
+
+                const badge = document.getElementById('sbStatusBadge');
+                if (badge) {
+                    if (window.bariRuta.isConnected) {
+                        badge.textContent = '🟢 Conectado';
+                        badge.style.color = '#00b894';
+                        badge.style.background = 'rgba(0, 184, 148, 0.15)';
+                    } else {
+                        badge.textContent = '⚙️ No configurado';
+                        badge.style.color = '#e17055';
+                        badge.style.background = 'rgba(225, 112, 85, 0.15)';
+                    }
+                }
+
                 renderCompaniesTable(window.bariRuta.companies);
                 renderTelemetryTable(window.bariRuta.vehicles);
+
                 window.bariRuta.onCompaniesChange(companies => renderCompaniesTable(companies));
                 window.bariRuta.onVehiclesChange(vehicles => renderTelemetryTable(vehicles));
             }
         });
 
-        // 1. NAVEGACIÓN POR PESTAÑAS
-        function switchAdminTab(tabId) {
-            const tabs = ['dashboard', 'clients', 'gastronomia', 'alojamientos', 'excursiones', 'mensajes', 'tarifas', 'config'];
-            const tabButtons = document.querySelectorAll('.admin-tab-btn');
+        async function handleAdminDirectLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('adminLockEmail').value.trim();
+            const pass = document.getElementById('adminLockPass').value;
+            const btn = document.getElementById('btnAdminLockLogin');
+            const errorEl = document.getElementById('adminLockError');
 
-            tabs.forEach((t, idx) => {
-                const el = document.getElementById('tabAdmin' + capitalize(t));
-                if (el) el.style.display = (t === tabId) ? 'block' : 'none';
-            });
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando credenciales...';
+            errorEl.textContent = '';
 
-            tabButtons.forEach(btn => {
-                const isTarget = btn.getAttribute('onclick')?.includes(tabId);
-                btn.classList.toggle('active', isTarget);
-            });
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function capitalize(str) {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        }
-
-        // 2. CARGA CENTRALIZADA DE TODOS LOS DATOS
-        async function refreshAllAdminData() {
             try {
-                // Obtener proveedores, suscripciones, alojamientos y gastronomía
-                const res = await fetch('save_alojamiento.php?action=admin_get_all_providers&admin_email=oscarns@gmail.com&t=' + Date.now());
-                const data = await res.json();
-                
-                stateAdmin.providers = data.providers || [];
-                stateAdmin.subscriptions = data.subscriptions || [];
-                stateAdmin.accommodations = data.accommodations || [];
-                stateAdmin.gastronomy = data.gastronomy || [];
-
-                // Renderizar tablas y contadores
-                updateKPIsAndBadges();
-                renderClientsTable(stateAdmin.providers);
-                renderGastronomiaCards(stateAdmin.gastronomy);
-                renderAlojamientosCards(stateAdmin.accommodations);
-
-                // Cargar precios, mensajes y promos
-                loadServicePrices();
-                loadSentMessages();
-                loadPromoCodes();
-            } catch (e) {
-                console.error('Error al cargar datos del panel:', e);
+                if (!window.authManager || !window.authManager.supabase) {
+                    throw new Error('Servicio de autenticación no inicializado.');
+                }
+                const { data, error } = await window.authManager.supabase.auth.signInWithPassword({ email, password: pass });
+                if (error) throw error;
+            } catch (err) {
+                errorEl.textContent = err.message || 'Contraseña incorrecta o error al iniciar sesión';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-key"></i> Desbloquear Panel de Control';
             }
         }
 
-        function updateKPIsAndBadges() {
-            // Actualizar contadores
-            document.getElementById('badgeCountClients').textContent = stateAdmin.providers.length;
-            document.getElementById('badgeCountGasto').textContent = stateAdmin.gastronomy.length;
-            document.getElementById('badgeCountAloj').textContent = stateAdmin.accommodations.length;
-            document.getElementById('badgeCountExc').textContent = (window.bariRuta ? window.bariRuta.vehicles.length : 0);
+        function handleSaveSupabaseConfig(e) {
+            e.preventDefault();
+            const url = document.getElementById('adminSbUrl').value.trim();
+            const key = document.getElementById('adminSbKey').value.trim();
 
-            // KPIs
-            document.getElementById('kpiClients').textContent = stateAdmin.providers.length;
-            document.getElementById('kpiGasto').textContent = stateAdmin.gastronomy.length;
-            document.getElementById('kpiAloj').textContent = stateAdmin.accommodations.length;
-            document.getElementById('kpiMóviles').textContent = (window.bariRuta ? window.bariRuta.vehicles.length : 0);
+            if (url && key && window.bariRuta) {
+                window.bariRuta.setCredentials(url, key);
+                alert('¡Configuración de Supabase guardada con éxito!');
+                location.reload();
+            } else {
+                alert('Completá la URL y la Key de Supabase.');
+            }
         }
 
         // ==========================================
-        // 3. MÓDULO CLIENTES / ANUNCIANTES
+        // 1. GESTIÓN DE TARIFAS Y PRECIOS
         // ==========================================
-        function renderClientsTable(providers) {
-            const tbody = document.getElementById('clientsTableBody');
-            if (!tbody) return;
+        async function loadServicePrices() {
+            try {
+                const res = await fetch('save_alojamiento.php?action=get_service_prices&t=' + Date.now());
+                const prices = await res.json();
+                if (prices) {
+                    document.getElementById('priceExcursiones').value = prices.excursiones || 10000;
+                    document.getElementById('priceAlojamiento').value = prices.alojamiento || 10000;
+                    document.getElementById('priceGastronomia').value = prices.gastronomia || 10000;
+                    document.getElementById('discount2Services').value = prices.combo_2_descuento || 10;
+                    document.getElementById('discount3Services').value = prices.combo_3_descuento || 20;
+                }
+            } catch (e) {
+                console.error('Error al cargar tarifas:', e);
+            }
+        }
 
-            if (!providers || providers.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-secondary);">No hay clientes registrados aún.</td></tr>';
+        async function handleSaveServicePrices(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSavePrices');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
+            const payload = {
+                admin_email: 'oscarns@gmail.com',
+                excursiones: parseInt(document.getElementById('priceExcursiones').value) || 10000,
+                alojamiento: parseInt(document.getElementById('priceAlojamiento').value) || 10000,
+                gastronomia: parseInt(document.getElementById('priceGastronomia').value) || 10000,
+                combo_2_descuento: parseInt(document.getElementById('discount2Services').value) || 10,
+                combo_3_descuento: parseInt(document.getElementById('discount3Services').value) || 20
+            };
+
+            try {
+                const res = await fetch('save_alojamiento.php?action=save_service_prices', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    alert('✅ Tarifas de suscripción actualizadas con éxito.');
+                } else {
+                    alert('Error: ' + (data.message || 'No se pudieron guardar las tarifas'));
+                }
+            } catch (err) {
+                alert('Error de conexión al guardar tarifas.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-floppy-disk"></i> Guardar Tarifas';
+            }
+        }
+
+        // ==========================================
+        // 2. PROVEEDORES MULTISERVICIO Y FLOTAS
+        // ==========================================
+        async function loadAllProvidersAdmin() {
+            const container = document.getElementById('providersFleetContainer');
+            if (!container) return;
+
+            try {
+                const res = await fetch('save_alojamiento.php?action=admin_get_all_providers&admin_email=oscarns@gmail.com&t=' + Date.now());
+                const data = await res.json();
+                allProvidersData = data.providers || [];
+                allSubscriptionsData = data.subscriptions || [];
+                allAlojamientosData = data.accommodations || [];
+                allGastronomiaData = data.gastronomy || [];
+
+                renderProvidersFleetList(data);
+                renderAdminGastronomia(allGastronomiaData);
+                renderAdminAlojamientos(allAlojamientosData);
+            } catch (e) {
+                console.error('Error al cargar proveedores:', e);
+                container.innerHTML = '<div style="color:#e74c3c; text-align:center; padding:20px;">Error al cargar datos.</div>';
+            }
+        }
+
+        function renderProvidersFleetList(data) {
+            const container = document.getElementById('providersFleetContainer');
+            if (!container) return;
+
+            const providers = data.providers || [];
+            const subs = data.subscriptions || [];
+
+            if (providers.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding:30px; color:var(--text-secondary); background:var(--bg-main); border-radius:16px; border:1px dashed var(--border);">
+                        <i class="fas fa-building-circle-check" style="font-size:2rem; margin-bottom:10px; opacity:0.5;"></i>
+                        <p>No hay proveedores registrados aún.</p>
+                    </div>
+                `;
                 return;
             }
 
-            const subs = stateAdmin.subscriptions || [];
-
-            tbody.innerHTML = providers.map(p => {
+            container.innerHTML = providers.map(p => {
                 const sub = subs.find(s => (s.email || '').toLowerCase().trim() === (p.email || '').toLowerCase().trim());
                 const expiresAt = sub?.expires_at ? new Date(sub.expires_at).toLocaleDateString() : 'Sin suscripción';
                 const isPaused = p.is_active === false;
                 const services = p.services || ['excursiones'];
+                const moviles = p.moviles || [];
 
                 return `
-                    <tr style="${isPaused ? 'background:rgba(239,68,68,0.04);' : ''}">
-                        <td><b>${p.business_name || 'Sin Nombre'}</b></td>
-                        <td><code>${p.email}</code></td>
-                        <td>${p.phone ? `<a href="https://wa.me/${p.phone.replace(/\\D/g,'')}" target="_blank" style="color:var(--primary); text-decoration:none;"><i class="fab fa-whatsapp"></i> ${p.phone}</a>` : '-'}</td>
-                        <td>
-                            <div style="display:flex; gap:4px; flex-wrap:wrap;">
-                                ${services.map(s => `
-                                    <span style="font-size:0.72rem; font-weight:700; background:rgba(0,132,255,0.12); color:#0084ff; padding:2px 6px; border-radius:6px;">
-                                        ${s === 'excursiones' ? '🚐 Excursión' : s === 'alojamiento' ? '🏡 Alojamiento' : '🍽️ Gastronomía'}
+                    <div style="background:var(--bg-main); border:1px solid ${isPaused ? '#e74c3c' : 'var(--border)'}; border-radius:16px; padding:20px; box-shadow:var(--shadow);">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px; margin-bottom:15px;">
+                            <div>
+                                <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                                    <h3 style="margin:0; font-family:'Outfit'; font-size:1.2rem;">${p.business_name || 'Sin Nombre Comercial'}</h3>
+                                    <span class="badge-active" style="background:${isPaused ? 'rgba(231,76,60,0.15)' : 'rgba(0,184,148,0.15)'}; color:${isPaused ? '#e74c3c' : '#00b894'};">
+                                        ${isPaused ? '⛔ Pausado' : '🟢 Activo'}
                                     </span>
-                                `).join('')}
+                                </div>
+                                <div style="font-size:0.85rem; color:var(--text-secondary); display:flex; gap:15px; flex-wrap:wrap;">
+                                    <span><i class="fas fa-envelope"></i> ${p.email}</span>
+                                    <span><i class="fab fa-whatsapp"></i> ${p.phone || '-'}</span>
+                                    <span><i class="fas fa-calendar"></i> Vigente hasta: <b>${expiresAt}</b></span>
+                                </div>
+                                <div style="display:flex; gap:6px; margin-top:8px;">
+                                    ${services.map(s => `
+                                        <span style="font-size:0.75rem; font-weight:700; background:rgba(0,132,255,0.12); color:#0084ff; padding:3px 8px; border-radius:8px; text-transform:capitalize;">
+                                            ${s === 'excursiones' ? '🚐 Excursiones' : s === 'alojamiento' ? '🏡 Alojamiento' : '🍽️ Gastronomía'}
+                                        </span>
+                                    `).join('')}
+                                </div>
                             </div>
-                        </td>
-                        <td><small style="font-weight:700; color:var(--text-primary);">${expiresAt}</small></td>
-                        <td>
-                            <span class="${isPaused ? 'badge-paused' : 'badge-active'}">
-                                ${isPaused ? '<i class="fas fa-pause"></i> Pausado' : '<i class="fas fa-check"></i> Activo'}
-                            </span>
-                        </td>
-                        <td style="text-align:right;">
-                            <div style="display:inline-flex; gap:6px;">
-                                <button class="btn-action-icon" title="Editar Cliente y Suscripción" onclick="openEditProviderModal('${p.email}')">
-                                    <i class="fas fa-pen"></i>
+                            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                <button onclick="openEditProviderModal('${p.email}')" class="btn-edit-comp">
+                                    <i class="fas fa-pen"></i> Editar
                                 </button>
-                                <button class="btn-action-icon" title="${isPaused ? 'Reanudar Cuenta' : 'Pausar Cuenta'}" onclick="togglePauseItem('provider', '${p.email}')" style="color:${isPaused ? '#00b894' : '#ef4444'};">
-                                    <i class="fas ${isPaused ? 'fa-play' : 'fa-pause'}"></i>
+                                <button onclick="togglePauseProvider('${p.email}', 'provider')" class="btn-del-comp" style="background:${isPaused ? '#e8f8f5' : '#ffebee'}; color:${isPaused ? '#00b894' : '#e74c3c'}; border-color:${isPaused ? '#a3e4d7' : '#ffcdd2'};">
+                                    <i class="fas ${isPaused ? 'fa-play' : 'fa-pause'}"></i> ${isPaused ? 'Reanudar' : 'Pausar'}
                                 </button>
-                                <button class="btn-action-icon" title="Enviar Mensaje" onclick="openSendMessageToUser('${p.email}')" style="color:#6c5ce7;">
-                                    <i class="fas fa-message"></i>
+                                <button onclick="openSendMessageToUser('${p.email}')" class="btn-add-comp" style="background:#6c5ce7; font-size:0.8rem; padding:6px 12px;">
+                                    <i class="fas fa-message"></i> Mensaje
                                 </button>
-                                <button class="btn-action-icon" title="Eliminar Cliente" onclick="deleteProvider('${p.email}')" style="color:#ef4444;">
+                                <button onclick="deleteProvider('${p.email}')" class="btn-del-comp" title="Eliminar Cliente">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
-                        </td>
-                    </tr>
+                        </div>
+
+                        <!-- FLOTA DE MÓVILES/COMBIS -->
+                        <div style="background:var(--bg-secondary); border-radius:12px; padding:12px; margin-top:12px; border:1px solid var(--border);">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                <b style="font-size:0.88rem; color:var(--text-primary);"><i class="fas fa-van-shuttle"></i> Flota de Móviles (${moviles.length})</b>
+                            </div>
+                            ${moviles.length === 0 ? `
+                                <small style="color:var(--text-secondary);">No tiene combis o móviles registrados aún.</small>
+                            ` : `
+                                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px;">
+                                    ${moviles.map(m => `
+                                        <div style="background:var(--bg-main); border:1px solid ${m.is_active === false ? '#e74c3c' : 'var(--border)'}; border-radius:10px; padding:10px; display:flex; justify-content:space-between; align-items:center;">
+                                            <div>
+                                                <b style="font-size:0.9rem; display:block;">🚐 ${m.codigo || 'Combi'}</b>
+                                                <small style="color:var(--text-secondary); display:block;">
+                                                    ${m.marca || 'Marca n/d'} • ${m.color || 'Blanco'} • Pat: <b>...${m.patente_ultimos3 || '---'}</b>
+                                                </small>
+                                            </div>
+                                            <div>
+                                                <button onclick="togglePauseProvider('${p.email}', 'movil', '${m.id}')" title="${m.is_active === false ? 'Reanudar móvil' : 'Pausar móvil'}" style="background:none; border:none; color:${m.is_active === false ? '#e74c3c' : '#00b894'}; font-size:1rem; cursor:pointer;">
+                                                    <i class="fas ${m.is_active === false ? 'fa-toggle-off' : 'fa-toggle-on'}"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            `}
+                        </div>
+                    </div>
                 `;
             }).join('');
         }
 
-        function filterClientsTable() {
-            const q = (document.getElementById('searchClientInput').value || '').toLowerCase().trim();
-            const filtered = stateAdmin.providers.filter(p => 
-                (p.business_name || '').toLowerCase().includes(q) ||
-                (p.email || '').toLowerCase().includes(q) ||
-                (p.services || []).join(' ').toLowerCase().includes(q)
-            );
-            renderClientsTable(filtered);
+        async function togglePauseProvider(targetEmail, type, movilId = '', itemId = '') {
+            try {
+                const res = await fetch('save_alojamiento.php?action=admin_toggle_pause', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        admin_email: 'oscarns@gmail.com',
+                        target_email: targetEmail,
+                        type: type,
+                        movil_id: movilId,
+                        id: itemId || movilId
+                    })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    loadAllProvidersAdmin();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (e) {
+                alert('Error de conexión');
+            }
         }
 
+        // ==========================================
+        // 3. SECCIÓN GASTRONOMÍA (CRUD)
+        // ==========================================
+        function renderAdminGastronomia(list) {
+            const container = document.getElementById('adminGastronomiaContainer');
+            if (!container) return;
+
+            if (!list || list.length === 0) {
+                container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:var(--text-secondary);">No hay locales gastronómicos cargados.</div>';
+                return;
+            }
+
+            container.innerHTML = list.map(g => {
+                const isPaused = (g.is_active === false);
+                const thumb = (g.images && g.images[0]) ? g.images[0] : 'img/gastronomia/patagonia.jpg';
+
+                return `
+                    <div class="admin-item-box ${isPaused ? 'is-paused' : ''}">
+                        <div class="admin-item-thumb" style="background-image: url('${thumb}');">
+                            <span class="${isPaused ? 'badge-paused' : 'badge-active'}" style="position:absolute; top:8px; right:8px;">
+                                ${isPaused ? '⛔ Pausado' : '🟢 Activo'}
+                            </span>
+                        </div>
+                        <div class="admin-item-content">
+                            <div style="font-size:0.75rem; color:#e74c3c; font-weight:800; text-transform:uppercase;">${g.type || 'Gastronomía'}</div>
+                            <h4 style="margin:4px 0; font-family:'Outfit'; font-size:1.1rem;">${g.name}</h4>
+                            <div style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:6px;"><i class="fas fa-location-dot"></i> ${g.location || 'Bariloche'}</div>
+                            ${g.promo ? `<div style="background:rgba(231,76,60,0.1); color:#e74c3c; font-size:0.78rem; font-weight:700; padding:4px 8px; border-radius:6px; margin-bottom:6px;">🎁 ${g.promo}</div>` : ''}
+                            <small style="color:var(--text-secondary); margin-top:auto;">Dueño: <b>${g.owner_email || 'oscarns@gmail.com'}</b></small>
+                        </div>
+                        <div class="admin-item-actions">
+                            <button onclick="openEditGastronomiaModal('${g.id}')" class="btn-edit-comp"><i class="fas fa-pen"></i> Editar</button>
+                            <button onclick="togglePauseProvider('', 'gastronomy', '', '${g.id}')" class="btn-del-comp" style="background:${isPaused ? '#e8f8f5' : '#ffebee'}; color:${isPaused ? '#00b894' : '#e74c3c'};">
+                                <i class="fas ${isPaused ? 'fa-play' : 'fa-pause'}"></i> ${isPaused ? 'Activar' : 'Pausar'}
+                            </button>
+                            <button onclick="deleteGastronomiaItem('${g.id}')" class="btn-del-comp" title="Eliminar"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openAddGastronomiaModal() {
+            openEditGastronomiaModal(null);
+        }
+
+        function openEditGastronomiaModal(id = null) {
+            const modal = document.getElementById('editGastronomiaModal');
+            const g = allGastronomiaData.find(item => item.id === id) || {};
+
+            document.getElementById('gastoEditId').value = id || '';
+            document.getElementById('modalGastoTitle').textContent = id ? `Editar Local: ${g.name}` : 'Agregar Local Gastronómico';
+            document.getElementById('gastoName').value = g.name || '';
+            document.getElementById('gastoType').value = g.type || 'Cervecería Artesanal';
+            document.getElementById('gastoLocation').value = g.location || 'Centro';
+            document.getElementById('gastoPhone').value = g.phone || '';
+            document.getElementById('gastoSpecialty').value = g.specialty || '';
+            document.getElementById('gastoPromo').value = g.promo || '';
+            document.getElementById('gastoDesc').value = g.description || '';
+            document.getElementById('gastoFeatures').value = (g.features || []).join(', ');
+            document.getElementById('gastoImages').value = (g.images || []).join('\n');
+            document.getElementById('gastoOwnerEmail').value = g.owner_email || 'oscarns@gmail.com';
+            document.getElementById('gastoRating').value = g.rating || 4.9;
+
+            modal.style.display = 'flex';
+        }
+
+        function closeEditGastronomiaModal() {
+            document.getElementById('editGastronomiaModal').style.display = 'none';
+        }
+
+        async function handleSaveGastronomiaForm(e) {
+            e.preventDefault();
+            const id = document.getElementById('gastoEditId').value.trim();
+            const formData = new FormData();
+            formData.append('owner_email', 'oscarns@gmail.com');
+            if (id) formData.append('id', id);
+            formData.append('name', document.getElementById('gastoName').value.trim());
+            formData.append('type', document.getElementById('gastoType').value.trim());
+            formData.append('location', document.getElementById('gastoLocation').value.trim());
+            formData.append('phone', document.getElementById('gastoPhone').value.trim());
+            formData.append('specialty', document.getElementById('gastoSpecialty').value.trim());
+            formData.append('promo', document.getElementById('gastoPromo').value.trim());
+            formData.append('description', document.getElementById('gastoDesc').value.trim());
+            formData.append('rating', document.getElementById('gastoRating').value);
+            formData.append('features', JSON.stringify(document.getElementById('gastoFeatures').value.split(',').map(s => s.trim()).filter(Boolean)));
+            formData.append('existing_images', JSON.stringify(document.getElementById('gastoImages').value.split(/[\n,]/).map(s => s.trim()).filter(Boolean)));
+
+            const btn = document.getElementById('btnSaveGastoSubmit');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
+            try {
+                const res = await fetch('save_alojamiento.php?action=save_gastronomia', { method: 'POST', body: formData });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    closeEditGastronomiaModal();
+                    loadAllProvidersAdmin();
+                    alert('✅ Local gastronómico guardado con éxito.');
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (err) {
+                alert('Error al guardar.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-floppy-disk"></i> Guardar Local Gastronómico';
+            }
+        }
+
+        async function deleteGastronomiaItem(id) {
+            if (!confirm('¿Estás seguro de eliminar este local gastronómico?')) return;
+            try {
+                const res = await fetch('save_alojamiento.php?action=delete_gastronomia', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, email: 'oscarns@gmail.com' })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    loadAllProvidersAdmin();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (e) {
+                alert('Error de conexión');
+            }
+        }
+
+        // ==========================================
+        // 4. SECCIÓN ALOJAMIENTOS (CRUD)
+        // ==========================================
+        function renderAdminAlojamientos(list) {
+            const container = document.getElementById('adminAlojamientosContainer');
+            if (!container) return;
+
+            if (!list || list.length === 0) {
+                container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:var(--text-secondary);">No hay alojamientos cargados.</div>';
+                return;
+            }
+
+            container.innerHTML = list.map(a => {
+                const isPaused = (a.is_active === false);
+                const thumb = (a.images && a.images[0]) ? a.images[0] : 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800';
+
+                return `
+                    <div class="admin-item-box ${isPaused ? 'is-paused' : ''}">
+                        <div class="admin-item-thumb" style="background-image: url('${thumb}');">
+                            <span class="${isPaused ? 'badge-paused' : 'badge-active'}" style="position:absolute; top:8px; right:8px;">
+                                ${isPaused ? '⛔ Pausado' : '🟢 Activo'}
+                            </span>
+                        </div>
+                        <div class="admin-item-content">
+                            <div style="font-size:0.75rem; color:#e67e22; font-weight:800; text-transform:uppercase;">${a.type || 'Cabaña'}</div>
+                            <h4 style="margin:4px 0; font-family:'Outfit'; font-size:1.1rem;">${a.name}</h4>
+                            <div style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:6px;"><i class="fas fa-location-dot"></i> ${a.location || 'Bariloche'}</div>
+                            <div style="font-weight:800; color:var(--primary); font-size:1rem; margin-bottom:6px;">$${Number(a.price || 0).toLocaleString('es-AR')}/noche</div>
+                            <small style="color:var(--text-secondary); margin-top:auto;">Dueño: <b>${a.owner_email || 'oscarns@gmail.com'}</b></small>
+                        </div>
+                        <div class="admin-item-actions">
+                            <button onclick="openEditAlojamientoModal('${a.id}')" class="btn-edit-comp"><i class="fas fa-pen"></i> Editar</button>
+                            <button onclick="togglePauseProvider('', 'accommodation', '', '${a.id}')" class="btn-del-comp" style="background:${isPaused ? '#e8f8f5' : '#ffebee'}; color:${isPaused ? '#00b894' : '#e74c3c'};">
+                                <i class="fas ${isPaused ? 'fa-play' : 'fa-pause'}"></i> ${isPaused ? 'Activar' : 'Pausar'}
+                            </button>
+                            <button onclick="deleteAlojamientoItem('${a.id}')" class="btn-del-comp" title="Eliminar"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openAddAlojamientoModal() {
+            openEditAlojamientoModal(null);
+        }
+
+        function openEditAlojamientoModal(id = null) {
+            const modal = document.getElementById('editAlojamientoModal');
+            const a = allAlojamientosData.find(item => item.id === id) || {};
+
+            document.getElementById('alojEditId').value = id || '';
+            document.getElementById('modalAlojTitle').textContent = id ? `Editar Alojamiento: ${a.name}` : 'Agregar Alojamiento';
+            document.getElementById('alojName').value = a.name || '';
+            document.getElementById('alojType').value = a.type || 'Cabaña';
+            document.getElementById('alojLocation').value = a.location || 'Villa Llao Llao';
+            document.getElementById('alojPrice').value = a.price || 120000;
+            document.getElementById('alojPhone').value = a.phone || '';
+            document.getElementById('alojDesc').value = a.description || '';
+            document.getElementById('alojAmenities').value = (a.amenities || []).join(', ');
+            document.getElementById('alojImages').value = (a.images || []).join('\n');
+            document.getElementById('alojOwnerEmail').value = a.owner_email || 'oscarns@gmail.com';
+            document.getElementById('alojRating').value = a.rating || 4.95;
+
+            modal.style.display = 'flex';
+        }
+
+        function closeEditAlojamientoModal() {
+            document.getElementById('editAlojamientoModal').style.display = 'none';
+        }
+
+        async function handleSaveAlojamientoForm(e) {
+            e.preventDefault();
+            const id = document.getElementById('alojEditId').value.trim();
+            const formData = new FormData();
+            formData.append('owner_email', 'oscarns@gmail.com');
+            if (id) formData.append('id', id);
+            formData.append('name', document.getElementById('alojName').value.trim());
+            formData.append('type', document.getElementById('alojType').value.trim());
+            formData.append('location', document.getElementById('alojLocation').value.trim());
+            formData.append('price', parseInt(document.getElementById('alojPrice').value) || 100000);
+            formData.append('phone', document.getElementById('alojPhone').value.trim());
+            formData.append('description', document.getElementById('alojDesc').value.trim());
+            formData.append('rating', document.getElementById('alojRating').value);
+            formData.append('amenities', JSON.stringify(document.getElementById('alojAmenities').value.split(',').map(s => s.trim()).filter(Boolean)));
+            formData.append('existing_images', JSON.stringify(document.getElementById('alojImages').value.split(/[\n,]/).map(s => s.trim()).filter(Boolean)));
+
+            const btn = document.getElementById('btnSaveAlojSubmit');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
+            try {
+                const res = await fetch('save_alojamiento.php?action=save_alojamiento', { method: 'POST', body: formData });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    closeEditAlojamientoModal();
+                    loadAllProvidersAdmin();
+                    alert('✅ Alojamiento guardado con éxito.');
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (err) {
+                alert('Error al guardar.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-floppy-disk"></i> Guardar Alojamiento';
+            }
+        }
+
+        async function deleteAlojamientoItem(id) {
+            if (!confirm('¿Estás seguro de eliminar este alojamiento?')) return;
+            try {
+                const res = await fetch('save_alojamiento.php?action=delete_alojamiento', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, email: 'oscarns@gmail.com' })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    loadAllProvidersAdmin();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (e) {
+                alert('Error de conexión');
+            }
+        }
+
+        // ==========================================
+        // 5. EDICIÓN Y BORRADO DE CLIENTES
+        // ==========================================
         function openEditProviderModal(email = '', isNew = false) {
             const modal = document.getElementById('editProviderModal');
-            const title = document.getElementById('modalProviderTitle');
-            const p = stateAdmin.providers.find(item => item.email === email) || {};
-            const sub = stateAdmin.subscriptions.find(s => s.email === email) || {};
+            const p = allProvidersData.find(item => item.email === email) || {};
+            const sub = allSubscriptionsData.find(s => s.email === email) || {};
 
-            title.textContent = isNew ? 'Registrar Nuevo Cliente' : `Editar Cliente: ${p.business_name || email}`;
+            document.getElementById('modalProviderTitle').textContent = isNew ? 'Registrar Cliente' : `Editar Cliente: ${p.business_name || email}`;
             document.getElementById('editProvBusinessName').value = p.business_name || '';
             document.getElementById('editProvEmail').value = p.email || '';
             document.getElementById('editProvEmail').readOnly = !isNew;
@@ -1443,7 +1486,7 @@
                 const data = await res.json();
                 if (data.status === 'success') {
                     closeEditProviderModal();
-                    refreshAllAdminData();
+                    loadAllProvidersAdmin();
                     alert('✅ Cliente actualizado correctamente.');
                 } else {
                     alert('Error: ' + data.message);
@@ -1457,7 +1500,7 @@
         }
 
         async function deleteProvider(email) {
-            if (!confirm(`¿Estás seguro de eliminar el cliente ${email}? Se borrará de la lista de anunciantes y sus suscripciones asociadas.`)) return;
+            if (!confirm(`¿Estás seguro de eliminar el cliente ${email}?`)) return;
             try {
                 const res = await fetch('save_alojamiento.php?action=admin_delete_provider', {
                     method: 'POST',
@@ -1466,7 +1509,7 @@
                 });
                 const data = await res.json();
                 if (data.status === 'success') {
-                    refreshAllAdminData();
+                    loadAllProvidersAdmin();
                 } else {
                     alert('Error: ' + data.message);
                 }
@@ -1476,370 +1519,12 @@
         }
 
         // ==========================================
-        // 4. MÓDULO GASTRONOMÍA (CRUD TOTAL)
-        // ==========================================
-        function renderGastronomiaCards(list) {
-            const container = document.getElementById('gastronomiaAdminCardsGrid');
-            if (!container) return;
-
-            if (!list || list.length === 0) {
-                container.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--text-secondary);">No hay locales gastronómicos cargados.</div>';
-                return;
-            }
-
-            container.innerHTML = list.map(g => {
-                const isPaused = (g.is_active === false);
-                const thumb = (g.images && g.images[0]) ? g.images[0] : 'img/gastronomia/patagonia.jpg';
-
-                return `
-                    <div class="card-item-admin ${isPaused ? 'paused' : ''}">
-                        <div class="card-item-thumb" style="background-image: url('${thumb}');">
-                            <span class="${isPaused ? 'badge-paused' : 'badge-active'}" style="position:absolute; top:10px; right:10px;">
-                                ${isPaused ? '⛔ Pausado' : '🟢 Activo'}
-                            </span>
-                        </div>
-                        <div class="card-item-body">
-                            <div style="font-size:0.75rem; color:var(--primary); font-weight:800; text-transform:uppercase;">${g.type || 'Gastronomía'}</div>
-                            <h3 style="margin:4px 0 6px; font-family:'Outfit'; font-size:1.15rem;">${g.name}</h3>
-                            <div style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:8px;">
-                                <i class="fas fa-location-dot"></i> ${g.location || 'Bariloche'}
-                            </div>
-                            ${g.promo ? `<div style="background:rgba(231,76,60,0.1); color:#e74c3c; font-size:0.8rem; font-weight:700; padding:6px 10px; border-radius:8px; margin-bottom:8px;">🎁 ${g.promo}</div>` : ''}
-                            <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:auto;">
-                                👤 Dueño: <b>${g.owner_email || 'oscarns@gmail.com'}</b>
-                            </div>
-                        </div>
-                        <div class="card-item-footer">
-                            <span style="font-weight:800; color:#fdcb6e;"><i class="fas fa-star"></i> ${g.rating || '4.9'}</span>
-                            <div style="display:flex; gap:6px;">
-                                <button class="btn-action-icon" title="Editar Local" onclick="openEditGastronomiaModal('${g.id}')">
-                                    <i class="fas fa-pen"></i>
-                                </button>
-                                <button class="btn-action-icon" title="${isPaused ? 'Activar Local' : 'Pausar Local'}" onclick="togglePauseItem('gastronomy', '', '${g.id}')" style="color:${isPaused ? '#00b894' : '#ef4444'};">
-                                    <i class="fas ${isPaused ? 'fa-play' : 'fa-pause'}"></i>
-                                </button>
-                                <button class="btn-action-icon" title="Eliminar Local" onclick="deleteGastronomiaItem('${g.id}')" style="color:#ef4444;">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function filterGastronomiaCards() {
-            const q = (document.getElementById('searchGastoInput').value || '').toLowerCase().trim();
-            const filtered = stateAdmin.gastronomy.filter(g => 
-                (g.name || '').toLowerCase().includes(q) ||
-                (g.type || '').toLowerCase().includes(q) ||
-                (g.location || '').toLowerCase().includes(q)
-            );
-            renderGastronomiaCards(filtered);
-        }
-
-        function openAddGastronomiaModal() {
-            openEditGastronomiaModal(null);
-        }
-
-        function openEditGastronomiaModal(id = null) {
-            const modal = document.getElementById('editGastronomiaModal');
-            const title = document.getElementById('modalGastoTitle');
-            const g = stateAdmin.gastronomy.find(item => item.id === id) || {};
-
-            document.getElementById('gastoEditId').value = id || '';
-            title.textContent = id ? `Editar Local: ${g.name}` : 'Agregar Nuevo Local Gastronómico';
-            document.getElementById('gastoName').value = g.name || '';
-            document.getElementById('gastoType').value = g.type || 'Cervecería Artesanal';
-            document.getElementById('gastoLocation').value = g.location || 'Centro';
-            document.getElementById('gastoPhone').value = g.phone || '';
-            document.getElementById('gastoSpecialty').value = g.specialty || '';
-            document.getElementById('gastoPromo').value = g.promo || '';
-            document.getElementById('gastoDesc').value = g.description || '';
-            document.getElementById('gastoFeatures').value = (g.features || []).join(', ');
-            document.getElementById('gastoImages').value = (g.images || []).join('\n');
-            document.getElementById('gastoOwnerEmail').value = g.owner_email || 'oscarns@gmail.com';
-            document.getElementById('gastoRating').value = g.rating || 4.9;
-
-            modal.style.display = 'flex';
-        }
-
-        function closeEditGastronomiaModal() {
-            document.getElementById('editGastronomiaModal').style.display = 'none';
-        }
-
-        async function handleSaveGastronomiaForm(e) {
-            e.preventDefault();
-            const id = document.getElementById('gastoEditId').value.trim();
-            const owner_email = document.getElementById('gastoOwnerEmail').value.trim();
-            const name = document.getElementById('gastoName').value.trim();
-            const type = document.getElementById('gastoType').value.trim();
-            const location = document.getElementById('gastoLocation').value.trim();
-            const phone = document.getElementById('gastoPhone').value.trim();
-            const specialty = document.getElementById('gastoSpecialty').value.trim();
-            const promo = document.getElementById('gastoPromo').value.trim();
-            const description = document.getElementById('gastoDesc').value.trim();
-            const rating = parseFloat(document.getElementById('gastoRating').value) || 4.9;
-
-            const features = document.getElementById('gastoFeatures').value.split(',').map(s => s.trim()).filter(Boolean);
-            const images = document.getElementById('gastoImages').value.split(/[\n,]/).map(s => s.trim()).filter(Boolean);
-
-            const formData = new FormData();
-            formData.append('owner_email', 'oscarns@gmail.com'); // Admin email para bypass de suscripción
-            if (id) formData.append('id', id);
-            formData.append('name', name);
-            formData.append('type', type);
-            formData.append('location', location);
-            formData.append('phone', phone);
-            formData.append('specialty', specialty);
-            formData.append('promo', promo);
-            formData.append('description', description);
-            formData.append('rating', rating);
-            formData.append('features', JSON.stringify(features));
-            formData.append('existing_images', JSON.stringify(images));
-
-            const btn = document.getElementById('btnSaveGastoSubmit');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
-
-            try {
-                const res = await fetch('save_alojamiento.php?action=save_gastronomia', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await res.json();
-                if (data.status === 'success') {
-                    closeEditGastronomiaModal();
-                    refreshAllAdminData();
-                    alert('✅ Local gastronómico guardado con éxito.');
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            } catch (err) {
-                alert('Error al guardar local gastronómico.');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-floppy-disk"></i> Guardar Local Gastronómico';
-            }
-        }
-
-        async function deleteGastronomiaItem(id) {
-            if (!confirm('¿Estás seguro de eliminar este local gastronómico?')) return;
-            try {
-                const res = await fetch('save_alojamiento.php?action=delete_gastronomia', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id, email: 'oscarns@gmail.com' })
-                });
-                const data = await res.json();
-                if (data.status === 'success') {
-                    refreshAllAdminData();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            } catch (e) {
-                alert('Error de conexión');
-            }
-        }
-
-        // ==========================================
-        // 5. MÓDULO ALOJAMIENTOS (CRUD TOTAL)
-        // ==========================================
-        function renderAlojamientosCards(list) {
-            const container = document.getElementById('alojamientosAdminCardsGrid');
-            if (!container) return;
-
-            if (!list || list.length === 0) {
-                container.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--text-secondary);">No hay alojamientos cargados.</div>';
-                return;
-            }
-
-            container.innerHTML = list.map(a => {
-                const isPaused = (a.is_active === false);
-                const thumb = (a.images && a.images[0]) ? a.images[0] : 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&q=80&w=800';
-
-                return `
-                    <div class="card-item-admin ${isPaused ? 'paused' : ''}">
-                        <div class="card-item-thumb" style="background-image: url('${thumb}');">
-                            <span class="${isPaused ? 'badge-paused' : 'badge-active'}" style="position:absolute; top:10px; right:10px;">
-                                ${isPaused ? '⛔ Pausado' : '🟢 Activo'}
-                            </span>
-                        </div>
-                        <div class="card-item-body">
-                            <div style="font-size:0.75rem; color:#e67e22; font-weight:800; text-transform:uppercase;">${a.type || 'Cabaña'}</div>
-                            <h3 style="margin:4px 0 6px; font-family:'Outfit'; font-size:1.15rem;">${a.name}</h3>
-                            <div style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:8px;">
-                                <i class="fas fa-location-dot"></i> ${a.location || 'Bariloche'}
-                            </div>
-                            <div style="font-size:1.1rem; font-weight:800; color:var(--primary); margin-bottom:8px;">
-                                $${Number(a.price || 0).toLocaleString('es-AR')} <span style="font-size:0.8rem; font-weight:600; color:var(--text-secondary);">/ noche</span>
-                            </div>
-                            <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:auto;">
-                                👤 Dueño: <b>${a.owner_email || 'oscarns@gmail.com'}</b>
-                            </div>
-                        </div>
-                        <div class="card-item-footer">
-                            <span style="font-weight:800; color:#fdcb6e;"><i class="fas fa-star"></i> ${a.rating || '4.9'}</span>
-                            <div style="display:flex; gap:6px;">
-                                <button class="btn-action-icon" title="Editar Alojamiento" onclick="openEditAlojamientoModal('${a.id}')">
-                                    <i class="fas fa-pen"></i>
-                                </button>
-                                <button class="btn-action-icon" title="${isPaused ? 'Activar Alojamiento' : 'Pausar Alojamiento'}" onclick="togglePauseItem('accommodation', '', '${a.id}')" style="color:${isPaused ? '#00b894' : '#ef4444'};">
-                                    <i class="fas ${isPaused ? 'fa-play' : 'fa-pause'}"></i>
-                                </button>
-                                <button class="btn-action-icon" title="Eliminar Alojamiento" onclick="deleteAlojamientoItem('${a.id}')" style="color:#ef4444;">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function filterAlojamientosCards() {
-            const q = (document.getElementById('searchAlojInput').value || '').toLowerCase().trim();
-            const filtered = stateAdmin.accommodations.filter(a => 
-                (a.name || '').toLowerCase().includes(q) ||
-                (a.type || '').toLowerCase().includes(q) ||
-                (a.location || '').toLowerCase().includes(q)
-            );
-            renderAlojamientosCards(filtered);
-        }
-
-        function openAddAlojamientoModal() {
-            openEditAlojamientoModal(null);
-        }
-
-        function openEditAlojamientoModal(id = null) {
-            const modal = document.getElementById('editAlojamientoModal');
-            const title = document.getElementById('modalAlojTitle');
-            const a = stateAdmin.accommodations.find(item => item.id === id) || {};
-
-            document.getElementById('alojEditId').value = id || '';
-            title.textContent = id ? `Editar Alojamiento: ${a.name}` : 'Agregar Nuevo Alojamiento';
-            document.getElementById('alojName').value = a.name || '';
-            document.getElementById('alojType').value = a.type || 'Cabaña';
-            document.getElementById('alojLocation').value = a.location || 'Villa Llao Llao';
-            document.getElementById('alojPrice').value = a.price || 120000;
-            document.getElementById('alojPhone').value = a.phone || '';
-            document.getElementById('alojDesc').value = a.description || '';
-            document.getElementById('alojAmenities').value = (a.amenities || []).join(', ');
-            document.getElementById('alojImages').value = (a.images || []).join('\n');
-            document.getElementById('alojOwnerEmail').value = a.owner_email || 'oscarns@gmail.com';
-            document.getElementById('alojRating').value = a.rating || 4.95;
-
-            modal.style.display = 'flex';
-        }
-
-        function closeEditAlojamientoModal() {
-            document.getElementById('editAlojamientoModal').style.display = 'none';
-        }
-
-        async function handleSaveAlojamientoForm(e) {
-            e.preventDefault();
-            const id = document.getElementById('alojEditId').value.trim();
-            const name = document.getElementById('alojName').value.trim();
-            const type = document.getElementById('alojType').value.trim();
-            const location = document.getElementById('alojLocation').value.trim();
-            const price = parseInt(document.getElementById('alojPrice').value) || 100000;
-            const phone = document.getElementById('alojPhone').value.trim();
-            const description = document.getElementById('alojDesc').value.trim();
-            const rating = parseFloat(document.getElementById('alojRating').value) || 4.9;
-
-            const amenities = document.getElementById('alojAmenities').value.split(',').map(s => s.trim()).filter(Boolean);
-            const images = document.getElementById('alojImages').value.split(/[\n,]/).map(s => s.trim()).filter(Boolean);
-
-            const formData = new FormData();
-            formData.append('owner_email', 'oscarns@gmail.com'); // Admin bypass
-            if (id) formData.append('id', id);
-            formData.append('name', name);
-            formData.append('type', type);
-            formData.append('location', location);
-            formData.append('price', price);
-            formData.append('phone', phone);
-            formData.append('description', description);
-            formData.append('rating', rating);
-            formData.append('amenities', JSON.stringify(amenities));
-            formData.append('existing_images', JSON.stringify(images));
-
-            const btn = document.getElementById('btnSaveAlojSubmit');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
-
-            try {
-                const res = await fetch('save_alojamiento.php?action=save_alojamiento', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await res.json();
-                if (data.status === 'success') {
-                    closeEditAlojamientoModal();
-                    refreshAllAdminData();
-                    alert('✅ Alojamiento guardado con éxito.');
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            } catch (err) {
-                alert('Error al guardar alojamiento.');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-floppy-disk"></i> Guardar Alojamiento';
-            }
-        }
-
-        async function deleteAlojamientoItem(id) {
-            if (!confirm('¿Estás seguro de eliminar este alojamiento?')) return;
-            try {
-                const res = await fetch('save_alojamiento.php?action=delete_alojamiento', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id, email: 'oscarns@gmail.com' })
-                });
-                const data = await res.json();
-                if (data.status === 'success') {
-                    refreshAllAdminData();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            } catch (e) {
-                alert('Error de conexión');
-            }
-        }
-
-        // ==========================================
-        // 6. ACCIÓN UNIFICADA: PAUSAR / REANUDAR
-        // ==========================================
-        async function togglePauseItem(type, targetEmail = '', id = '') {
-            try {
-                const res = await fetch('save_alojamiento.php?action=admin_toggle_pause', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        admin_email: 'oscarns@gmail.com',
-                        type: type,
-                        target_email: targetEmail,
-                        id: id
-                    })
-                });
-                const data = await res.json();
-                if (data.status === 'success') {
-                    refreshAllAdminData();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            } catch (e) {
-                alert('Error al actualizar estado.');
-            }
-        }
-
-        // ==========================================
-        // 7. MENSAJERÍA DIRECTA A CLIENTES
+        // 6. MENSAJERÍA A USUARIOS
         // ==========================================
         function openSendMessageToUser(email) {
-            switchAdminTab('mensajes');
             document.getElementById('msgTargetEmail').value = email;
             document.getElementById('msgTitle').focus();
+            window.scrollTo({ top: document.getElementById('msgTargetEmail').offsetTop - 100, behavior: 'smooth' });
         }
 
         async function handleSendAdminMessage(e) {
@@ -1891,9 +1576,6 @@
             try {
                 const res = await fetch('save_alojamiento.php?action=get_user_messages&email=all&t=' + Date.now());
                 const msgs = await res.json();
-                stateAdmin.messages = msgs || [];
-                document.getElementById('badgeCountMsg').textContent = stateAdmin.messages.length;
-
                 if (!msgs || msgs.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-secondary);">No hay mensajes enviados.</td></tr>';
                     return;
@@ -1933,66 +1615,112 @@
         }
 
         // ==========================================
-        // 8. TARIFAS Y CÓDIGOS PROMO
+        // 7. EMPRESAS Y TELEMETRÍA SUPABASE
         // ==========================================
-        async function loadServicePrices() {
-            try {
-                const res = await fetch('save_alojamiento.php?action=get_service_prices&t=' + Date.now());
-                const prices = await res.json();
-                if (prices) {
-                    stateAdmin.prices = prices;
-                    document.getElementById('priceExcursiones').value = prices.excursiones || 10000;
-                    document.getElementById('priceAlojamiento').value = prices.alojamiento || 10000;
-                    document.getElementById('priceGastronomia').value = prices.gastronomia || 10000;
-                    document.getElementById('discount2Services').value = prices.combo_2_descuento || 10;
-                    document.getElementById('discount3Services').value = prices.combo_3_descuento || 20;
-                }
-            } catch (e) {
-                console.error('Error al cargar tarifas:', e);
+        function renderCompaniesTable(companies) {
+            const tbody = document.getElementById('companiesTableBody');
+            if (!tbody) return;
+
+            if (!companies || companies.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">No hay empresas registradas.</td></tr>';
+                return;
             }
+
+            tbody.innerHTML = companies.map(c => `
+                <tr>
+                    <td><b>${c.name}</b></td>
+                    <td><span class="badge-active">${c.category || 'combi'}</span></td>
+                    <td>${c.phone || '-'}</td>
+                    <td>${c.mp_public_key ? '<span style="color:#00b894;">Configurado ✅</span>' : '<span style="color:#999;">Pendiente</span>'}</td>
+                    <td><span class="badge-active">Activa</span></td>
+                    <td style="text-align:right;">
+                        <button class="btn-del-comp" onclick="deleteCompany('${c.id}')">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
         }
 
-        async function handleSaveServicePrices(e) {
+        function renderTelemetryTable(vehicles) {
+            const tbody = document.getElementById('telemetryTableBody');
+            if (!tbody) return;
+
+            if (!vehicles || vehicles.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-secondary);">No hay vehículos registrados o transmitiendo.</td></tr>';
+                return;
+            }
+
+            const now = Date.now();
+            tbody.innerHTML = vehicles.map(v => {
+                const updatedTime = new Date(v.updated_at || 0).getTime();
+                const isOnline = (now - updatedTime) < 35000;
+                const speed = Math.round(v.speed || 0);
+
+                return `
+                    <tr>
+                        <td><b>🚐 ${v.vehicle_code || 'Combi'}</b></td>
+                        <td>${v.company_name || '-'}</td>
+                        <td>
+                            <span class="${isOnline ? 'badge-active' : 'badge-paused'}">
+                                <i class="fas ${isOnline ? 'fa-satellite-dish' : 'fa-moon'}"></i> ${isOnline ? 'Transmitiendo en Vivo' : 'Inactivo / En espera'}
+                            </span>
+                        </td>
+                        <td><b style="color:var(--primary);">${speed > 0 ? `${speed} km/h` : 'Detenido'}</b></td>
+                        <td><small style="color:var(--text-secondary);">${v.updated_at ? new Date(v.updated_at).toLocaleTimeString() : 'Reciente'}</small></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function openAddCompanyModal() {
+            document.getElementById('addCompanyModal').style.display = 'flex';
+        }
+
+        function closeAddCompanyModal() {
+            document.getElementById('addCompanyModal').style.display = 'none';
+        }
+
+        async function handleSaveCompany(e) {
             e.preventDefault();
-            const btn = document.getElementById('btnSavePrices');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
-
-            const payload = {
-                admin_email: 'oscarns@gmail.com',
-                excursiones: parseInt(document.getElementById('priceExcursiones').value) || 10000,
-                alojamiento: parseInt(document.getElementById('priceAlojamiento').value) || 10000,
-                gastronomia: parseInt(document.getElementById('priceGastronomia').value) || 10000,
-                combo_2_descuento: parseInt(document.getElementById('discount2Services').value) || 10,
-                combo_3_descuento: parseInt(document.getElementById('discount3Services').value) || 20
-            };
+            const name = document.getElementById('newCompName').value.trim();
+            const category = document.getElementById('newCompCategory').value;
+            const phone = document.getElementById('newCompPhone').value.trim();
+            const mp_public_key = document.getElementById('newCompMpPublic').value.trim();
+            const mp_access_token = document.getElementById('newCompMpToken').value.trim();
 
             try {
-                const res = await fetch('save_alojamiento.php?action=save_service_prices', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                if (!window.bariRuta) throw new Error('Supabase no disponible');
+                await window.bariRuta.addCompany({
+                    name,
+                    category,
+                    phone,
+                    mp_public_key,
+                    mp_access_token,
+                    is_active: true
                 });
-                const data = await res.json();
-                if (data.status === 'success') {
-                    alert('✅ Tarifas de suscripción actualizadas con éxito.');
-                } else {
-                    alert('Error: ' + data.message);
-                }
+
+                closeAddCompanyModal();
+                alert(`¡Empresa "${name}" dada de alta con éxito!`);
             } catch (err) {
-                alert('Error de conexión al guardar tarifas.');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-floppy-disk"></i> Guardar Tarifas';
+                alert('Error al guardar empresa: ' + err.message);
             }
         }
 
+        async function deleteCompany(id) {
+            if (confirm('¿Estás seguro de eliminar esta empresa?')) {
+                await window.bariRuta.deleteCompany(id);
+            }
+        }
+
+        // ==========================================
+        // 8. CÓDIGOS DE GRATUIDAD (PROMOS)
+        // ==========================================
         async function loadPromoCodes() {
             try {
                 const res = await fetch(`save_alojamiento.php?action=get_promo_codes&admin_email=oscarns@gmail.com&t=` + Date.now());
-                const codes = await res.json();
-                stateAdmin.promoCodes = codes || [];
-                renderPromoCodesTable(stateAdmin.promoCodes);
+                adminPromoCodes = await res.json();
+                renderPromoCodesTable(adminPromoCodes);
             } catch (e) {
                 console.error('Error al cargar códigos:', e);
             }
@@ -2031,7 +1759,7 @@
                         <td><small style="color:var(--text-secondary);">${createdDate}</small></td>
                         <td style="text-align:right;">
                             <button class="btn-del-comp" onclick="deletePromoCode('${c.code}')">
-                                <i class="fas fa-trash"></i>
+                                <i class="fas fa-trash"></i> Eliminar
                             </button>
                         </td>
                     </tr>
@@ -2085,7 +1813,7 @@
                 if (data.status === 'success') {
                     closeAddPromoModal();
                     loadPromoCodes();
-                    alert(`¡Código ${code} creado con éxito para ${months} meses!`);
+                    alert(`¡Código ${code} creado con éxito para ${months} meses (${service})!`);
                 } else {
                     alert('Error: ' + data.message);
                 }
@@ -2099,17 +1827,21 @@
 
         async function deletePromoCode(code) {
             if (!confirm(`¿Estás seguro de eliminar el código "${code}"?`)) return;
+
             try {
                 const res = await fetch('save_alojamiento.php?action=delete_promo_code', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ admin_email: 'oscarns@gmail.com', code })
+                    body: JSON.stringify({
+                        admin_email: 'oscarns@gmail.com',
+                        code: code
+                    })
                 });
                 const data = await res.json();
                 if (data.status === 'success') {
                     loadPromoCodes();
                 } else {
-                    alert('Error: ' + data.message);
+                    alert('Error al eliminar código: ' + data.message);
                 }
             } catch (e) {
                 alert('Error de conexión');
@@ -2117,133 +1849,9 @@
         }
 
         function copyPromoCode(code) {
-            navigator.clipboard.writeText(code).then(() => alert(`Código "${code}" copiado al portapapeles.`));
-        }
-
-        // ==========================================
-        // 9. EXCURSIONES Y SUPABASE
-        // ==========================================
-        function renderCompaniesTable(companies) {
-            const tbody = document.getElementById('companiesTableBody');
-            if (!tbody) return;
-
-            if (!companies || companies.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">No hay empresas registradas en Supabase.</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = companies.map(c => `
-                <tr>
-                    <td><b>${c.name}</b></td>
-                    <td><span class="badge-active">${c.category || 'combi'}</span></td>
-                    <td>${c.phone || '-'}</td>
-                    <td>${c.mp_public_key ? '<span style="color:#00b894;">Configurado ✅</span>' : '<span style="color:#999;">Pendiente</span>'}</td>
-                    <td><span class="badge-active">Activa</span></td>
-                    <td style="text-align:right;">
-                        <button class="btn-del-comp" onclick="deleteCompany('${c.id}')">
-                            <i class="fas fa-trash"></i> Eliminar
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function renderTelemetryTable(vehicles) {
-            const tbody = document.getElementById('telemetryTableBody');
-            if (!tbody) return;
-
-            if (!vehicles || vehicles.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-secondary);">No hay vehículos transmitiendo en este momento.</td></tr>';
-                return;
-            }
-
-            const now = Date.now();
-            tbody.innerHTML = vehicles.map(v => {
-                const updatedTime = new Date(v.updated_at || 0).getTime();
-                const isOnline = (now - updatedTime) < 35000;
-                const speed = Math.round(v.speed || 0);
-
-                return `
-                    <tr>
-                        <td><b>🚐 ${v.vehicle_code || 'Combi'}</b></td>
-                        <td>${v.company_name || '-'}</td>
-                        <td>
-                            <span class="${isOnline ? 'badge-active' : 'badge-paused'}">
-                                <i class="fas ${isOnline ? 'fa-satellite-dish' : 'fa-moon'}"></i> ${isOnline ? 'Transmitiendo en Vivo' : 'Inactivo / En espera'}
-                            </span>
-                        </td>
-                        <td><b style="color:var(--primary);">${speed > 0 ? `${speed} km/h` : 'Detenido'}</b></td>
-                        <td><small style="color:var(--text-secondary);">${v.updated_at ? new Date(v.updated_at).toLocaleTimeString() : 'Reciente'}</small></td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function openAddCompanyModal() {
-            document.getElementById('addCompanyModal').style.display = 'flex';
-        }
-        function closeAddCompanyModal() {
-            document.getElementById('addCompanyModal').style.display = 'none';
-        }
-
-        async function handleSaveCompany(e) {
-            e.preventDefault();
-            const name = document.getElementById('newCompName').value.trim();
-            const category = document.getElementById('newCompCategory').value;
-            const phone = document.getElementById('newCompPhone').value.trim();
-            const mp_public_key = document.getElementById('newCompMpPublic').value.trim();
-            const mp_access_token = document.getElementById('newCompMpToken').value.trim();
-
-            try {
-                if (!window.bariRuta) throw new Error('Supabase no disponible');
-                await window.bariRuta.addCompany({ name, category, phone, mp_public_key, mp_access_token, is_active: true });
-                closeAddCompanyModal();
-                alert(`¡Empresa "${name}" dada de alta con éxito!`);
-            } catch (err) {
-                alert('Error al guardar empresa: ' + err.message);
-            }
-        }
-
-        async function deleteCompany(id) {
-            if (confirm('¿Estás seguro de eliminar esta empresa?')) {
-                await window.bariRuta.deleteCompany(id);
-            }
-        }
-
-        function handleSaveSupabaseConfig(e) {
-            e.preventDefault();
-            const url = document.getElementById('adminSbUrl').value.trim();
-            const key = document.getElementById('adminSbKey').value.trim();
-            if (url && key && window.bariRuta) {
-                window.bariRuta.setCredentials(url, key);
-                alert('¡Configuración de Supabase guardada!');
-                location.reload();
-            }
-        }
-
-        async function handleAdminDirectLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('adminLockEmail').value.trim();
-            const pass = document.getElementById('adminLockPass').value;
-            const btn = document.getElementById('btnAdminLockLogin');
-            const errorEl = document.getElementById('adminLockError');
-
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando credenciales...';
-            errorEl.textContent = '';
-
-            try {
-                if (!window.authManager || !window.authManager.supabase) {
-                    throw new Error('Servicio de autenticación no inicializado.');
-                }
-                const { data, error } = await window.authManager.supabase.auth.signInWithPassword({ email, password: pass });
-                if (error) throw error;
-            } catch (err) {
-                errorEl.textContent = err.message || 'Contraseña incorrecta o error al iniciar sesión';
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-key"></i> Desbloquear Panel de Control';
-            }
+            navigator.clipboard.writeText(code).then(() => {
+                alert(`Código "${code}" copiado al portapapeles.`);
+            });
         }
     </script>
 </body>
