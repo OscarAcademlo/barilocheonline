@@ -70,7 +70,7 @@ function getAmenityIcon(amenity) {
 function filterAccommodationsCategory(cat) {
     currentCategoryFilter = cat;
     currentAmenityFilter = 'all';
-    document.querySelectorAll('.category-chips-row .chip-filter').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.dormir-chip-btn').forEach(b => b.classList.remove('active'));
     const btn = document.getElementById(cat === 'all' ? 'chip-acc-all' : cat === 'Cabaña' ? 'chip-acc-cabana' : cat === 'Departamento' ? 'chip-acc-depto' : cat === 'Casa' ? 'chip-acc-casa' : 'chip-acc-hotel');
     if (btn) btn.classList.add('active');
     applyFilters();
@@ -79,7 +79,7 @@ function filterAccommodationsCategory(cat) {
 function filterAccommodationsAmenity(amenity) {
     currentAmenityFilter = amenity;
     currentCategoryFilter = 'all';
-    document.querySelectorAll('.category-chips-row .chip-filter').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.dormir-chip-btn').forEach(b => b.classList.remove('active'));
     const btn = document.getElementById(amenity === 'Pet friendly' ? 'chip-acc-pet' : amenity === 'Vista al lago' ? 'chip-acc-lake' : amenity === 'Pileta' ? 'chip-acc-pool' : amenity === 'Parrilla' ? 'chip-acc-grill' : 'chip-acc-jacuzzi');
     if (btn) btn.classList.add('active');
     applyFilters();
@@ -340,6 +340,7 @@ function updateUserBar() {
     const isAdmin = !!(currentUser && currentUser.email && currentUser.email.toLowerCase().trim() === ADMIN_EMAIL);
 
     if (userBar) {
+        if (currentUser && currentUser.email) {
             const shortEmail = currentUser.email.split('@')[0];
             userBar.innerHTML = `
                 <div class="auth-logged-pill" style="${isAdmin ? 'border:1px solid #e74c3c; background:rgba(231, 76, 60, 0.12);' : 'background:var(--bg-main); border:1px solid var(--border);'} display:inline-flex; align-items:center; gap:8px; padding:4px 10px; border-radius:20px; flex-shrink:0;">

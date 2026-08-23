@@ -2858,49 +2858,73 @@ body {
 }
 
 /* CHIPS DE FILTRO ELEGANTES ESTILO AIRBNB */
+.dormir-chips-wrapper,
 .category-chips-row {
     display: flex !important;
-    gap: 8px !important;
+    gap: 10px !important;
     overflow-x: auto !important;
-    padding: 4px 2px 10px !important;
+    padding: 6px 2px 14px !important;
     margin-bottom: 12px !important;
     scrollbar-width: none !important;
     -webkit-overflow-scrolling: touch !important;
 }
 
+.dormir-chips-wrapper::-webkit-scrollbar,
 .category-chips-row::-webkit-scrollbar {
     display: none !important;
 }
 
+.dormir-chip-btn,
 .category-chips-row .chip-filter {
-    background: var(--bg-secondary) !important;
-    border: 1px solid var(--border) !important;
-    color: var(--text-secondary) !important;
-    padding: 7px 14px !important;
-    border-radius: 20px !important;
-    font-size: 0.82rem !important;
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
+    color: #cbd5e1 !important;
+    padding: 0 16px !important;
+    border-radius: 999px !important;
+    font-size: 0.85rem !important;
     font-weight: 700 !important;
     white-space: nowrap !important;
     cursor: pointer !important;
     display: inline-flex !important;
+    flex-direction: row !important;
     align-items: center !important;
-    gap: 6px !important;
-    transition: all 0.2s ease !important;
-    box-shadow: none !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
     flex-shrink: 0 !important;
-    height: 36px !important;
+    height: 38px !important;
+    min-width: auto !important;
+    width: auto !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
 }
 
+.dormir-chip-btn i,
+.category-chips-row .chip-filter i {
+    font-size: 0.95rem !important;
+    color: #38bdf8 !important;
+    margin: 0 !important;
+}
+
+.dormir-chip-btn:hover,
 .category-chips-row .chip-filter:hover {
-    border-color: var(--primary) !important;
-    color: var(--text-primary) !important;
+    background: #334155 !important;
+    border-color: #38bdf8 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px) !important;
 }
 
+.dormir-chip-btn.active,
 .category-chips-row .chip-filter.active {
-    background: var(--primary) !important;
-    border-color: var(--primary) !important;
-    color: white !important;
+    background: #0084ff !important;
+    border-color: #0084ff !important;
+    color: #ffffff !important;
     font-weight: 800 !important;
+    box-shadow: 0 4px 12px rgba(0, 132, 255, 0.4) !important;
+}
+
+.dormir-chip-btn.active i,
+.category-chips-row .chip-filter.active i {
+    color: #ffffff !important;
 }
 
 /* NAVBAR ALIGNMENT FIX */

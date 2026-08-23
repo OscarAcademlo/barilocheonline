@@ -50,18 +50,18 @@
                 </button>
             </div>
 
-            <!-- FILTROS POR CATEGORÍA Y AMENITIES ESTILO AIRBNB -->
-            <div class="category-chips-row" style="display:flex; gap:8px; overflow-x:auto; padding-bottom:12px; margin-bottom:12px; scrollbar-width:none;">
-                <button onclick="filterAccommodationsCategory('all')" class="chip-filter active" id="chip-acc-all"><i class="fas fa-border-all"></i> Todos</button>
-                <button onclick="filterAccommodationsCategory('Cabaña')" class="chip-filter" id="chip-acc-cabana"><i class="fas fa-house-chimney"></i> Cabañas</button>
-                <button onclick="filterAccommodationsCategory('Departamento')" class="chip-filter" id="chip-acc-depto"><i class="fas fa-building"></i> Deptos</button>
-                <button onclick="filterAccommodationsCategory('Casa')" class="chip-filter" id="chip-acc-casa"><i class="fas fa-home"></i> Casas</button>
-                <button onclick="filterAccommodationsCategory('Hotel')" class="chip-filter" id="chip-acc-hotel"><i class="fas fa-hotel"></i> Hoteles</button>
-                <button onclick="filterAccommodationsAmenity('Pet friendly')" class="chip-filter" id="chip-acc-pet"><i class="fas fa-paw"></i> Pet friendly</button>
-                <button onclick="filterAccommodationsAmenity('Vista al lago')" class="chip-filter" id="chip-acc-lake"><i class="fas fa-water"></i> Vista al Lago</button>
-                <button onclick="filterAccommodationsAmenity('Pileta')" class="chip-filter" id="chip-acc-pool"><i class="fas fa-person-swimming"></i> Pileta</button>
-                <button onclick="filterAccommodationsAmenity('Parrilla')" class="chip-filter" id="chip-acc-grill"><i class="fas fa-fire"></i> Parrilla</button>
-                <button onclick="filterAccommodationsAmenity('Jacuzzi')" class="chip-filter" id="chip-acc-jacuzzi"><i class="fas fa-hot-tub-person"></i> Jacuzzi</button>
+            <!-- FILTROS POR CATEGORÍA Y AMENITIES ESTILO AIRBNB SUPER ESTÉTICOS -->
+            <div class="dormir-chips-wrapper">
+                <button onclick="filterAccommodationsCategory('all')" class="dormir-chip-btn active" id="chip-acc-all"><i class="fas fa-sparkles"></i> Todos</button>
+                <button onclick="filterAccommodationsCategory('Cabaña')" class="dormir-chip-btn" id="chip-acc-cabana"><i class="fas fa-house-chimney"></i> Cabañas</button>
+                <button onclick="filterAccommodationsCategory('Departamento')" class="dormir-chip-btn" id="chip-acc-depto"><i class="fas fa-building"></i> Deptos</button>
+                <button onclick="filterAccommodationsCategory('Casa')" class="dormir-chip-btn" id="chip-acc-casa"><i class="fas fa-house"></i> Casas</button>
+                <button onclick="filterAccommodationsCategory('Hotel')" class="dormir-chip-btn" id="chip-acc-hotel"><i class="fas fa-hotel"></i> Hoteles</button>
+                <button onclick="filterAccommodationsAmenity('Pet friendly')" class="dormir-chip-btn" id="chip-acc-pet"><i class="fas fa-paw"></i> Pet friendly</button>
+                <button onclick="filterAccommodationsAmenity('Vista al lago')" class="dormir-chip-btn" id="chip-acc-lake"><i class="fas fa-water"></i> Vista al Lago</button>
+                <button onclick="filterAccommodationsAmenity('Pileta')" class="dormir-chip-btn" id="chip-acc-pool"><i class="fas fa-person-swimming"></i> Pileta</button>
+                <button onclick="filterAccommodationsAmenity('Parrilla')" class="dormir-chip-btn" id="chip-acc-grill"><i class="fas fa-fire"></i> Parrilla</button>
+                <button onclick="filterAccommodationsAmenity('Jacuzzi')" class="dormir-chip-btn" id="chip-acc-jacuzzi"><i class="fas fa-hot-tub-person"></i> Jacuzzi</button>
             </div>
 
             <!-- LISTADO DINÁMICO AIRBNB -->
@@ -102,13 +102,13 @@
             <div id="loginFormContainer">
                 <form onsubmit="handleLoginSubmit(event)">
                     <div class="input-group-custom">
-                        <label><i class="fas fa-envelope"></i> Email</label>
-                        <input type="email" id="loginEmail" name="auth_acc_email" placeholder="tu-email@gmail.com" autocomplete="off" data-lpignore="true" data-1p-ignore="true" spellcheck="false" required style="width:100%; height:48px; border-radius:12px; padding:0 14px; background:var(--bg-main); border:1px solid var(--border); box-sizing:border-box;">
+                        <label><i class="fas fa-user-circle"></i> Usuario o Correo</label>
+                        <input type="text" inputmode="email" id="loginEmail" name="auth_acc_email_field" placeholder="Ingresá tu correo" autocomplete="new-password" data-lpignore="true" data-1p-ignore="true" data-form-type="other" spellcheck="false" required style="width:100% !important; height:48px !important; border-radius:12px !important; padding:0 16px !important; background:var(--bg-main) !important; color:var(--text-primary) !important; border:1px solid var(--border) !important; box-sizing:border-box !important; font-size:0.95rem !important;">
                     </div>
                     <div class="input-group-custom password-wrapper-relative">
                         <label><i class="fas fa-lock"></i> Contraseña</label>
                         <div class="pass-input-box" style="position: relative; width: 100%; display: flex; align-items: center;">
-                            <input type="password" id="loginPass" name="auth_acc_pass" placeholder="••••••••" autocomplete="off" data-lpignore="true" data-1p-ignore="true" style="width: 100%; height:48px; border-radius:12px; padding:0 45px 0 14px; background:var(--bg-main); border:1px solid var(--border); box-sizing: border-box;" required>
+                            <input type="password" id="loginPass" name="auth_acc_pass_field" placeholder="••••••••" autocomplete="new-password" data-lpignore="true" data-1p-ignore="true" data-form-type="other" style="width: 100% !important; height:48px !important; border-radius:12px !important; padding:0 45px 0 16px !important; background:var(--bg-main) !important; color:var(--text-primary) !important; border:1px solid var(--border) !important; box-sizing: border-box !important; font-size:0.95rem !important;" required>
                             <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('loginPass', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #94a3b8; font-size: 1.1rem; padding: 4px; z-index: 10; display: flex; align-items: center; justify-content: center;">
                                 <i class="fas fa-eye"></i>
                             </button>
@@ -127,13 +127,13 @@
             <div id="signupFormContainer" style="display:none;">
                 <form onsubmit="handleSignupSubmit(event)">
                     <div class="input-group-custom">
-                        <label><i class="fas fa-envelope"></i> Tu Email</label>
-                        <input type="email" id="signupEmail" placeholder="tu-email@gmail.com" autocomplete="off" data-lpignore="true" spellcheck="false" required>
+                        <label><i class="fas fa-user-circle"></i> Correo Electrónico</label>
+                        <input type="text" inputmode="email" id="signupEmail" name="signup_acc_email_field" placeholder="Ingresá tu correo" autocomplete="new-password" data-lpignore="true" data-1p-ignore="true" data-form-type="other" spellcheck="false" required style="width:100% !important; height:48px !important; border-radius:12px !important; padding:0 16px !important; background:var(--bg-main) !important; color:var(--text-primary) !important; border:1px solid var(--border) !important; box-sizing:border-box !important; font-size:0.95rem !important;">
                     </div>
                     <div class="input-group-custom password-wrapper-relative">
                         <label><i class="fas fa-lock"></i> Crear Contraseña</label>
                         <div class="pass-input-box" style="position: relative; width: 100%; display: flex; align-items: center;">
-                            <input type="password" id="signupPass" placeholder="Mínimo 6 caracteres" minlength="6" autocomplete="off" data-lpignore="true" style="width: 100%; padding-right: 45px; box-sizing: border-box;" required>
+                            <input type="password" id="signupPass" name="signup_acc_pass_field" placeholder="Mínimo 6 caracteres" minlength="6" autocomplete="new-password" data-lpignore="true" data-1p-ignore="true" data-form-type="other" style="width: 100% !important; height:48px !important; border-radius:12px !important; padding:0 45px 0 16px !important; background:var(--bg-main) !important; color:var(--text-primary) !important; border:1px solid var(--border) !important; box-sizing: border-box !important; font-size:0.95rem !important;" required>
                             <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('signupPass', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #94a3b8; font-size: 1.1rem; padding: 4px; z-index: 10; display: flex; align-items: center; justify-content: center;">
                                 <i class="fas fa-eye"></i>
                             </button>
