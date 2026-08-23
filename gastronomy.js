@@ -12,7 +12,8 @@ async function fetchGastronomy() {
     try {
         const res = await fetch('save_alojamiento.php?action=get_gastronomia&t=' + Date.now());
         if (res.ok) {
-            GASTRONOMY = await res.json();
+            const data = await res.json();
+            GASTRONOMY = (data || []).filter(g => g.is_active !== false);
         }
     } catch (e) {
         console.warn('Cargando gastronomía local:', e);

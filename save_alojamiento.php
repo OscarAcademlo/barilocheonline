@@ -814,8 +814,177 @@ if ($action === 'admin_toggle_pause') {
         exit;
     }
 
+    if ($type === 'accommodation') {
+        $itemId = trim($data['id'] ?? $movilId);
+        $accFile = __DIR__ . '/alojamientos.json';
+        $accs = file_exists($accFile) ? json_decode(file_get_contents($accFile), true) : [];
+        if (is_array($accs)) {
+            foreach ($accs as &$item) {
+                if (($item['id'] ?? '') === $itemId) {
+                    $item['is_active'] = isset($item['is_active']) ? !($item['is_active']) : false;
+                    break;
+                }
+            }
+            file_put_contents($accFile, json_encode($accs, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            echo json_encode(['status' => 'success', 'message' => 'Estado del alojamiento actualizado']);
+            exit;
+        }
+    }
+
+    if ($type === 'gastronomy') {
+        $itemId = trim($data['id'] ?? $movilId);
+        $gastoFile = __DIR__ . '/gastronomia.json';
+        $gastos = file_exists($gastoFile) ? json_decode(file_get_contents($gastoFile), true) : [];
+        if (is_array($gastos)) {
+            foreach ($gastos as &$item) {
+                if (($item['id'] ?? '') === $itemId) {
+                    $item['is_active'] = isset($item['is_active']) ? !($item['is_active']) : false;
+                    break;
+                }
+            }
+            file_put_contents($gastoFile, json_encode($gastos, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            echo json_encode(['status' => 'success', 'message' => 'Estado del local gastronómico actualizado']);
+            exit;
+        }
+    }
+
     http_response_code(400);
     echo json_encode(['status' => 'error', 'message' => 'Parámetros inválidos']);
+    exit;
+}
+
+// 19.1 PANEL ADMIN: EDITAR CLIENTE / SUSCRIPCIÓN
+if ($action === 'admin_update_provider') {
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true) ?: $_POST;
+    $adminEmail = strtolower(trim($data['admin_email'] ?? ''));
+
+    if ($adminEmail !== ADMIN_EMAIL) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
+        exit;
+    }
+
+    $targetEmail = strtolower(trim($data['target_email'] ?? ''));
+    if (empty($targetEmail)) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'Email de cliente requerido']);
+        exit;
+    }
+
+    $businessName = trim($data['business_name'] ?? '');
+    $phone = trim($data['phone'] ?? '');
+    $services = is_array($data['services'] ?? null) ? $data['services'] : ['excursiones'];
+    $expiresAt = trim($data['expires_at'] ?? '');
+    $isActive = isset($data['is_active']) ? (bool)$data['is_active'] : true;
+
+    // Actualizar en proveedores_servicios.json
+    $provFile = __DIR__ . '/proveedores_servicios.json';
+    $providers = file_exists($provFile) ? json_decode(file_get_contents($provFile), true) : [];
+    if (!is_array($providers)) $providers = [];
+    
+    $found = false;
+    foreach ($providers as &$p) {
+        if (strtolower(trim($p['email'] ?? '')) === $targetEmail) {
+            if (!empty($businessName)) $p['business_name'] = $businessName;
+            $p['phone'] = $phone;
+            $p['services'] = $services;
+            $p['is_active'] = $isActive;
+            $p['updated_at'] = date('c');
+            $found = true;
+            break;
+        }
+    }
+    if (!$found) {
+        $providers[] = [
+            'email' => $targetEmail,
+            'business_name' => $businessName ?: 'Cliente ' . $targetEmail,
+            'phone' => $phone,
+            'services' => $services,
+            'is_active' => $isActive,
+            'created_at' => date('c')
+        ];
+    }
+    file_put_contents($provFile, json_encode($providers, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+    // Actualizar suscripción si se especificó fecha
+    if (!empty($expiresAt)) {
+        $subsFile = __DIR__ . '/suscripciones.json';
+        $subs = file_exists($subsFile) ? json_decode(file_get_contents($subsFile), true) : [];
+        if (!is_array($subs)) $subs = [];
+        
+        $subFound = false;
+        foreach ($subs as &$s) {
+            if (strtolower(trim($s['email'] ?? '')) === $targetEmail) {
+                $s['active'] = true;
+                $s['expires_at'] = $expiresAt;
+                $s['updated_at'] = date('c');
+                $subFound = true;
+                break;
+            }
+        }
+        if (!$subFound) {
+            $subs[] = [
+                'email' => $targetEmail,
+                'active' => true,
+                'expires_at' => $expiresAt,
+                'plan' => 'admin_custom',
+                'created_at' => date('c')
+            ];
+        }
+        file_put_contents($subsFile, json_encode($subs, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    }
+
+    echo json_encode(['status' => 'success', 'message' => 'Cliente actualizado correctamente']);
+    exit;
+}
+
+// 19.2 PANEL ADMIN: ELIMINAR CLIENTE / ANUNCIANTE
+if ($action === 'admin_delete_provider') {
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true) ?: $_POST;
+    $adminEmail = strtolower(trim($data['admin_email'] ?? ''));
+
+    if ($adminEmail !== ADMIN_EMAIL) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
+        exit;
+    }
+
+    $targetEmail = strtolower(trim($data['target_email'] ?? ''));
+    if (empty($targetEmail)) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'Email requerido']);
+        exit;
+    }
+
+    // Borrar de proveedores_servicios.json
+    $provFile = __DIR__ . '/proveedores_servicios.json';
+    $providers = file_exists($provFile) ? json_decode(file_get_contents($provFile), true) : [];
+    $newProviders = [];
+    if (is_array($providers)) {
+        foreach ($providers as $p) {
+            if (strtolower(trim($p['email'] ?? '')) !== $targetEmail) {
+                $newProviders[] = $p;
+            }
+        }
+        file_put_contents($provFile, json_encode($newProviders, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    }
+
+    // Borrar de suscripciones.json
+    $subsFile = __DIR__ . '/suscripciones.json';
+    $subs = file_exists($subsFile) ? json_decode(file_get_contents($subsFile), true) : [];
+    $newSubs = [];
+    if (is_array($subs)) {
+        foreach ($subs as $s) {
+            if (strtolower(trim($s['email'] ?? '')) !== $targetEmail) {
+                $newSubs[] = $s;
+            }
+        }
+        file_put_contents($subsFile, json_encode($newSubs, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    }
+
+    echo json_encode(['status' => 'success', 'message' => 'Cliente eliminado con éxito']);
     exit;
 }
 

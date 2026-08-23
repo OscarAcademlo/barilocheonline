@@ -54,8 +54,10 @@ async function fetchAccommodations() {
     } catch (e) {
         console.warn('Cargando alojamientos locales:', e);
     }
-    renderAccommodations(accommodations);
-    renderMapMarkers(accommodations);
+    // Filtrar para mostrar sólo activos a los turistas (a menos que sea admin/dueño)
+    const activeList = accommodations.filter(a => a.is_active !== false);
+    renderAccommodations(activeList);
+    renderMapMarkers(activeList);
 }
 
 // 2. INICIALIZAR MAPA PRINCIPAL
