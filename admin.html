@@ -729,8 +729,31 @@
                 </div>
 
                 <div class="form-group-custom">
-                    <label>Comodidades (separadas por coma)</label>
-                    <input type="text" id="alojAmenities" class="form-control-custom" placeholder="Wi-Fi, Parrilla, Vista al lago, Calefacción, Pet friendly">
+                    <label style="display:block; margin-bottom:8px; font-weight:700;"><i class="fas fa-list-check"></i> Comodidades y Servicios (Estilo Airbnb)</label>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:8px; background:var(--bg-main); padding:12px; border-radius:12px; border:1px solid var(--border);">
+                        <label style="font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="admin-acc-amenity" value="Wi-Fi"> 📶 Wi-Fi</label>
+                        <label style="font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="admin-acc-amenity" value="Estacionamiento"> 🚗 Estacionamiento</label>
+                        <label style="font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="admin-acc-amenity" value="Pet friendly"> 🐾 Pet friendly</label>
+                        <label style="font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="admin-acc-amenity" value="Parrilla"> 🥩 Parrilla</label>
+                        <label style="font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="admin-acc-amenity" value="Vista al lago"> 🏔️ Vista al Lago</label>
+                        <label style="font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="admin-acc-amenity" value="Pileta"> 🏊 Pileta / Piscina</label>
+                        <label style="font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="admin-acc-amenity" value="Jacuzzi"> 🛁 Jacuzzi</label>
+                        <label style="font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="admin-acc-amenity" value="Hogar a leña"> 🪵 Hogar a leña</label>
+                        <label style="font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="admin-acc-amenity" value="Calefacción"> 🔥 Calefacción</label>
+                        <label style="font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="admin-acc-amenity" value="Aire acondicionado"> ❄️ Aire acondicionado</label>
+                        <label style="font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="admin-acc-amenity" value="Cocina completa"> 🍳 Cocina completa</label>
+                        <label style="font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="admin-acc-amenity" value="Desayuno incluido"> ☕ Desayuno incluido</label>
+                        <label style="font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="admin-acc-amenity" value="Smart TV"> 📺 Smart TV</label>
+                        <label style="font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="admin-acc-amenity" value="Ropa blanca"> 🛏️ Ropa blanca</label>
+                        <label style="font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="admin-acc-amenity" value="Apto familias"> 👶 Apto familias</label>
+                        <label style="font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="admin-acc-amenity" value="Seguridad 24hs"> 🛡️ Seguridad 24hs</label>
+                        <label style="font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="admin-acc-amenity" value="Salida al lago"> 🌊 Salida al Lago</label>
+                        <label style="font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="admin-acc-amenity" value="Lavarropas"> 🧺 Lavarropas</label>
+                    </div>
+                    <div style="margin-top:8px;">
+                        <label style="font-size:0.8rem; font-weight:700; color:var(--text-secondary);">➕ Otros Servicios Personalizados (separados por coma)</label>
+                        <input type="text" id="adminAlojOtherAmenities" class="form-control-custom" placeholder="Ej: Kayak gratis, Deck privado, Cancha de tenis, Sauna">
+                    </div>
                 </div>
 
                 <div class="form-group-custom">
@@ -1352,9 +1375,20 @@
             document.getElementById('alojType').value = a.type || 'Cabaña';
             document.getElementById('alojLocation').value = a.location || 'Villa Llao Llao';
             document.getElementById('alojPrice').value = a.price || 120000;
-            document.getElementById('alojPhone').value = a.phone || '';
-            document.getElementById('alojDesc').value = a.description || '';
-            document.getElementById('alojAmenities').value = (a.amenities || []).join(', ');
+            const ams = a.amenities || [];
+            const standardList = ['Wi-Fi', 'Estacionamiento', 'Pet friendly', 'Parrilla', 'Vista al lago', 'Pileta', 'Jacuzzi', 'Hogar a leña', 'Calefacción', 'Aire acondicionado', 'Cocina completa', 'Desayuno incluido', 'Smart TV', 'Ropa blanca', 'Apto familias', 'Seguridad 24hs', 'Salida al lago', 'Lavarropas'];
+            const others = [];
+
+            document.querySelectorAll('.admin-acc-amenity').forEach(cb => {
+                cb.checked = ams.includes(cb.value);
+            });
+
+            ams.forEach(item => {
+                if (!standardList.includes(item)) {
+                    others.push(item);
+                }
+            });
+            document.getElementById('adminAlojOtherAmenities').value = others.join(', ');
             document.getElementById('alojImages').value = (a.images || []).join('\n');
             document.getElementById('alojOwnerEmail').value = a.owner_email || 'oscarns@gmail.com';
             document.getElementById('alojRating').value = a.rating || 4.95;
@@ -1370,7 +1404,7 @@
             e.preventDefault();
             const id = document.getElementById('alojEditId').value.trim();
             const formData = new FormData();
-            formData.append('owner_email', 'oscarns@gmail.com');
+            formData.append('owner_email', document.getElementById('alojOwnerEmail').value.trim() || 'oscarns@gmail.com');
             if (id) formData.append('id', id);
             formData.append('name', document.getElementById('alojName').value.trim());
             formData.append('type', document.getElementById('alojType').value.trim());
@@ -1379,7 +1413,23 @@
             formData.append('phone', document.getElementById('alojPhone').value.trim());
             formData.append('description', document.getElementById('alojDesc').value.trim());
             formData.append('rating', document.getElementById('alojRating').value);
-            formData.append('amenities', JSON.stringify(document.getElementById('alojAmenities').value.split(',').map(s => s.trim()).filter(Boolean)));
+
+            // Recopilar comodidades (Checkboxes seleccionados + Otros personalizados)
+            const selectedAmenities = [];
+            document.querySelectorAll('.admin-acc-amenity:checked').forEach(cb => {
+                selectedAmenities.push(cb.value);
+            });
+            const othersRaw = document.getElementById('adminAlojOtherAmenities').value.trim();
+            if (othersRaw) {
+                othersRaw.split(',').forEach(item => {
+                    const clean = item.trim();
+                    if (clean && !selectedAmenities.includes(clean)) {
+                        selectedAmenities.push(clean);
+                    }
+                });
+            }
+
+            formData.append('amenities', JSON.stringify(selectedAmenities));
             formData.append('existing_images', JSON.stringify(document.getElementById('alojImages').value.split(/[\n,]/).map(s => s.trim()).filter(Boolean)));
 
             const btn = document.getElementById('btnSaveAlojSubmit');

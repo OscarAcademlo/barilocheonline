@@ -41,6 +41,62 @@ function initSupabase() {
     }
 }
 
+let currentCategoryFilter = 'all';
+let currentAmenityFilter = 'all';
+
+function getAmenityIcon(amenity) {
+    const am = (amenity || '').toLowerCase();
+    if (am.includes('wi-fi') || am.includes('wifi') || am.includes('internet')) return 'fas fa-wifi';
+    if (am.includes('estacionamiento') || am.includes('cochera') || am.includes('garage') || am.includes('parking')) return 'fas fa-car';
+    if (am.includes('pet') || am.includes('mascota')) return 'fas fa-paw';
+    if (am.includes('parrilla') || am.includes('asador')) return 'fas fa-fire';
+    if (am.includes('lago') || am.includes('vista')) return 'fas fa-mountain-sun';
+    if (am.includes('pileta') || am.includes('piscina') || am.includes('swimming')) return 'fas fa-person-swimming';
+    if (am.includes('jacuzzi') || am.includes('hidro') || am.includes('spa')) return 'fas fa-hot-tub-person';
+    if (am.includes('leña') || am.includes('chimenea') || am.includes('hogar')) return 'fas fa-tree';
+    if (am.includes('calefaccion') || am.includes('losa')) return 'fas fa-temperature-high';
+    if (am.includes('aire') || am.includes('clima')) return 'fas fa-snowflake';
+    if (am.includes('cocina') || am.includes('vajilla')) return 'fas fa-kitchen-set';
+    if (am.includes('desayuno') || am.includes('cafe')) return 'fas fa-mug-hot';
+    if (am.includes('tv') || am.includes('smart') || am.includes('netflix')) return 'fas fa-tv';
+    if (am.includes('ropa') || am.includes('toalla') || am.includes('blanca')) return 'fas fa-bed';
+    if (am.includes('familia') || am.includes('niño') || am.includes('cuna')) return 'fas fa-children';
+    if (am.includes('seguridad') || am.includes('vigilancia')) return 'fas fa-shield-halved';
+    if (am.includes('playa') || am.includes('costa')) return 'fas fa-water';
+    if (am.includes('lavarropas') || am.includes('lavanderia')) return 'fas fa-shirt';
+    return 'fas fa-check';
+}
+
+function filterAccommodationsCategory(cat) {
+    currentCategoryFilter = cat;
+    currentAmenityFilter = 'all';
+    document.querySelectorAll('.category-chips-row .chip-filter').forEach(b => b.classList.remove('active'));
+    const btn = document.getElementById(cat === 'all' ? 'chip-acc-all' : cat === 'Cabaña' ? 'chip-acc-cabana' : cat === 'Departamento' ? 'chip-acc-depto' : cat === 'Casa' ? 'chip-acc-casa' : 'chip-acc-hotel');
+    if (btn) btn.classList.add('active');
+    applyFilters();
+}
+
+function filterAccommodationsAmenity(amenity) {
+    currentAmenityFilter = amenity;
+    currentCategoryFilter = 'all';
+    document.querySelectorAll('.category-chips-row .chip-filter').forEach(b => b.classList.remove('active'));
+    const btn = document.getElementById(amenity === 'Pet friendly' ? 'chip-acc-pet' : amenity === 'Vista al lago' ? 'chip-acc-lake' : amenity === 'Pileta' ? 'chip-acc-pool' : amenity === 'Parrilla' ? 'chip-acc-grill' : 'chip-acc-jacuzzi');
+    if (btn) btn.classList.add('active');
+    applyFilters();
+}
+
+function applyFilters() {
+    let filtered = accommodations.filter(a => a.is_active !== false);
+    if (currentCategoryFilter !== 'all') {
+        filtered = filtered.filter(a => (a.type || '').toLowerCase().includes(currentCategoryFilter.toLowerCase()));
+    }
+    if (currentAmenityFilter !== 'all') {
+        filtered = filtered.filter(a => (a.amenities || []).some(am => am.toLowerCase().includes(currentAmenityFilter.toLowerCase())));
+    }
+    renderAccommodations(filtered);
+    renderMapMarkers(filtered);
+}
+
 // 1. CARGA DE ALOJAMIENTOS DESDE JSON
 async function fetchAccommodations() {
     try {
@@ -54,10 +110,7 @@ async function fetchAccommodations() {
     } catch (e) {
         console.warn('Cargando alojamientos locales:', e);
     }
-    // Filtrar para mostrar sólo activos a los turistas (a menos que sea admin/dueño)
-    const activeList = accommodations.filter(a => a.is_active !== false);
-    renderAccommodations(activeList);
-    renderMapMarkers(activeList);
+    applyFilters();
 }
 
 // 2. INICIALIZAR MAPA PRINCIPAL
@@ -143,8 +196,8 @@ function renderAccommodations(list) {
                     </div>
                     <p class="accommodation-location-text"><i class="fas fa-map-marker-alt"></i> ${acc.location}</p>
                     <div class="card-amenities-pills">
-                        ${(acc.amenities || []).slice(0, 3).map(am => `<span>${am}</span>`).join('')}
-                        ${(acc.amenities || []).length > 3 ? `<span>+${acc.amenities.length - 3}</span>` : ''}
+                        ${(acc.amenities || []).slice(0, 4).map(am => `<span><i class="${getAmenityIcon(am)}"></i> ${am}</span>`).join('')}
+                        ${(acc.amenities || []).length > 4 ? `<span>+${acc.amenities.length - 4} más</span>` : ''}
                     </div>
                     ${isOwnerOrAdmin ? `
                         <div class="owner-card-actions" onclick="event.stopPropagation()">
@@ -173,7 +226,7 @@ function showAccommodationDetails(id) {
     if (!modal || !content) return;
 
     const cleanPhone = (acc.phone || '5492944123456').replace(/\D/g, '');
-    const waText = encodeURIComponent(`¡Hola! Vi tu alojamiento "${acc.name}" en Bariloche.Online y quiero consultar disponibilidad.`);
+    const waText = encodeURIComponent(`¡Hola! Vi tu alojamiento "${acc.name}" en Bariloche.Online y quiero consultar disponibilidad y tarifas.`);
     const waUrl = `https://wa.me/${cleanPhone}?text=${waText}`;
 
     const imgs = (acc.images && acc.images.length > 0) ? acc.images : ['https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800'];
@@ -209,7 +262,7 @@ function showAccommodationDetails(id) {
             <div class="modal-section">
                 <h3>Comodidades y Servicios</h3>
                 <div class="amenities-grid">
-                    ${(acc.amenities || ['Wi-Fi', 'Calefacción', 'Parrilla']).map(a => `<span class="amenity-tag"><i class="fas fa-check"></i> ${a}</span>`).join('')}
+                    ${(acc.amenities || ['Wi-Fi', 'Calefacción', 'Parrilla']).map(a => `<span class="amenity-tag"><i class="${getAmenityIcon(a)}"></i> ${a}</span>`).join('')}
                 </div>
             </div>
             
@@ -677,7 +730,7 @@ function openPublisherModal(editData = null) {
 
         // Comodidades
         const ams = editData.amenities || [];
-        const standardAmenities = ['Wi-Fi', 'Parrilla', 'Vista al lago', 'Calefacción', 'Estacionamiento', 'Pet friendly', 'Jacuzzi', 'Hogar a leña', 'Cocina completa'];
+        const standardAmenities = ['Wi-Fi', 'Estacionamiento', 'Pet friendly', 'Parrilla', 'Vista al lago', 'Pileta', 'Jacuzzi', 'Hogar a leña', 'Calefacción', 'Aire acondicionado', 'Cocina completa', 'Desayuno incluido', 'Smart TV', 'Ropa blanca', 'Apto familias', 'Seguridad 24hs', 'Salida al lago', 'Lavarropas'];
         const otherAms = [];
 
         document.querySelectorAll('.amenity-checkbox').forEach(cb => {
