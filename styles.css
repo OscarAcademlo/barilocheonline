@@ -2995,3 +2995,45 @@ body {
     flex-shrink: 0 !important;
     white-space: nowrap !important;
 }
+
+/* ============================================
+   MÓVIL: pill ultra compacto en el header
+   Panel y Admin ya están en el bottom nav
+   ============================================ */
+@media (max-width: 1023px) {
+    /* Ocultar botón "Panel" del header en móvil */
+    .auth-logged-pill .btn-owner-edit {
+        display: none !important;
+    }
+    /* Ocultar botón "Admin" del header en móvil */
+    .auth-logged-pill .btn-admin-pill {
+        display: none !important;
+    }
+    /* El pill en sí: más compacto */
+    .auth-logged-pill {
+        padding: 3px 7px !important;
+        gap: 5px !important;
+    }
+    /* El span del email: más corto */
+    .auth-logged-pill span {
+        max-width: 60px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+    }
+    /* Botón de login: compacto */
+    .btn-login-header {
+        font-size: 0.78rem !important;
+        padding: 5px 10px !important;
+    }
+    /* Header en móvil: altura fija, sin overflow */
+    .main-header {
+        height: 55px !important;
+        padding: 0 12px !important;
+        gap: 6px !important;
+    }
+    /* Logo más pequeño en móvil */
+    .logo {
+        font-size: 1rem !important;
+    }
+}
