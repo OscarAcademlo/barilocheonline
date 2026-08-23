@@ -133,7 +133,15 @@ function initMapGasto() {
         // Pin con el Nombre del Local y Emoji
         const nameIcon = L.divIcon({
             className: 'gasto-map-marker-wrap',
-            html: `<div class="gasto-map-badge" onclick="showGastronomyDetails('${rest.id}')" style="background:#e67e22; color:white; border:2px solid #ffffff; padding:4px 10px; font-weight:800; white-space:nowrap; font-size:0.8rem; border-radius:14px; box-shadow:0 3px 12px rgba(0,0,0,0.35); display:inline-flex; align-items:center; gap:5px; cursor:pointer; transform:translate(-50%, -50%);">${emoji} ${rest.name}</div>`,
+            html: `
+                <div class="gasto-pin-marker" id="pin_gasto_${rest.id}" onclick="showGastronomyDetails('${rest.id}')">
+                    <div class="gasto-pin-head">
+                        <span>${emoji}</span>
+                        <span>${rest.name}</span>
+                    </div>
+                    <div class="gasto-pin-tip"></div>
+                </div>
+            `,
             iconSize: [0, 0],
             iconAnchor: [0, 0]
         });
@@ -151,6 +159,28 @@ function initMapGasto() {
 
     if (bounds.length > 0) {
         mapGasto.fitBounds(bounds, { padding: [60, 60], maxZoom: 14 });
+    }
+}
+
+function highlightMapMarker(id) {
+    const el = document.getElementById('pin_gasto_' + id);
+    if (el) {
+        el.classList.add('highlighted');
+    }
+    const marker = markersGasto.find(m => String(m.gastoId) === String(id));
+    if (marker) {
+        marker.setZIndexOffset(10000);
+    }
+}
+
+function unhighlightMapMarker(id) {
+    const el = document.getElementById('pin_gasto_' + id);
+    if (el) {
+        el.classList.remove('highlighted');
+    }
+    const marker = markersGasto.find(m => String(m.gastoId) === String(id));
+    if (marker) {
+        marker.setZIndexOffset(0);
     }
 }
 

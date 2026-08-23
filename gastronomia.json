@@ -1,16 +1,36 @@
 [
   {
+    "id": "gasto_cabeza",
+    "owner_email": "nicolasbariloche@icloud.com",
+    "name": "Cerveza La Cabeza",
+    "type": "Cervecería Artesanal",
+    "location": "Juramento 190, Bariloche",
+    "rating": 4.9,
+    "lat": -41.1370,
+    "lng": -71.3130,
+    "images": [
+      "img/gastronomia/cerveza_cabeza.jpg",
+      "img/gastronomia/patagonia.jpg"
+    ],
+    "description": "Cerveza artesanal de autor elaborada con agua pura de deshielo y lúpulos patagónicos. Tapeos, hamburguesas caseras y el mejor ambiente cervecero de Bariloche.",
+    "specialty": "IPA Patagónica, Hamburguesas Caseras, Tapeo Cervecero",
+    "promo": "Happy Hour 18:00 a 20:00 hs - 2x1 en Pintas Artesanales",
+    "features": ["Cerveza Tirada", "Música en Vivo", "Patio Cervecero", "Pet friendly", "Opciones Veganas"],
+    "phone": "5492944998877",
+    "is_active": true,
+    "created_at": "2026-08-23T10:00:00Z"
+  },
+  {
     "id": "gasto_1",
     "owner_email": "oscarns@gmail.com",
     "name": "Cervecería Patagonia",
     "type": "Cervecería Artesanal",
     "location": "Circuito Chico Km 24.7",
     "rating": 4.8,
-    "lat": -41.0777,
-    "lng": -71.5422,
+    "lat": -41.0545,
+    "lng": -71.5332,
     "images": [
-      "img/gastronomia/patagonia.jpg",
-      "img/gastronomia/cerveza_cabeza.jpg"
+      "img/gastronomia/patagonia.jpg"
     ],
     "description": "El refugio icónico de Cerveza Patagonia. Imperdible vista panorámica al lago Nahuel Huapi, cervezas tiradas exclusivas y un menú que combina carnes ahumadas, pizzas y tablas de montaña.",
     "specialty": "Cerveza Patagonia, Carnes Ahumadas, Entradas",
@@ -27,11 +47,10 @@
     "type": "Parrilla Argentina",
     "location": "Villegas 347, Centro",
     "rating": 4.9,
-    "lat": -41.1345,
-    "lng": -71.3092,
+    "lat": -41.1362,
+    "lng": -71.3090,
     "images": [
-      "img/gastronomia/alberto.jpg",
-      "img/gastronomia/fonda.jpg"
+      "img/gastronomia/alberto.jpg"
     ],
     "description": "La parrilla más clásica y recomendada de Bariloche. Cortes de carne de primera calidad, porciones súper abundantes y las mejores papas fritas provenzal de la Patagonia.",
     "specialty": "Ojo de bife, Bife de Chorizo, Papas fritas",
@@ -48,8 +67,8 @@
     "type": "Chocolatería y Heladería",
     "location": "Mitre 202, Centro",
     "rating": 4.9,
-    "lat": -41.1338,
-    "lng": -71.3115,
+    "lat": -41.1336,
+    "lng": -71.3105,
     "images": [
       "img/gastronomia/rapanui.jpg"
     ],
@@ -66,10 +85,10 @@
     "owner_email": "oscarns@gmail.com",
     "name": "Jauja Bariloche",
     "type": "Restaurante y Heladería",
-    "location": "Moreno y Quaglia, Centro",
+    "location": "Moreno 482, Centro",
     "rating": 4.6,
-    "lat": -41.1355,
-    "lng": -71.3075,
+    "lat": -41.1352,
+    "lng": -71.3055,
     "images": [
       "img/gastronomia/jauja.jpg"
     ],
@@ -88,8 +107,8 @@
     "type": "Bodegón Tradicional",
     "location": "Mitre 1130, Bariloche",
     "rating": 4.8,
-    "lat": -41.1310,
-    "lng": -71.2980,
+    "lat": -41.1342,
+    "lng": -71.2940,
     "images": [
       "img/gastronomia/fonda.jpg"
     ],

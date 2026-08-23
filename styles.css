@@ -1032,20 +1032,50 @@ body {
     font-size: 0.8rem;
 }
 
-/* MARKERS DE PRECIO EN MAPA - ESTILO AIRBNB */
 .gasto-map-marker-wrap {
     background: none !important;
     border: none !important;
 }
 
-.gasto-map-badge {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+.gasto-pin-marker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translate(-50%, -100%);
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), filter 0.2s;
+    user-select: none;
 }
 
-.gasto-map-badge:hover {
-    transform: translate(-50%, -50%) scale(1.1) !important;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.5) !important;
-    z-index: 10000 !important;
+.gasto-pin-marker:hover,
+.gasto-pin-marker.highlighted {
+    transform: translate(-50%, -108%) scale(1.15) !important;
+    filter: brightness(1.1);
+    z-index: 99999 !important;
+}
+
+.gasto-pin-head {
+    background: #e67e22;
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 0.78rem;
+    padding: 4px 8px;
+    border-radius: 12px;
+    border: 2px solid #ffffff;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.gasto-pin-tip {
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #ffffff;
+    margin-top: -1px;
 }
 
 /* ==============================================================================

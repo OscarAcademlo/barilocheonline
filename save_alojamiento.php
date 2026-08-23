@@ -711,18 +711,23 @@ if ($action === 'get_my_provider_profile') {
         }
     }
 
-    // Alojamiento del usuario
+    $isAdmin = ($email === ADMIN_EMAIL);
+
+    // Alojamientos del usuario (o TODOS si es Admin)
     $accFile = __DIR__ . '/alojamientos.json';
     $accs = file_exists($accFile) ? json_decode(file_get_contents($accFile), true) : [];
-    $myAccs = is_array($accs) ? array_values(array_filter($accs, fn($a) => strtolower(trim($a['owner_email'] ?? '')) === $email)) : [];
+    if (!is_array($accs)) $accs = [];
+    $myAccs = $isAdmin ? $accs : array_values(array_filter($accs, fn($a) => strtolower(trim($a['owner_email'] ?? '')) === $email));
 
-    // Gastronomía del usuario
+    // Gastronomía del usuario (o TODA si es Admin)
     $gastoFile = __DIR__ . '/gastronomia.json';
     $gastos = file_exists($gastoFile) ? json_decode(file_get_contents($gastoFile), true) : [];
-    $myGastos = is_array($gastos) ? array_values(array_filter($gastos, fn($g) => strtolower(trim($g['owner_email'] ?? '')) === $email)) : [];
+    if (!is_array($gastos)) $gastos = [];
+    $myGastos = $isAdmin ? $gastos : array_values(array_filter($gastos, fn($g) => strtolower(trim($g['owner_email'] ?? '')) === $email));
 
     echo json_encode([
         'status' => 'success',
+        'is_admin' => $isAdmin,
         'provider' => $myProfile,
         'accommodations' => $myAccs,
         'gastronomy' => $myGastos

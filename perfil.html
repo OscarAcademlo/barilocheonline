@@ -1063,15 +1063,41 @@
             }
             container.innerHTML = list.map(g => `
                 <div style="background:var(--bg-main); border:1px solid var(--border); border-radius:16px; padding:14px; display:flex; gap:14px; align-items:center;">
-                    <img src="${(g.images && g.images[0]) || g.image || 'https://images.unsplash.com/photo-1574096079513-a82f09919cf7?w=200'}" style="width:80px; height:80px; object-fit:cover; border-radius:12px; flex-shrink:0;">
+                    <img src="${(g.images && g.images[0]) || g.image || 'img/gastronomia/patagonia.jpg'}" style="width:80px; height:80px; object-fit:cover; border-radius:12px; flex-shrink:0;">
                     <div style="flex:1; overflow:hidden;">
                         <b style="font-size:1rem; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${g.name}</b>
-                        <small style="color:var(--text-secondary);"><i class="fas fa-utensils"></i> ${g.type}</small>
+                        <small style="color:var(--text-secondary);"><i class="fas fa-utensils"></i> ${g.type} ${g.owner_email ? `• <span style="color:var(--primary); font-weight:700;">${g.owner_email}</span>` : ''}</small>
                         <div style="font-weight:700; color:#e67e22; font-size:0.88rem; margin-top:4px;">${g.specialty || g.promo || 'Especialidades'}</div>
                     </div>
-                    <button onclick="editGastronomyItem('${g.id}')" class="btn-owner-edit" style="padding:8px 12px; font-size:0.8rem; font-weight:700; cursor:pointer;">Editar</button>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <button onclick="editGastronomyItem('${g.id}')" class="btn-owner-edit" style="padding:8px 12px; font-size:0.8rem; font-weight:700; cursor:pointer;" title="Editar local"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteGastronomyItem('${g.id}', '${g.name.replace(/'/g, "\\'")}')" style="background:rgba(239,68,68,0.15); color:#ef4444; border:1px solid rgba(239,68,68,0.3); border-radius:10px; padding:8px 12px; font-size:0.8rem; font-weight:700; cursor:pointer;" title="Eliminar local"><i class="fas fa-trash"></i></button>
+                    </div>
                 </div>
             `).join('');
+        }
+
+        async function deleteGastronomyItem(id, name) {
+            if (!confirm(`¿Estás seguro de que deseas eliminar permanentemente "${name}"?`)) return;
+            if (!window.authManager.currentUser) return;
+            const email = window.authManager.currentUser.email;
+
+            try {
+                const res = await fetch('save_alojamiento.php?action=delete_gastronomia', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, email })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    alert('✅ Local eliminado correctamente');
+                    loadUserDashboard(email);
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (e) {
+                alert('Error al eliminar local gastronómico');
+            }
         }
 
         // ==================== GESTIÓN Y EDITOR DE LOCAL GASTRONÓMICO ====================
