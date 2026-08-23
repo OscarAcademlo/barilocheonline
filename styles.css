@@ -53,12 +53,17 @@ body {
     top: 0;
     z-index: 1000;
     border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    box-sizing: border-box;
+    gap: 8px;
 }
 
 .logo {
     font-family: 'Outfit', sans-serif;
     font-size: 1.2rem;
     font-weight: 900;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .logo b {
@@ -67,12 +72,17 @@ body {
 
 .nav-desktop {
     display: none;
+    flex-shrink: 0;
+    overflow: hidden;
 }
 
 .header-icons {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    flex-shrink: 0;
+    overflow: hidden;
+    max-width: 70%;
 }
 
 /* HERO (Arreglado) */
@@ -2947,15 +2957,41 @@ body {
 }
 
 /* NAVBAR ALIGNMENT FIX */
+/* === NAV ALIGNMENT FIX === */
 .main-header {
-    white-space: nowrap !important;
+    flex-wrap: nowrap !important;
+    overflow: hidden !important;
 }
 
 .nav-desktop {
     white-space: nowrap !important;
     flex-shrink: 0 !important;
+    overflow: visible !important;
 }
 
 .nav-desktop .nav-link {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+/* Pill de usuario: nunca desborda ni rompe el header */
+.auth-logged-pill {
+    max-width: 100% !important;
+    overflow: hidden !important;
+    flex-wrap: nowrap !important;
+}
+
+#userAuthStatus {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    flex-shrink: 1;
+    min-width: 0;
+}
+
+/* Pill buttons alineados siempre */
+.auth-logged-pill a,
+.auth-logged-pill button {
+    flex-shrink: 0 !important;
     white-space: nowrap !important;
 }
