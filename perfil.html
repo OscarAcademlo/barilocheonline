@@ -11,25 +11,26 @@
     <link rel="apple-touch-icon" href="icon-192.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css?v=2150">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css?v=2230">
     <style>
         .dashboard-wrap {
-            max-width: 1050px;
-            margin: 25px auto 100px;
-            padding: 0 20px;
+            max-width: 1100px;
+            margin: 20px auto 100px;
+            padding: 0 16px;
         }
 
         .dashboard-header-card {
             background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: 24px;
-            padding: 25px 30px;
+            padding: 24px 28px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 25px;
+            gap: 16px;
+            margin-bottom: 20px;
             box-shadow: var(--shadow);
         }
 
@@ -37,28 +38,60 @@
             background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: 24px;
-            padding: 30px;
-            margin-bottom: 25px;
+            padding: 26px;
+            margin-bottom: 22px;
             box-shadow: var(--shadow);
+        }
+
+        .service-tabs-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+            overflow-x: auto;
+        }
+
+        .service-tab-btn {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 10px 18px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .service-tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 15px rgba(0, 132, 255, 0.3);
         }
 
         .service-selector-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
+            gap: 14px;
+            margin: 16px 0;
         }
 
         .service-check-card {
             background: var(--bg-main);
             border: 2px solid var(--border);
             border-radius: 18px;
-            padding: 20px;
+            padding: 18px;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
             align-items: flex-start;
-            gap: 15px;
+            gap: 14px;
         }
 
         .service-check-card:hover {
@@ -83,7 +116,7 @@
         .fleet-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 15px;
+            gap: 14px;
             margin-top: 15px;
         }
 
@@ -149,6 +182,19 @@
             flex-wrap: wrap;
             gap: 15px;
         }
+
+        .sub-banner-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10b981;
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
     </style>
 </head>
 
@@ -156,7 +202,7 @@
     <header class="main-header">
         <a href="index.html" class="logo" style="text-decoration:none; color:inherit;"><b>B</b> BARILOCHE.ONLINE</a>
         <nav class="nav-desktop">
-            <a href="mapa.html" class="nav-link"><i class="fas fa-satellite-dish"></i> EN VIVO</a>
+            <a href="mapa.html" class="nav-link"><i class="fas fa-satellite-dish"></i> EXCURSIONES EN VIVO</a>
             <a href="radios.html" class="nav-link">RADIOS</a>
             <a href="vuelos.html" class="nav-link">VUELOS</a>
             <a href="alojamiento.html" class="nav-link">DORMIR</a>
@@ -191,24 +237,54 @@
                         <span id="userProfileBadge"></span>
                     </div>
                     <p style="margin:0; color:var(--text-secondary); font-size:0.9rem;">
-                        Configurá tus servicios contratados, administrá tu flota y mantené tu información 100% actualizada.
+                        Configurá tus servicios contratados, administrá tu flota y mantené tus publicaciones 100% actualizadas.
                     </p>
                 </div>
                 <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                    <a href="mapa.html" class="btn-owner-edit" style="text-decoration:none; padding:10px 16px; font-weight:700;"><i class="fas fa-map"></i> Ver Mapa</a>
-                    <button onclick="window.authManager.logout()" class="btn-del-comp" style="padding:10px 16px; font-weight:700;"><i class="fas fa-sign-out-alt"></i> Salir</button>
+                    <a href="index.html" class="btn-owner-edit" style="text-decoration:none; padding:10px 16px; font-weight:700;"><i class="fas fa-home"></i> Inicio</a>
+                    <button onclick="window.authManager.logout()" class="btn-del-comp" style="padding:10px 16px; font-weight:700; background:rgba(239,68,68,0.1); color:#ef4444; border:1px solid rgba(239,68,68,0.25); border-radius:12px; cursor:pointer;"><i class="fas fa-sign-out-alt"></i> Salir</button>
                 </div>
+            </div>
+
+            <!-- BANNER DE SUSCRIPCIÓN ACTIVA EN EL PANEL -->
+            <div id="panelSubscriptionNotice" class="sub-banner-box" style="display:none;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <i class="fas fa-calendar-check" style="font-size:1.6rem; color:#10b981;"></i>
+                    <div>
+                        <b style="font-size:1rem; display:block; color:#10b981;" id="subNoticeTitle">Suscripción Activa</b>
+                        <span style="font-size:0.88rem; color:var(--text-primary);" id="subNoticeDetails">Tenés el servicio activo hasta el 20/09/2026.</span>
+                    </div>
+                </div>
+                <button onclick="if(window.openSubscriptionModal) window.openSubscriptionModal()" class="btn-owner-edit" style="background:#10b981; color:white; border:none; padding:8px 16px; font-weight:800; border-radius:10px; cursor:pointer;">
+                    Renovar / Canjear Código
+                </button>
             </div>
 
             <!-- BANDEJA DE MENSAJES DEL ADMINISTRADOR -->
             <div id="adminMessagesContainer"></div>
 
+            <!-- PESTAÑAS DE SERVICIOS CONTRATADOS -->
+            <div class="service-tabs-row" id="serviceTabsRow">
+                <button class="service-tab-btn active" id="tabBtnServicios" onclick="switchDashboardTab('servicios')">
+                    <i class="fas fa-sliders"></i> Configurar Servicios (1, 2 o Todos)
+                </button>
+                <button class="service-tab-btn" id="tabBtnExcursiones" onclick="switchDashboardTab('excursiones')" style="display:none;">
+                    <i class="fas fa-van-shuttle" style="color:#0084ff;"></i> Mis Excursiones y Combis
+                </button>
+                <button class="service-tab-btn" id="tabBtnAlojamiento" onclick="switchDashboardTab('alojamiento')" style="display:none;">
+                    <i class="fas fa-bed" style="color:#e67e22;"></i> Mis Alojamientos
+                </button>
+                <button class="service-tab-btn" id="tabBtnGastronomia" onclick="switchDashboardTab('gastronomia')" style="display:none;">
+                    <i class="fas fa-utensils" style="color:#e74c3c;"></i> Mis Locales Gastronómicos
+                </button>
+            </div>
+
             <!-- 1. SELECCIÓN DE SERVICIOS Y CALCULADORA DINÁMICA -->
-            <div class="dash-card">
+            <div class="dash-card" id="tabViewServicios">
                 <div class="section-header-row">
                     <div>
-                        <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-layer-group" style="color:var(--primary);"></i> Servicios Ofrecidos</h2>
-                        <small style="color:var(--text-secondary);">Seleccioná uno o más servicios que ofrecés en Bariloche.</small>
+                        <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-layer-group" style="color:var(--primary);"></i> Servicios Ofrecidos en tu Cuenta</h2>
+                        <small style="color:var(--text-secondary);">Marcá los servicios que ofrecés (podés elegir 1, 2 o todos). El panel activará los módulos correspondientes.</small>
                     </div>
                 </div>
 
@@ -226,7 +302,7 @@
                         <input type="checkbox" id="checkAlojamiento" onchange="handleServiceSelectionChange()">
                         <div>
                             <b style="font-size:1.05rem; display:block;"><i class="fas fa-bed" style="color:#e67e22;"></i> Dónde Dormir (Alojamiento)</b>
-                            <small style="color:var(--text-secondary);">Publicá cabañas, lofts y casas con fotos, mapa y WhatsApp directo.</small>
+                            <small style="color:var(--text-secondary);">Publicá cabañas, lofts y casas con fotos, tarifas y WhatsApp directo.</small>
                             <div style="margin-top:6px; font-weight:800; color:#e67e22;" id="labelPriceAlojamiento">$10.000/mes</div>
                         </div>
                     </label>
@@ -235,7 +311,7 @@
                         <input type="checkbox" id="checkGastronomia" onchange="handleServiceSelectionChange()">
                         <div>
                             <b style="font-size:1.05rem; display:block;"><i class="fas fa-utensils" style="color:#e74c3c;"></i> Dónde Comer (Gastronomía)</b>
-                            <small style="color:var(--text-secondary);">Cervecerías, parrillas y chocolaterías con promos y ubicación.</small>
+                            <small style="color:var(--text-secondary);">Cervecerías, parrillas y chocolaterías con promos y WhatsApp.</small>
                             <div style="margin-top:6px; font-weight:800; color:#e74c3c;" id="labelPriceGastronomia">$10.000/mes</div>
                         </div>
                     </label>
@@ -243,60 +319,60 @@
 
                 <div class="price-summary-box">
                     <div>
-                        <div style="font-size:0.85rem; color:var(--text-secondary); font-weight:700;">VALOR TOTAL DE SUSCRIPCIÓN</div>
-                        <div style="font-size:1.5rem; font-family:'Outfit'; font-weight:800; color:var(--primary);" id="totalCalculatedPrice">$10.000 / mes</div>
+                        <div style="font-size:0.85rem; color:var(--text-secondary); font-weight:700;">VALOR TOTAL DE SUSCRIPCIÓN MENSUAL</div>
+                        <div style="font-size:1.6rem; font-family:'Outfit'; font-weight:800; color:var(--primary);" id="totalCalculatedPrice">$10.000 / mes</div>
                         <small id="discountAppliedLabel" style="color:#00b894; font-weight:700; display:none;">🎉 ¡Descuento de combo aplicado!</small>
                     </div>
                     <div>
-                        <button onclick="saveSelectedServicesConfig()" class="btn-submit-pickup" style="background:var(--primary); color:white; width:auto; padding:12px 24px; font-weight:800;">
-                            <i class="fas fa-floppy-disk"></i> Guardar Selección de Servicios
+                        <button onclick="saveSelectedServicesConfig()" class="btn-submit-pickup" style="background:var(--primary); color:white; width:auto; padding:12px 24px; font-weight:800; border-radius:12px; border:none; cursor:pointer;">
+                            <i class="fas fa-floppy-disk"></i> Guardar Servicios y Habilitar Módulos
                         </button>
                     </div>
                 </div>
             </div>
 
             <!-- 2. GESTIÓN DE EXCURSIONES Y FLOTA DE MÓVILES/COMBIS -->
-            <div class="dash-card" id="sectionExcursionesFleet" style="display:none;">
-                <div class="section-header-row">
+            <div class="dash-card" id="tabViewExcursiones" style="display:none;">
+                <div class="section-header-row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:18px;">
                     <div>
-                        <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-van-shuttle" style="color:#0084ff;"></i> Gestión de Flota de Combis</h2>
-                        <small style="color:var(--text-secondary);">Ingresá cada unidad de tu flota con su marca, color y los 3 últimos dígitos de su patente.</small>
+                        <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-van-shuttle" style="color:#0084ff;"></i> Gestión de Flota de Combis (BariRuta GPS)</h2>
+                        <small style="color:var(--text-secondary);">Configurá cada unidad de tu flota: marca, color, 3 últimos dígitos de patente y chofer.</small>
                     </div>
                     <button class="btn-add-movil" onclick="addNewMovilToFleet()">
-                        <i class="fas fa-plus"></i> Agregar Móvil
+                        <i class="fas fa-plus"></i> Agregar Unidad
                     </button>
                 </div>
 
                 <form onsubmit="handleSaveFleetData(event)">
                     <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:15px; margin-bottom:20px;">
                         <div class="form-group-custom">
-                            <label>Nombre Comercial de la Empresa</label>
-                            <input type="text" id="fleetCompanyName" class="form-control-custom" placeholder="Ej. Bariloche Excursiones VIP" required>
+                            <label style="font-weight:700; font-size:0.85rem; display:block; margin-bottom:6px;">Nombre Comercial de la Empresa</label>
+                            <input type="text" id="fleetCompanyName" class="form-control-custom" placeholder="Ej. Bariloche Excursiones VIP" required style="width:100%; height:46px; border-radius:12px; border:1px solid var(--border); padding:10px 14px; background:var(--bg-main); color:var(--text-primary);">
                         </div>
                         <div class="form-group-custom">
-                            <label>Teléfono / WhatsApp de la Empresa</label>
-                            <input type="text" id="fleetCompanyPhone" class="form-control-custom" placeholder="Ej. +54 9 294 4123456" required>
+                            <label style="font-weight:700; font-size:0.85rem; display:block; margin-bottom:6px;">Teléfono / WhatsApp de la Empresa</label>
+                            <input type="text" id="fleetCompanyPhone" class="form-control-custom" placeholder="Ej. +54 9 294 4123456" required style="width:100%; height:46px; border-radius:12px; border:1px solid var(--border); padding:10px 14px; background:var(--bg-main); color:var(--text-primary);">
                         </div>
                     </div>
 
                     <div class="section-header-row" style="border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:15px;">
-                        <h3 style="font-size:1.05rem; margin:0;"><i class="fas fa-car-side"></i> Unidades Registradas</h3>
+                        <h3 style="font-size:1.05rem; margin:0;"><i class="fas fa-car-side"></i> Unidades Registradas (<span id="fleetCountLabel">0</span>)</h3>
                     </div>
 
                     <div id="fleetMovilesList" class="fleet-grid"></div>
 
-                    <button type="submit" id="btnSaveFleet" class="btn-submit-pickup" style="background:#0084ff; color:white; width:auto; padding:12px 28px; font-weight:800; margin-top:20px;">
+                    <button type="submit" id="btnSaveFleet" class="btn-submit-pickup" style="background:#0084ff; color:white; width:auto; padding:12px 28px; font-weight:800; margin-top:20px; border-radius:12px; border:none; cursor:pointer;">
                         <i class="fas fa-floppy-disk"></i> Guardar Flota de Combis
                     </button>
                 </form>
             </div>
 
             <!-- 3. GESTIÓN DE ALOJAMIENTOS PROPIOS -->
-            <div class="dash-card" id="sectionAlojamientoManage" style="display:none;">
-                <div class="section-header-row">
+            <div class="dash-card" id="tabViewAlojamiento" style="display:none;">
+                <div class="section-header-row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:18px;">
                     <div>
                         <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-bed" style="color:#e67e22;"></i> Mis Alojamientos Publicados</h2>
-                        <small style="color:var(--text-secondary);">Gestioná tus cabañas, departamentos y casas en Bariloche.</small>
+                        <small style="color:var(--text-secondary);">Gestioná tus cabañas, departamentos y casas en Bariloche con tarifas por noche y fotos.</small>
                     </div>
                     <a href="alojamiento.html" class="btn-add-movil" style="background:#e67e22; text-decoration:none;">
                         <i class="fas fa-plus"></i> Publicar / Editar en Mapa
@@ -306,26 +382,96 @@
             </div>
 
             <!-- 4. GESTIÓN DE LOCALES GASTRONÓMICOS PROPIOS -->
-            <div class="dash-card" id="sectionGastronomiaManage" style="display:none;">
-                <div class="section-header-row">
+            <div class="dash-card" id="tabViewGastronomia" style="display:none;">
+                <div class="section-header-row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:18px;">
                     <div>
                         <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-utensils" style="color:#e74c3c;"></i> Mis Locales Gastronómicos</h2>
-                        <small style="color:var(--text-secondary);">Gestioná tus restaurantes, cervecerías o chocolaterías.</small>
+                        <small style="color:var(--text-secondary);">Gestioná tus restaurantes, cervecerías, parrillas o chocolaterías con promos y WhatsApp.</small>
                     </div>
-                    <a href="comer.html" class="btn-add-movil" style="background:#e74c3c; text-decoration:none;">
-                        <i class="fas fa-plus"></i> Ver en Mapa Gastronómico
-                    </a>
+                    <button class="btn-add-movil" onclick="openGastronomyEditor()" style="background:#e74c3c;">
+                        <i class="fas fa-plus"></i> Agregar Local Gastronómico
+                    </button>
                 </div>
                 <div id="myGastronomyList" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:15px; margin-top:15px;"></div>
             </div>
         </div>
     </main>
 
+    <!-- MODAL EDITOR DE LOCAL GASTRONÓMICO -->
+    <div id="gastoEditorModal" class="modal-overlay" onclick="closeGastronomyEditor()">
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width:600px; background:#1e293b; color:white; border-radius:24px; padding:26px; border:1px solid rgba(255,255,255,0.15);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+                <h2 style="font-family:'Outfit'; font-size:1.4rem; margin:0;" id="gastoModalTitle"><i class="fas fa-utensils" style="color:#e74c3c;"></i> Publicar Local Gastronómico</h2>
+                <button onclick="closeGastronomyEditor()" style="background:none; border:none; color:#94a3b8; font-size:1.3rem; cursor:pointer;"><i class="fas fa-times"></i></button>
+            </div>
+
+            <form onsubmit="handleSaveGastronomyForm(event)" id="gastoForm">
+                <input type="hidden" id="gastoEditId" value="">
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:12px;">
+                    <div class="form-group-custom">
+                        <label style="font-size:0.82rem; font-weight:700;">Nombre del Local</label>
+                        <input type="text" id="gastoName" required placeholder="Ej: Cervecería Patagonia" style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
+                    </div>
+                    <div class="form-group-custom">
+                        <label style="font-size:0.82rem; font-weight:700;">Tipo de Gastronomía</label>
+                        <select id="gastoType" style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
+                            <option value="Cervecería Artesanal">🍺 Cervecería Artesanal</option>
+                            <option value="Parrilla Argentina">🥩 Parrilla Argentina</option>
+                            <option value="Chocolatería y Heladería">🍫 Chocolatería y Heladería</option>
+                            <option value="Restaurante y Pizzería">🍕 Restaurante y Pizzería</option>
+                            <option value="Bodegón Tradicional">🥘 Bodegón Tradicional</option>
+                            <option value="Cafetería de Montaña">☕ Cafetería de Montaña</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:12px;">
+                    <div class="form-group-custom">
+                        <label style="font-size:0.82rem; font-weight:700;">Ubicación / Dirección</label>
+                        <input type="text" id="gastoLocation" required placeholder="Ej: Circuito Chico Km 24.7" style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
+                    </div>
+                    <div class="form-group-custom">
+                        <label style="font-size:0.82rem; font-weight:700;">Teléfono / WhatsApp de Reservas</label>
+                        <input type="text" id="gastoPhone" required placeholder="Ej: 5492944123456" style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
+                    </div>
+                </div>
+
+                <div class="form-group-custom" style="margin-bottom:12px;">
+                    <label style="font-size:0.82rem; font-weight:700;">Especialidades de la Casa</label>
+                    <input type="text" id="gastoSpecialty" placeholder="Ej: Ojo de bife, Trucha ahumada, Cervezas exclusivas" style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
+                </div>
+
+                <div class="form-group-custom" style="margin-bottom:12px;">
+                    <label style="font-size:0.82rem; font-weight:700;">Promoción / Beneficio para Clientes</label>
+                    <input type="text" id="gastoPromo" placeholder="Ej: Happy Hour 17 a 19hs - 2x1 en Pintas" style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
+                </div>
+
+                <div class="form-group-custom" style="margin-bottom:12px;">
+                    <label style="font-size:0.82rem; font-weight:700;">Descripción del Local</label>
+                    <textarea id="gastoDesc" rows="2" placeholder="Describí el ambiente, atención y propuesta gastronómica..." style="width:100%; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white; resize:vertical;"></textarea>
+                </div>
+
+                <div class="form-group-custom" style="margin-bottom:16px;">
+                    <label style="font-size:0.82rem; font-weight:700;">URL de Foto Principal</label>
+                    <input type="url" id="gastoImgUrl" placeholder="https://images.unsplash.com/photo-..." style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; gap:10px;">
+                    <button type="button" onclick="closeGastronomyEditor()" style="background:#334155; color:white; border:none; padding:10px 18px; border-radius:10px; cursor:pointer;">Cancelar</button>
+                    <button type="submit" id="btnSaveGasto" style="background:#e74c3c; color:white; border:none; padding:10px 22px; font-weight:800; border-radius:10px; cursor:pointer;">
+                        <i class="fas fa-check"></i> Guardar Local
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- App Bottom Nav -->
     <nav class="mobile-nav">
         <a href="mapa.html" class="mobile-nav-item">
             <i class="fas fa-satellite-dish"></i>
-            <span>En Vivo</span>
+            <span>Excursiones</span>
         </a>
         <a href="radios.html" class="mobile-nav-item">
             <i class="fas fa-radio"></i>
@@ -346,12 +492,14 @@
     </nav>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="auth_manager.js?v=2150"></script>
-    <script src="app.js?v=2150"></script>
+    <script src="auth_manager.js?v=2230"></script>
+    <script src="app.js?v=2230"></script>
     <script>
         let currentPrices = { excursiones: 10000, alojamiento: 10000, gastronomia: 10000, combo_2_descuento: 10, combo_3_descuento: 20 };
         let currentProviderData = null;
         let myFleetMoviles = [];
+        let myAccommodations = [];
+        let myGastronomy = [];
 
         document.addEventListener('DOMContentLoaded', () => {
             loadPrices();
@@ -389,6 +537,17 @@
             }
         }
 
+        function switchDashboardTab(tabId) {
+            document.querySelectorAll('.service-tab-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById('tabBtn' + tabId.charAt(0).toUpperCase() + tabId.slice(1));
+            if (activeBtn) activeBtn.classList.add('active');
+
+            document.getElementById('tabViewServicios').style.display = (tabId === 'servicios') ? 'block' : 'none';
+            document.getElementById('tabViewExcursiones').style.display = (tabId === 'excursiones') ? 'block' : 'none';
+            document.getElementById('tabViewAlojamiento').style.display = (tabId === 'alojamiento') ? 'block' : 'none';
+            document.getElementById('tabViewGastronomia').style.display = (tabId === 'gastronomia') ? 'block' : 'none';
+        }
+
         function handleServiceSelectionChange() {
             const chkExc = document.getElementById('checkExcursiones').checked;
             const chkAcc = document.getElementById('checkAlojamiento').checked;
@@ -398,9 +557,9 @@
             document.getElementById('cardServiceAlojamiento').classList.toggle('selected', chkAcc);
             document.getElementById('cardServiceGastronomia').classList.toggle('selected', chkGas);
 
-            document.getElementById('sectionExcursionesFleet').style.display = chkExc ? 'block' : 'none';
-            document.getElementById('sectionAlojamientoManage').style.display = chkAcc ? 'block' : 'none';
-            document.getElementById('sectionGastronomiaManage').style.display = chkGas ? 'block' : 'none';
+            document.getElementById('tabBtnExcursiones').style.display = chkExc ? 'inline-flex' : 'none';
+            document.getElementById('tabBtnAlojamiento').style.display = chkAcc ? 'inline-flex' : 'none';
+            document.getElementById('tabBtnGastronomia').style.display = chkGas ? 'inline-flex' : 'none';
 
             calculateTotalPrice();
         }
@@ -457,8 +616,16 @@
                         renderFleetInputs();
                     }
 
-                    renderMyAccommodations(data.accommodations || []);
-                    renderMyGastronomy(data.gastronomy || []);
+                    myAccommodations = data.accommodations || [];
+                    myGastronomy = data.gastronomy || [];
+
+                    renderMyAccommodations(myAccommodations);
+                    renderMyGastronomy(myGastronomy);
+
+                    // Si tiene un solo servicio elegido, abrir su pestaña directamente
+                    if (services.length === 1) {
+                        switchDashboardTab(services[0]);
+                    }
                 }
             } catch (e) {
                 console.error('Error al cargar perfil:', e);
@@ -485,6 +652,8 @@
 
         function renderFleetInputs() {
             const container = document.getElementById('fleetMovilesList');
+            const countLabel = document.getElementById('fleetCountLabel');
+            if (countLabel) countLabel.textContent = myFleetMoviles.length;
             if (!container) return;
 
             container.innerHTML = myFleetMoviles.map((m, index) => `
@@ -492,26 +661,26 @@
                     <button type="button" class="btn-del-movil" onclick="removeMovilFromFleet('${m.id}')" title="Eliminar móvil">
                         <i class="fas fa-trash"></i>
                     </button>
-                    <b style="font-size:0.95rem; margin-bottom:10px; display:block; color:var(--primary);"><i class="fas fa-van-shuttle"></i> Móvil #${index + 1}</b>
+                    <b style="font-size:0.95rem; margin-bottom:10px; display:block; color:var(--primary);"><i class="fas fa-van-shuttle"></i> Unidad #${index + 1}</b>
                     
                     <div class="form-group-custom" style="margin-bottom:8px;">
-                        <label style="font-size:0.75rem;">Nombre / Código de la Unidad</label>
-                        <input type="text" class="form-control-custom" value="${m.codigo}" onchange="updateMovilProp('${m.id}', 'codigo', this.value)" placeholder="Ej. Combi 01" required style="padding:8px 10px; font-size:0.88rem;">
+                        <label style="font-size:0.75rem; font-weight:700;">Nombre / Código de la Unidad</label>
+                        <input type="text" class="form-control-custom" value="${m.codigo}" onchange="updateMovilProp('${m.id}', 'codigo', this.value)" placeholder="Ej. Combi 01" required style="width:100%; height:40px; border-radius:8px; border:1px solid var(--border); padding:6px 10px; font-size:0.88rem; background:var(--bg-secondary); color:var(--text-primary);">
                     </div>
 
                     <div class="form-group-custom" style="margin-bottom:8px;">
-                        <label style="font-size:0.75rem;">Marca / Modelo</label>
-                        <input type="text" class="form-control-custom" value="${m.marca}" onchange="updateMovilProp('${m.id}', 'marca', this.value)" placeholder="Ej. Renault Master" required style="padding:8px 10px; font-size:0.88rem;">
+                        <label style="font-size:0.75rem; font-weight:700;">Marca / Modelo</label>
+                        <input type="text" class="form-control-custom" value="${m.marca}" onchange="updateMovilProp('${m.id}', 'marca', this.value)" placeholder="Ej. Renault Master" required style="width:100%; height:40px; border-radius:8px; border:1px solid var(--border); padding:6px 10px; font-size:0.88rem; background:var(--bg-secondary); color:var(--text-primary);">
                     </div>
 
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
                         <div class="form-group-custom" style="margin-bottom:0;">
-                            <label style="font-size:0.75rem;">Color</label>
-                            <input type="text" class="form-control-custom" value="${m.color}" onchange="updateMovilProp('${m.id}', 'color', this.value)" placeholder="Ej. Blanco" required style="padding:8px 10px; font-size:0.88rem;">
+                            <label style="font-size:0.75rem; font-weight:700;">Color</label>
+                            <input type="text" class="form-control-custom" value="${m.color}" onchange="updateMovilProp('${m.id}', 'color', this.value)" placeholder="Ej. Blanco" required style="width:100%; height:40px; border-radius:8px; border:1px solid var(--border); padding:6px 10px; font-size:0.88rem; background:var(--bg-secondary); color:var(--text-primary);">
                         </div>
                         <div class="form-group-custom" style="margin-bottom:0;">
-                            <label style="font-size:0.75rem;">3 Últimos Dígitos Patente</label>
-                            <input type="text" class="form-control-custom" value="${m.patente_ultimos3}" onchange="updateMovilProp('${m.id}', 'patente_ultimos3', this.value)" maxlength="3" placeholder="Ej. 789" required style="padding:8px 10px; font-size:0.88rem; text-transform:uppercase; font-weight:800;">
+                            <label style="font-size:0.75rem; font-weight:700;">3 Últimos Dígitos Patente</label>
+                            <input type="text" class="form-control-custom" value="${m.patente_ultimos3}" onchange="updateMovilProp('${m.id}', 'patente_ultimos3', this.value)" maxlength="3" placeholder="Ej. 789" required style="width:100%; height:40px; border-radius:8px; border:1px solid var(--border); padding:6px 10px; font-size:0.88rem; text-transform:uppercase; font-weight:800; background:var(--bg-secondary); color:var(--text-primary);">
                         </div>
                     </div>
                 </div>
@@ -534,6 +703,11 @@
             if (document.getElementById('checkAlojamiento').checked) selectedServices.push('alojamiento');
             if (document.getElementById('checkGastronomia').checked) selectedServices.push('gastronomia');
 
+            if (selectedServices.length === 0) {
+                alert('⚠️ Selecciona al menos un servicio para tu cuenta.');
+                return;
+            }
+
             try {
                 const res = await fetch('save_alojamiento.php?action=save_multiservice_provider', {
                     method: 'POST',
@@ -548,7 +722,11 @@
                 });
                 const data = await res.json();
                 if (data.status === 'success') {
-                    alert('✅ Configuración de servicios guardada con éxito.');
+                    alert('✅ Configuración de servicios guardada. Los módulos activos ya están disponibles en las pestañas.');
+                    handleServiceSelectionChange();
+                    if (selectedServices.length > 0) {
+                        switchDashboardTab(selectedServices[0]);
+                    }
                 } else {
                     alert('Error: ' + data.message);
                 }
@@ -567,6 +745,138 @@
 
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-floppy-disk"></i> Guardar Flota de Combis';
+        }
+
+        function renderMyAccommodations(list) {
+            const container = document.getElementById('myAccommodationsList');
+            if (!container) return;
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column:1/-1; text-align:center; padding:30px; background:var(--bg-main); border-radius:16px; border:1px dashed var(--border);">
+                        <i class="fas fa-bed" style="font-size:2rem; color:#e67e22; margin-bottom:10px;"></i>
+                        <p style="margin:0; font-weight:700;">No tienes alojamientos creados aún.</p>
+                        <small style="color:var(--text-secondary); display:block; margin-top:4px;">Hacé clic en "Publicar en Mapa" para agregar tu cabaña o casa.</small>
+                    </div>
+                `;
+                return;
+            }
+            container.innerHTML = list.map(a => `
+                <div style="background:var(--bg-main); border:1px solid var(--border); border-radius:16px; padding:14px; display:flex; gap:14px; align-items:center;">
+                    <img src="${(a.images && a.images[0]) || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200'}" style="width:80px; height:80px; object-fit:cover; border-radius:12px; flex-shrink:0;">
+                    <div style="flex:1; overflow:hidden;">
+                        <b style="font-size:1rem; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${a.name}</b>
+                        <small style="color:var(--text-secondary);"><i class="fas fa-map-marker-alt"></i> ${a.location}</small>
+                        <div style="font-weight:800; color:var(--primary); font-size:0.95rem; margin-top:4px;">$${Number(a.price).toLocaleString('es-AR')}/noche</div>
+                    </div>
+                    <a href="alojamiento.html" class="btn-owner-edit" style="text-decoration:none; padding:8px 12px; font-size:0.8rem; font-weight:700;">Editar</a>
+                </div>
+            `).join('');
+        }
+
+        function renderMyGastronomy(list) {
+            const container = document.getElementById('myGastronomyList');
+            if (!container) return;
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column:1/-1; text-align:center; padding:30px; background:var(--bg-main); border-radius:16px; border:1px dashed var(--border);">
+                        <i class="fas fa-utensils" style="font-size:2rem; color:#e74c3c; margin-bottom:10px;"></i>
+                        <p style="margin:0; font-weight:700;">No tienes locales gastronómicos creados aún.</p>
+                        <small style="color:var(--text-secondary); display:block; margin-top:4px;">Hacé clic en "Agregar Local Gastronómico" para publicar tu restaurante.</small>
+                    </div>
+                `;
+                return;
+            }
+            container.innerHTML = list.map(g => `
+                <div style="background:var(--bg-main); border:1px solid var(--border); border-radius:16px; padding:14px; display:flex; gap:14px; align-items:center;">
+                    <img src="${(g.images && g.images[0]) || g.image || 'https://images.unsplash.com/photo-1574096079513-a82f09919cf7?w=200'}" style="width:80px; height:80px; object-fit:cover; border-radius:12px; flex-shrink:0;">
+                    <div style="flex:1; overflow:hidden;">
+                        <b style="font-size:1rem; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${g.name}</b>
+                        <small style="color:var(--text-secondary);"><i class="fas fa-utensils"></i> ${g.type}</small>
+                        <div style="font-weight:700; color:#e67e22; font-size:0.88rem; margin-top:4px;">${g.specialty || g.promo || 'Especialidades'}</div>
+                    </div>
+                    <button onclick="editGastronomyItem('${g.id}')" class="btn-owner-edit" style="padding:8px 12px; font-size:0.8rem; font-weight:700; cursor:pointer;">Editar</button>
+                </div>
+            `).join('');
+        }
+
+        function openGastronomyEditor() {
+            document.getElementById('gastoEditId').value = '';
+            document.getElementById('gastoName').value = '';
+            document.getElementById('gastoLocation').value = '';
+            document.getElementById('gastoPhone').value = '';
+            document.getElementById('gastoSpecialty').value = '';
+            document.getElementById('gastoPromo').value = '';
+            document.getElementById('gastoDesc').value = '';
+            document.getElementById('gastoImgUrl').value = '';
+            document.getElementById('gastoModalTitle').innerHTML = '<i class="fas fa-utensils" style="color:#e74c3c;"></i> Agregar Local Gastronómico';
+            document.getElementById('gastoEditorModal').style.display = 'flex';
+        }
+
+        function editGastronomyItem(id) {
+            const item = myGastronomy.find(g => String(g.id) === String(id));
+            if (!item) return;
+
+            document.getElementById('gastoEditId').value = item.id;
+            document.getElementById('gastoName').value = item.name || '';
+            document.getElementById('gastoType').value = item.type || 'Restaurante';
+            document.getElementById('gastoLocation').value = item.location || '';
+            document.getElementById('gastoPhone').value = item.phone || '';
+            document.getElementById('gastoSpecialty').value = item.specialty || '';
+            document.getElementById('gastoPromo').value = item.promo || '';
+            document.getElementById('gastoDesc').value = item.description || '';
+            document.getElementById('gastoImgUrl').value = (item.images && item.images[0]) || item.image || '';
+            document.getElementById('gastoModalTitle').innerHTML = '<i class="fas fa-edit" style="color:#e74c3c;"></i> Editar Local Gastronómico';
+            document.getElementById('gastoEditorModal').style.display = 'flex';
+        }
+
+        function closeGastronomyEditor() {
+            document.getElementById('gastoEditorModal').style.display = 'none';
+        }
+
+        async function handleSaveGastronomyForm(e) {
+            e.preventDefault();
+            if (!window.authManager.currentUser) return;
+            const email = window.authManager.currentUser.email;
+
+            const btn = document.getElementById('btnSaveGasto');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
+            const editId = document.getElementById('gastoEditId').value;
+            const imgUrl = document.getElementById('gastoImgUrl').value.trim();
+            const existingImages = imgUrl ? [imgUrl] : [];
+
+            const formData = new FormData();
+            formData.append('owner_email', email);
+            if (editId) formData.append('id', editId);
+            formData.append('name', document.getElementById('gastoName').value.trim());
+            formData.append('type', document.getElementById('gastoType').value);
+            formData.append('location', document.getElementById('gastoLocation').value.trim());
+            formData.append('phone', document.getElementById('gastoPhone').value.trim());
+            formData.append('specialty', document.getElementById('gastoSpecialty').value.trim());
+            formData.append('promo', document.getElementById('gastoPromo').value.trim());
+            formData.append('description', document.getElementById('gastoDesc').value.trim());
+            formData.append('existing_images', JSON.stringify(existingImages));
+
+            try {
+                const res = await fetch('save_alojamiento.php?action=save_gastronomia', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    alert('🎉 ¡Local gastronómico guardado con éxito!');
+                    closeGastronomyEditor();
+                    loadUserDashboard(email);
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (err) {
+                alert('Error al guardar local gastronómico');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check"></i> Guardar Local';
+            }
         }
 
         async function loadUserAdminMessages(email) {
@@ -614,44 +924,6 @@
                     loadUserAdminMessages(window.authManager.currentUser.email);
                 }
             } catch (e) {}
-        }
-
-        function renderMyAccommodations(list) {
-            const container = document.getElementById('myAccommodationsList');
-            if (!container) return;
-            if (list.length === 0) {
-                container.innerHTML = '<small style="color:var(--text-secondary);">No tienes alojamientos creados aún. Haz clic en "Publicar en Mapa".</small>';
-                return;
-            }
-            container.innerHTML = list.map(a => `
-                <div style="background:var(--bg-main); border:1px solid var(--border); border-radius:14px; padding:12px; display:flex; gap:12px; align-items:center;">
-                    <img src="${(a.images && a.images[0]) || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200'}" style="width:70px; height:70px; object-fit:cover; border-radius:10px;">
-                    <div>
-                        <b style="font-size:0.95rem; display:block;">${a.name}</b>
-                        <small style="color:var(--text-secondary);"><i class="fas fa-map-marker-alt"></i> ${a.location}</small>
-                        <div style="font-weight:700; color:var(--primary); font-size:0.9rem; margin-top:2px;">$${Number(a.price).toLocaleString('es-AR')}/noche</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderMyGastronomy(list) {
-            const container = document.getElementById('myGastronomyList');
-            if (!container) return;
-            if (list.length === 0) {
-                container.innerHTML = '<small style="color:var(--text-secondary);">No tienes locales gastronómicos creados aún.</small>';
-                return;
-            }
-            container.innerHTML = list.map(g => `
-                <div style="background:var(--bg-main); border:1px solid var(--border); border-radius:14px; padding:12px; display:flex; gap:12px; align-items:center;">
-                    <img src="${g.image || 'https://images.unsplash.com/photo-1574096079513-a82f09919cf7?w=200'}" style="width:70px; height:70px; object-fit:cover; border-radius:10px;">
-                    <div>
-                        <b style="font-size:0.95rem; display:block;">${g.name}</b>
-                        <small style="color:var(--text-secondary);"><i class="fas fa-utensils"></i> ${g.type}</small>
-                        <div style="font-weight:700; color:#e67e22; font-size:0.9rem; margin-top:2px;">${g.specialty || 'Especialidades'}</div>
-                    </div>
-                </div>
-            `).join('');
         }
     </script>
 </body>

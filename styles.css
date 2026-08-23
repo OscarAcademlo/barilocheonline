@@ -435,12 +435,19 @@ body {
     }
 
     .main-header {
-        padding: 0 10%;
+        padding: 0 4% !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 15px !important;
+        flex-wrap: nowrap !important;
     }
 
     .nav-desktop {
-        display: flex;
-        gap: 30px;
+        display: flex !important;
+        gap: 18px !important;
+        align-items: center !important;
+        flex-shrink: 1 !important;
     }
 
     .nav-link {

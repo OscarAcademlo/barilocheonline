@@ -513,8 +513,12 @@ async function handleSignupSubmit(e) {
             }
         });
         if (error) throw error;
-        alert('🎉 ¡Cuenta creada con éxito! Te enviamos un correo de verificación. Revisa tu bandeja de entrada o spam.');
         closeAuthModal();
+        if (window.authManager && window.authManager.showVerificationSuccessModal) {
+            window.authManager.showVerificationSuccessModal(email);
+        } else {
+            alert('🎉 ¡Cuenta creada con éxito! Revisa tu correo para confirmar tu cuenta.');
+        }
     } catch (err) {
         errorEl.textContent = err.message || 'Error al registrarte';
     } finally {

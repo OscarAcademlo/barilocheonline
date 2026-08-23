@@ -903,6 +903,145 @@ if ($action === 'delete_user_message') {
     exit;
 }
 
+// 23. GUARDAR / EDITAR LOCAL GASTRONÓMICO
+if ($action === 'save_gastronomia') {
+    $email = strtolower(trim($_POST['owner_email'] ?? ''));
+    if (empty($email)) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'Email de propietario requerido']);
+        exit;
+    }
+
+    $uploadDir = __DIR__ . '/img/gastronomia/';
+    if (!file_exists($uploadDir)) {
+        @mkdir($uploadDir, 0755, true);
+    }
+
+    $uploadedImages = [];
+    if (!empty($_FILES['images'])) {
+        $files = $_FILES['images'];
+        $count = is_array($files['name']) ? count($files['name']) : 1;
+
+        for ($i = 0; $i < $count; $i++) {
+            $name = is_array($files['name']) ? $files['name'][$i] : $files['name'];
+            $tmpName = is_array($files['tmp_name']) ? $files['tmp_name'][$i] : $files['tmp_name'];
+            $error = is_array($files['error']) ? $files['error'][$i] : $files['error'];
+
+            if ($error === UPLOAD_ERR_OK && !empty($tmpName)) {
+                $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+                if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp'])) {
+                    $newFilename = 'gasto_' . uniqid() . '_' . time() . '.' . $ext;
+                    if (move_uploaded_file($tmpName, $uploadDir . $newFilename)) {
+                        $uploadedImages[] = 'img/gastronomia/' . $newFilename;
+                    }
+                }
+            }
+        }
+    }
+
+    $existingImages = json_decode($_POST['existing_images'] ?? '[]', true) ?: [];
+    $allImages = array_merge($existingImages, $uploadedImages);
+    if (empty($allImages)) {
+        $allImages = ['https://images.unsplash.com/photo-1574096079513-a82f09919cf7?auto=format&fit=crop&q=80&w=800'];
+    }
+
+    $gastoId = $_POST['id'] ?? ('gasto_' . time());
+    $features = json_decode($_POST['features'] ?? '[]', true) ?: ['Excelente atención', 'Opciones ricas'];
+
+    $newItem = [
+        'id' => $gastoId,
+        'owner_email' => $email,
+        'name' => trim($_POST['name'] ?? 'Mi Local'),
+        'type' => trim($_POST['type'] ?? 'Restaurante'),
+        'location' => trim($_POST['location'] ?? 'Centro'),
+        'rating' => floatval($_POST['rating'] ?? 4.8),
+        'lat' => floatval($_POST['lat'] ?? -41.1335),
+        'lng' => floatval($_POST['lng'] ?? -71.3103),
+        'images' => $allImages,
+        'description' => trim($_POST['description'] ?? ''),
+        'specialty' => trim($_POST['specialty'] ?? ''),
+        'promo' => trim($_POST['promo'] ?? ''),
+        'features' => $features,
+        'phone' => preg_replace('/[^\d]/', '', $_POST['phone'] ?? '5492944123456'),
+        'is_active' => true,
+        'updated_at' => date('c')
+    ];
+
+    $file = __DIR__ . '/gastronomia.json';
+    $list = file_exists($file) ? json_decode(file_get_contents($file), true) : [];
+    if (!is_array($list)) $list = [];
+
+    $isAdmin = ($email === ADMIN_EMAIL);
+    $foundIndex = -1;
+    foreach ($list as $idx => $item) {
+        if ($item['id'] === $gastoId) {
+            if ($item['owner_email'] !== $email && !$isAdmin) {
+                http_response_code(403);
+                echo json_encode(['status' => 'error', 'message' => 'No tienes permiso para editar este local']);
+                exit;
+            }
+            $foundIndex = $idx;
+            break;
+        }
+    }
+
+    if ($foundIndex >= 0) {
+        $list[$foundIndex] = array_merge($list[$foundIndex], $newItem);
+    } else {
+        $newItem['created_at'] = date('c');
+        array_unshift($list, $newItem);
+    }
+
+    file_put_contents($file, json_encode($list, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    @chmod($file, 0666);
+
+    echo json_encode(['status' => 'success', 'message' => 'Local gastronómico guardado con éxito', 'data' => $newItem]);
+    exit;
+}
+
+// 24. ELIMINAR LOCAL GASTRONÓMICO
+if ($action === 'delete_gastronomia') {
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true) ?: $_POST;
+    $id = $data['id'] ?? '';
+    $email = strtolower(trim($data['email'] ?? ''));
+
+    if (empty($id) || empty($email)) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'ID y email requeridos']);
+        exit;
+    }
+
+    $isAdmin = ($email === ADMIN_EMAIL);
+    $file = __DIR__ . '/gastronomia.json';
+    $list = file_exists($file) ? json_decode(file_get_contents($file), true) : [];
+
+    $newList = [];
+    $deleted = false;
+    foreach ($list as $item) {
+        if ($item['id'] === $id) {
+            if ($item['owner_email'] === $email || $isAdmin) {
+                $deleted = true;
+                continue;
+            } else {
+                http_response_code(403);
+                echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
+                exit;
+            }
+        }
+        $newList[] = $item;
+    }
+
+    if ($deleted) {
+        file_put_contents($file, json_encode($newList, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        echo json_encode(['status' => 'success', 'message' => 'Local gastronómico eliminado']);
+    } else {
+        http_response_code(404);
+        echo json_encode(['status' => 'error', 'message' => 'Local no encontrado']);
+    }
+    exit;
+}
+
 http_response_code(400);
 echo json_encode(['status' => 'error', 'message' => 'Acción no reconocida']);
 ?>

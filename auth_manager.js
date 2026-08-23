@@ -80,45 +80,20 @@ class AuthManager {
         if (userBar) {
             if (this.currentUser) {
                 const emailClean = this.currentUser.email.toLowerCase().trim();
-                let subBadge = '';
-                
-                if (isAdmin) {
-                    subBadge = '<span class="badge-admin" style="background:#e74c3c; color:white; font-size:0.75rem; font-weight:800; padding:3px 8px; border-radius:6px;">ADMIN</span>';
-                } else {
-                    let sub = null;
-                    try {
-                        const raw = localStorage.getItem('bari_sub_' + emailClean);
-                        if (raw) sub = JSON.parse(raw);
-                    } catch (e) {}
-
-                    if (sub && sub.expires_at) {
-                        const expDate = new Date(sub.expires_at);
-                        const now = Date.now();
-                        const diffMs = expDate.getTime() - now;
-                        const diffHours = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60)));
-                        const diffDays = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
-                        const formattedDate = expDate.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-
-                        if (diffMs <= 0) {
-                            subBadge = `<button type="button" onclick="if(window.openSubscriptionModal) window.openSubscriptionModal()" style="background:#ef4444; color:white; border:none; font-size:0.75rem; font-weight:800; padding:4px 8px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="fas fa-exclamation-circle"></i> Período finalizado • Suscribite</button>`;
-                        } else if (diffHours <= 48) {
-                            subBadge = `<button type="button" onclick="if(window.openSubscriptionModal) window.openSubscriptionModal()" style="background:#f59e0b; color:#111; border:none; font-size:0.75rem; font-weight:800; padding:4px 8px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="fas fa-clock"></i> Tenés el servicio hasta el ${formattedDate} • (Restan ${diffHours} hs)</button>`;
-                        } else {
-                            subBadge = `<span style="background:rgba(16, 185, 129, 0.15); border:1px solid #10b981; color:#10b981; font-size:0.75rem; font-weight:800; padding:4px 8px; border-radius:8px; display:inline-flex; align-items:center; gap:4px;"><i class="fas fa-calendar-check"></i> Tenés el servicio hasta el ${formattedDate} • (Restan ${diffDays} días)</span>`;
-                        }
-                    }
-                }
+                let shortEmail = emailClean.split('@')[0];
+                if (shortEmail.length > 12) shortEmail = shortEmail.substring(0, 10) + '…';
 
                 userBar.innerHTML = `
-                    <div class="auth-logged-pill" style="${isAdmin ? 'border:1px solid #e74c3c; background:rgba(231, 76, 60, 0.12);' : ''} display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                        <a href="perfil.html" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:6px;" title="Ir a Mi Panel de Prestador">
-                            <i class="fas ${isAdmin ? 'fa-user-shield' : 'fa-user-circle'}" style="${isAdmin ? 'color:#e74c3c;' : 'color:var(--primary);'} font-size:1.1rem;"></i>
-                            <span style="font-weight:700; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${this.currentUser.email}</span>
+                    <div class="auth-logged-pill" style="${isAdmin ? 'border:1px solid #e74c3c; background:rgba(231, 76, 60, 0.12);' : 'background:var(--bg-main); border:1px solid var(--border);'} display:inline-flex; align-items:center; gap:8px; padding:4px 10px; border-radius:20px; flex-shrink:0;">
+                        <a href="perfil.html" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:6px; font-weight:700; font-size:0.85rem;" title="${this.currentUser.email}">
+                            <i class="fas ${isAdmin ? 'fa-user-shield' : 'fa-user-circle'}" style="${isAdmin ? 'color:#e74c3c;' : 'color:var(--primary);'} font-size:1.15rem;"></i>
+                            <span style="max-width:110px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${shortEmail}</span>
                         </a>
-                        ${subBadge}
-                        <a href="perfil.html" class="btn-owner-edit" style="text-decoration:none; font-size:0.75rem; padding:4px 8px; font-weight:700; display:inline-flex; align-items:center; gap:4px;"><i class="fas fa-sliders"></i> Mi Panel</a>
-                        ${isAdmin ? '<a href="admin.html" class="btn-admin-pill" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px;"><i class="fas fa-shield-alt"></i> Panel Admin</a>' : ''}
-                        <button onclick="window.authManager.logout()" class="btn-logout-mini" title="Cerrar sesión" style="margin-left:4px;">
+                        <a href="perfil.html" class="btn-owner-edit" style="text-decoration:none; font-size:0.75rem; padding:4px 10px; font-weight:700; display:inline-flex; align-items:center; gap:5px; border-radius:12px; background:rgba(0,132,255,0.15); color:var(--primary);">
+                            <i class="fas fa-sliders"></i> Mi Panel
+                        </a>
+                        ${isAdmin ? '<a href="admin.html" class="btn-admin-pill" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px; font-size:0.75rem; padding:4px 8px; border-radius:10px; background:#e74c3c; color:white; font-weight:800;"><i class="fas fa-shield-alt"></i> Admin</a>' : ''}
+                        <button onclick="window.authManager.logout()" class="btn-logout-mini" title="Cerrar sesión" style="background:transparent; border:none; color:var(--text-secondary); cursor:pointer; font-size:0.95rem; padding:4px; display:flex; align-items:center;">
                             <i class="fas fa-sign-out-alt"></i>
                         </button>
                     </div>
@@ -376,9 +351,8 @@ class AuthManager {
                 });
             } catch (e) {}
 
-            alert('🎉 ¡Cuenta creada con éxito! Ya puedes ingresar y administrar tus publicaciones.');
             this.closeModal();
-            this.toggleMode('login');
+            this.showVerificationSuccessModal(email);
         } catch (err) {
             if (errorEl) errorEl.textContent = err.message || 'Error al registrarte';
         } finally {
@@ -387,6 +361,60 @@ class AuthManager {
                 btn.innerHTML = 'Registrarme';
             }
         }
+    }
+
+    showVerificationSuccessModal(email) {
+        let modal = document.getElementById('emailVerificationModal');
+        if (!modal) {
+            const modalHtml = `
+            <div id="emailVerificationModal" class="modal-overlay" style="display:none; z-index:1000000;">
+                <div class="modal-content" style="max-width:480px; background:#1e293b; color:#ffffff; border-radius:24px; padding:32px 24px; text-align:center; box-shadow:0 25px 60px rgba(0,0,0,0.8); border:1px solid rgba(255,255,255,0.15); position:relative;">
+                    <div style="width:76px; height:76px; border-radius:50%; background:linear-gradient(135deg, rgba(0,132,255,0.2), rgba(0,206,201,0.2)); color:#00cec9; font-size:2.4rem; display:flex; align-items:center; justify-content:center; margin:0 auto 18px; border:2px solid rgba(0,206,201,0.4); box-shadow:0 0 25px rgba(0,206,201,0.3);">
+                        <i class="fas fa-envelope-open-text"></i>
+                    </div>
+                    <h2 style="font-family:'Outfit'; font-size:1.65rem; margin:0 0 8px; color:#ffffff;">¡Activá tu Cuenta!</h2>
+                    <p style="color:#94a3b8; font-size:0.95rem; margin:0 0 16px;">Te enviamos un correo con el enlace de confirmación a:</p>
+                    
+                    <div style="background:#0f172a; border:1px solid #334155; border-radius:14px; padding:12px 16px; font-weight:800; color:#38bdf8; font-size:1rem; margin-bottom:20px; word-break:break-all;">
+                        <i class="fas fa-envelope" style="margin-right:6px;"></i> <span id="verifyModalTargetEmail">${email}</span>
+                    </div>
+
+                    <div style="text-align:left; background:rgba(255,255,255,0.04); border-radius:16px; padding:16px; margin-bottom:24px; font-size:0.88rem; color:#cbd5e1; display:flex; flex-direction:column; gap:10px;">
+                        <div style="display:flex; align-items:flex-start; gap:10px;">
+                            <span style="background:var(--primary); color:white; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:800; flex-shrink:0;">1</span>
+                            <span>Revisá tu <b>Bandeja de Entrada</b> (o la carpeta de <i>Spam / Correo no deseado</i>).</span>
+                        </div>
+                        <div style="display:flex; align-items:flex-start; gap:10px;">
+                            <span style="background:var(--primary); color:white; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:800; flex-shrink:0;">2</span>
+                            <span>Hacé clic en el botón o enlace <b>"Confirm your mail"</b> para validar tu cuenta.</span>
+                        </div>
+                        <div style="display:flex; align-items:flex-start; gap:10px;">
+                            <span style="background:var(--primary); color:white; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:800; flex-shrink:0;">3</span>
+                            <span>Regresá a Bariloche.Online e <b>iniciá sesión</b> para gestionar tu panel.</span>
+                        </div>
+                    </div>
+
+                    <button onclick="window.authManager.closeVerificationSuccessModal()" class="btn-auth-primary" style="width:100%; background:linear-gradient(135deg, #0084ff, #00cec9); color:white; border:none; padding:15px; border-radius:14px; font-weight:800; font-size:1rem; cursor:pointer; box-shadow:0 8px 25px rgba(0,132,255,0.4);">
+                        <i class="fas fa-check"></i> Entendido, ir a Iniciar Sesión
+                    </button>
+                </div>
+            </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            modal = document.getElementById('emailVerificationModal');
+        } else {
+            const emailSpan = document.getElementById('verifyModalTargetEmail');
+            if (emailSpan) emailSpan.textContent = email;
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    closeVerificationSuccessModal() {
+        const modal = document.getElementById('emailVerificationModal');
+        if (modal) modal.style.display = 'none';
+        this.openModal();
+        this.toggleMode('login');
     }
 
     async logout() {
