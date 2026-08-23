@@ -340,18 +340,20 @@ function updateUserBar() {
     const isAdmin = !!(currentUser && currentUser.email && currentUser.email.toLowerCase().trim() === ADMIN_EMAIL);
 
     if (userBar) {
-        if (currentUser) {
-            const subBadge = formatSubscriptionStatusBadge();
+            const shortEmail = currentUser.email.split('@')[0];
             userBar.innerHTML = `
-                <div class="auth-logged-pill" style="${isAdmin ? 'border:1px solid #e74c3c; background:rgba(231, 76, 60, 0.12);' : ''} display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                    <div style="display:flex; align-items:center; gap:6px;">
-                        <i class="fas ${isAdmin ? 'fa-user-shield' : 'fa-user-circle'}" style="${isAdmin ? 'color:#e74c3c;' : 'color:var(--primary);'} font-size:1.1rem;"></i>
-                        <span style="font-weight:700; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${currentUser.email}</span>
-                    </div>
-                    ${subBadge}
-                    ${isAdmin ? '<a href="admin.html" class="btn-admin-pill" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px;"><i class="fas fa-shield-alt"></i> Panel Admin</a>' : ''}
-                    ${isAdmin ? '<button onclick="openAdminPanel()" class="btn-admin-pill"><i class="fas fa-key"></i> Códigos</button>' : ''}
-                    <button onclick="handleLogout()" class="btn-logout-mini" title="Cerrar sesión" style="margin-left:4px;"><i class="fas fa-sign-out-alt"></i></button>
+                <div class="auth-logged-pill" style="${isAdmin ? 'border:1px solid #e74c3c; background:rgba(231, 76, 60, 0.12);' : 'background:var(--bg-main); border:1px solid var(--border);'} display:inline-flex; align-items:center; gap:8px; padding:4px 10px; border-radius:20px; flex-shrink:0;">
+                    <a href="perfil.html" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:6px; font-weight:700; font-size:0.85rem;" title="${currentUser.email}">
+                        <i class="fas ${isAdmin ? 'fa-user-shield' : 'fa-user-circle'}" style="${isAdmin ? 'color:#e74c3c;' : 'color:var(--primary);'} font-size:1.15rem;"></i>
+                        <span style="max-width:110px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${shortEmail}</span>
+                    </a>
+                    <a href="perfil.html" class="btn-owner-edit" style="text-decoration:none; font-size:0.75rem; padding:4px 10px; font-weight:700; display:inline-flex; align-items:center; gap:5px; border-radius:12px; background:rgba(0,132,255,0.15); color:var(--primary);">
+                        <i class="fas fa-sliders"></i> Mi Panel
+                    </a>
+                    ${isAdmin ? '<a href="admin.html" class="btn-admin-pill" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px; font-size:0.75rem; padding:4px 8px; border-radius:10px; background:#e74c3c; color:white; font-weight:800;"><i class="fas fa-shield-alt"></i> Admin</a>' : ''}
+                    <button onclick="handleLogout()" class="btn-logout-mini" title="Cerrar sesión" style="background:transparent; border:none; color:var(--text-secondary); cursor:pointer; font-size:0.95rem; padding:4px; display:flex; align-items:center;">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
                 </div>
             `;
         } else {
@@ -363,23 +365,10 @@ function updateUserBar() {
         }
     }
 
-    // Acceso exclusivo ADMIN en la navegación desktop y mobile
     const desktopNav = document.querySelector('.nav-desktop');
     if (desktopNav) {
-        let adminDesktopLink = document.getElementById('nav-admin-link-desktop');
-        if (isAdmin) {
-            if (!adminDesktopLink) {
-                adminDesktopLink = document.createElement('a');
-                adminDesktopLink.id = 'nav-admin-link-desktop';
-                adminDesktopLink.href = 'admin.html';
-                adminDesktopLink.className = 'nav-link';
-                adminDesktopLink.style.cssText = 'color:#e74c3c !important; font-weight:800; display:inline-flex; align-items:center; gap:6px; background:rgba(231,76,60,0.1); border-radius:10px; padding:6px 12px;';
-                adminDesktopLink.innerHTML = '<i class="fas fa-shield-alt"></i> ADMIN';
-                desktopNav.appendChild(adminDesktopLink);
-            }
-        } else if (adminDesktopLink) {
-            adminDesktopLink.remove();
-        }
+        const adminDesktopLink = document.getElementById('nav-admin-link-desktop');
+        if (adminDesktopLink) adminDesktopLink.remove();
     }
 
     const mobileNav = document.querySelector('.mobile-nav');

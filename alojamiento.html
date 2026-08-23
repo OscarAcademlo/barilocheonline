@@ -103,12 +103,12 @@
                 <form onsubmit="handleLoginSubmit(event)">
                     <div class="input-group-custom">
                         <label><i class="fas fa-envelope"></i> Email</label>
-                        <input type="email" id="loginEmail" placeholder="tu-email@gmail.com" autocomplete="off" data-lpignore="true" spellcheck="false" required>
+                        <input type="email" id="loginEmail" name="auth_acc_email" placeholder="tu-email@gmail.com" autocomplete="off" data-lpignore="true" data-1p-ignore="true" spellcheck="false" required style="width:100%; height:48px; border-radius:12px; padding:0 14px; background:var(--bg-main); border:1px solid var(--border); box-sizing:border-box;">
                     </div>
                     <div class="input-group-custom password-wrapper-relative">
                         <label><i class="fas fa-lock"></i> Contraseña</label>
                         <div class="pass-input-box" style="position: relative; width: 100%; display: flex; align-items: center;">
-                            <input type="password" id="loginPass" placeholder="••••••••" autocomplete="off" data-lpignore="true" style="width: 100%; padding-right: 45px; box-sizing: border-box;" required>
+                            <input type="password" id="loginPass" name="auth_acc_pass" placeholder="••••••••" autocomplete="off" data-lpignore="true" data-1p-ignore="true" style="width: 100%; height:48px; border-radius:12px; padding:0 45px 0 14px; background:var(--bg-main); border:1px solid var(--border); box-sizing: border-box;" required>
                             <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('loginPass', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #94a3b8; font-size: 1.1rem; padding: 4px; z-index: 10; display: flex; align-items: center; justify-content: center;">
                                 <i class="fas fa-eye"></i>
                             </button>

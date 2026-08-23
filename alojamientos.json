@@ -1,5 +1,38 @@
 [
   {
+    "id": "acc_bustillo_4550",
+    "owner_email": "oscarns@gmail.com",
+    "name": "Cabaña Nahuel Huapi Pet & Lake",
+    "type": "Cabaña",
+    "location": "Av. Bustillo 4550, Bariloche",
+    "price": 135000,
+    "rating": 4.99,
+    "lat": -41.1275,
+    "lng": -71.3650,
+    "images": [
+      "img/alojamientos/cabana_bustillo_frente.jpg",
+      "img/alojamientos/cabana_bustillo_interior.jpg",
+      "img/alojamientos/cabana_bustillo_deck.jpg"
+    ],
+    "description": "Hermosa cabaña rústica de ciprés y piedra a metros de la costa del Lago Nahuel Huapi en Av. Bustillo Km 4.5. Totalmente equipada, 100% Pet Friendly con jardín cerrado, deck con vista panorámica al lago, parrilla techada, estufa a leña y bajada directa a la playa.",
+    "amenities": [
+      "Pet friendly",
+      "Vista al lago",
+      "Parrilla",
+      "Wi-Fi",
+      "Hogar a leña",
+      "Estacionamiento",
+      "Cocina completa",
+      "Calefacción",
+      "Salida al lago",
+      "Smart TV",
+      "Ropa blanca"
+    ],
+    "phone": "5492944123456",
+    "is_active": true,
+    "created_at": "2026-08-23T15:45:00Z"
+  },
+  {
     "id": "acc_1",
     "owner_email": "oscarns@gmail.com",
     "name": "Cabaña Vista al Nahuel",

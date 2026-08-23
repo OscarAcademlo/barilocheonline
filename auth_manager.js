@@ -118,23 +118,11 @@ class AuthManager {
             }
         }
 
-        // 2. Acceso ADMIN en la barra de navegación Desktop (SOLO para oscarns@gmail.com)
+        // 2. Limpiar links duplicados de desktopNav si existieran
         const desktopNav = document.querySelector('.nav-desktop');
         if (desktopNav) {
-            let adminDesktopLink = document.getElementById('nav-admin-link-desktop');
-            if (isAdmin) {
-                if (!adminDesktopLink) {
-                    adminDesktopLink = document.createElement('a');
-                    adminDesktopLink.id = 'nav-admin-link-desktop';
-                    adminDesktopLink.href = 'admin.html';
-                    adminDesktopLink.className = 'nav-link';
-                    adminDesktopLink.style.cssText = 'color:#e74c3c !important; font-weight:800; display:inline-flex; align-items:center; gap:6px; background:rgba(231,76,60,0.1); border-radius:10px; padding:6px 12px;';
-                    adminDesktopLink.innerHTML = '<i class="fas fa-shield-alt"></i> ADMIN';
-                    desktopNav.appendChild(adminDesktopLink);
-                }
-            } else if (adminDesktopLink) {
-                adminDesktopLink.remove();
-            }
+            const adminDesktopLink = document.getElementById('nav-admin-link-desktop');
+            if (adminDesktopLink) adminDesktopLink.remove();
         }
 
         // 3. Acceso ADMIN en la barra de navegación Mobile (SOLO para oscarns@gmail.com)
