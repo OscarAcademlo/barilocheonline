@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="styles.css?v=2230">
+    <link rel="stylesheet" href="styles.css?v=2240">
     <style>
         .dashboard-wrap {
             max-width: 1100px;
@@ -195,6 +195,106 @@
             flex-wrap: wrap;
             gap: 12px;
         }
+
+        /* UPLOADER DE FOTOS Y PREVIEWS */
+        .image-upload-zone {
+            border: 2px dashed #3b82f6;
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+            background: rgba(59, 130, 246, 0.05);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 12px;
+        }
+
+        .image-upload-zone:hover {
+            background: rgba(59, 130, 246, 0.12);
+            border-color: #60a5fa;
+        }
+
+        .image-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .image-preview-card {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            aspect-ratio: 4/3;
+            background: #000;
+        }
+
+        .image-preview-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .btn-remove-preview-img {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(239, 68, 68, 0.85);
+            color: white;
+            border: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .image-preview-badge {
+            position: absolute;
+            bottom: 4px;
+            left: 4px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+
+        /* AUTOCOMPLETE DROPDOWN */
+        .address-suggestions-box {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #0f172a;
+            border: 1px solid #3b82f6;
+            border-radius: 12px;
+            max-height: 220px;
+            overflow-y: auto;
+            z-index: 10000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            margin-top: 4px;
+        }
+
+        .suggestion-item {
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            font-size: 0.85rem;
+            transition: background 0.15s ease;
+        }
+
+        .suggestion-item:hover {
+            background: rgba(59, 130, 246, 0.25);
+        }
     </style>
 </head>
 
@@ -237,7 +337,7 @@
                         <span id="userProfileBadge"></span>
                     </div>
                     <p style="margin:0; color:var(--text-secondary); font-size:0.9rem;">
-                        Configurá tus servicios contratados, administrá tu flota y mantené tus publicaciones 100% actualizadas.
+                        Configurá tus servicios contratados, administrá tu flota y mantené tus promociones y cobros 100% actualizados.
                     </p>
                 </div>
                 <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
@@ -246,18 +346,35 @@
                 </div>
             </div>
 
-            <!-- BANNER DE SUSCRIPCIÓN ACTIVA EN EL PANEL -->
-            <div id="panelSubscriptionNotice" class="sub-banner-box" style="display:none;">
+            <!-- BANNER DE SUSCRIPCIÓN Y CANJE DE CÓDIGO -->
+            <div class="sub-banner-box" id="panelSubBanner">
                 <div style="display:flex; align-items:center; gap:12px;">
-                    <i class="fas fa-calendar-check" style="font-size:1.6rem; color:#10b981;"></i>
+                    <i class="fas fa-calendar-check" style="font-size:1.6rem; color:#10b981;" id="subBannerIcon"></i>
                     <div>
-                        <b style="font-size:1rem; display:block; color:#10b981;" id="subNoticeTitle">Suscripción Activa</b>
-                        <span style="font-size:0.88rem; color:var(--text-primary);" id="subNoticeDetails">Tenés el servicio activo hasta el 20/09/2026.</span>
+                        <b style="font-size:1rem; display:block; color:#10b981;" id="subNoticeTitle">Estado de tu Suscripción</b>
+                        <span style="font-size:0.88rem; color:var(--text-primary);" id="subNoticeDetails">Cargando estado...</span>
                     </div>
                 </div>
-                <button onclick="if(window.openSubscriptionModal) window.openSubscriptionModal()" class="btn-owner-edit" style="background:#10b981; color:white; border:none; padding:8px 16px; font-weight:800; border-radius:10px; cursor:pointer;">
-                    Renovar / Canjear Código
-                </button>
+                <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                    <button onclick="openRedeemCodeBox()" class="btn-owner-edit" style="background:#e67e22; color:white; border:none; padding:8px 14px; font-weight:800; border-radius:10px; cursor:pointer;">
+                        <i class="fas fa-gift"></i> Canjear Código Promo
+                    </button>
+                    <button onclick="if(window.openSubscriptionModal) window.openSubscriptionModal()" class="btn-owner-edit" style="background:#10b981; color:white; border:none; padding:8px 14px; font-weight:800; border-radius:10px; cursor:pointer;">
+                        <i class="fas fa-credit-card"></i> Pagar con Mercado Pago
+                    </button>
+                </div>
+            </div>
+
+            <!-- CAJA DE CANJE DE CÓDIGO DE PROMOCIÓN DIRECTA -->
+            <div id="redeemPromoBox" style="display:none; background:var(--bg-secondary); border:1px solid #e67e22; border-radius:16px; padding:16px 20px; margin-bottom:20px;">
+                <b style="font-size:0.95rem; color:#e67e22; display:block; margin-bottom:8px;"><i class="fas fa-ticket"></i> Ingresar Código Promocional</b>
+                <div style="display:flex; gap:10px; max-width:480px;">
+                    <input type="text" id="inputUserPromoCode" placeholder="Ej: REGALO3M" style="flex:1; height:42px; border-radius:10px; padding:6px 12px; background:var(--bg-main); border:1px solid var(--border); color:var(--text-primary); text-transform:uppercase; font-weight:800; letter-spacing:1px;">
+                    <button onclick="handleRedeemUserCode()" id="btnSubmitUserCode" style="background:#e67e22; color:white; border:none; padding:0 18px; border-radius:10px; font-weight:800; cursor:pointer;">
+                        Canjear
+                    </button>
+                </div>
+                <div id="userPromoResultMsg" style="font-size:0.85rem; font-weight:700; margin-top:8px;"></div>
             </div>
 
             <!-- BANDEJA DE MENSAJES DEL ADMINISTRADOR -->
@@ -331,12 +448,12 @@
                 </div>
             </div>
 
-            <!-- 2. GESTIÓN DE EXCURSIONES Y FLOTA DE MÓVILES/COMBIS -->
+            <!-- 2. GESTIÓN DE EXCURSIONES, FLOTA DE COMBIS Y MERCADO PAGO PROPIO -->
             <div class="dash-card" id="tabViewExcursiones" style="display:none;">
                 <div class="section-header-row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:18px;">
                     <div>
                         <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-van-shuttle" style="color:#0084ff;"></i> Gestión de Flota de Combis (BariRuta GPS)</h2>
-                        <small style="color:var(--text-secondary);">Configurá cada unidad de tu flota: marca, color, 3 últimos dígitos de patente y chofer.</small>
+                        <small style="color:var(--text-secondary);">Configurá tu empresa, tus cobros directos de Mercado Pago y cada unidad con marca, color y patente.</small>
                     </div>
                     <button class="btn-add-movil" onclick="addNewMovilToFleet()">
                         <i class="fas fa-plus"></i> Agregar Unidad
@@ -355,6 +472,22 @@
                         </div>
                     </div>
 
+                    <!-- AUTOMATIZACIÓN DE MERCADO PAGO DEL PRESTADOR DE EXCURSIONES -->
+                    <div style="background:rgba(0, 132, 255, 0.05); border:1px solid var(--primary); border-radius:16px; padding:16px; margin-bottom:20px;">
+                        <b style="font-size:0.95rem; display:block; margin-bottom:4px; color:var(--primary);"><i class="fas fa-wallet"></i> Automatización de Cobros por Mercado Pago (Opcional)</b>
+                        <small style="color:var(--text-secondary); display:block; margin-bottom:12px;">Ingresá tu Link de Pago o tus credenciales para que cuando el turista reserve su excursión, el dinero ingrese directo a tu cuenta.</small>
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+                            <div class="form-group-custom" style="margin-bottom:0;">
+                                <label style="font-size:0.78rem; font-weight:700;">Link de Pago / Alias / CVU de Mercado Pago</label>
+                                <input type="text" id="fleetMpLink" placeholder="Ej: https://mpago.la/xxxx o miempresa.mp" style="width:100%; height:40px; border-radius:8px; border:1px solid var(--border); padding:6px 10px; font-size:0.85rem; background:var(--bg-main); color:var(--text-primary);">
+                            </div>
+                            <div class="form-group-custom" style="margin-bottom:0;">
+                                <label style="font-size:0.78rem; font-weight:700;">Public Key de Mercado Pago (Opcional)</label>
+                                <input type="text" id="fleetMpPublicKey" placeholder="APP_USR-xxxx..." style="width:100%; height:40px; border-radius:8px; border:1px solid var(--border); padding:6px 10px; font-size:0.85rem; background:var(--bg-main); color:var(--text-primary);">
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="section-header-row" style="border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:15px;">
                         <h3 style="font-size:1.05rem; margin:0;"><i class="fas fa-car-side"></i> Unidades Registradas (<span id="fleetCountLabel">0</span>)</h3>
                     </div>
@@ -362,17 +495,17 @@
                     <div id="fleetMovilesList" class="fleet-grid"></div>
 
                     <button type="submit" id="btnSaveFleet" class="btn-submit-pickup" style="background:#0084ff; color:white; width:auto; padding:12px 28px; font-weight:800; margin-top:20px; border-radius:12px; border:none; cursor:pointer;">
-                        <i class="fas fa-floppy-disk"></i> Guardar Flota de Combis
+                        <i class="fas fa-floppy-disk"></i> Guardar Flota de Combis y Cobros
                     </button>
                 </form>
             </div>
 
-            <!-- 3. GESTIÓN DE ALOJAMIENTOS PROPIOS -->
+            <!-- 3. GESTIÓN DE ALOJAMIENTOS PROPIOS Y MERCADO PAGO -->
             <div class="dash-card" id="tabViewAlojamiento" style="display:none;">
                 <div class="section-header-row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:18px;">
                     <div>
                         <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-bed" style="color:#e67e22;"></i> Mis Alojamientos Publicados</h2>
-                        <small style="color:var(--text-secondary);">Gestioná tus cabañas, departamentos y casas en Bariloche con tarifas por noche y fotos.</small>
+                        <small style="color:var(--text-secondary);">Gestioná tus cabañas, departamentos y casas en Bariloche con tarifas por noche, fotos y reservas directas.</small>
                     </div>
                     <a href="alojamiento.html" class="btn-add-movil" style="background:#e67e22; text-decoration:none;">
                         <i class="fas fa-plus"></i> Publicar / Editar en Mapa
@@ -386,7 +519,7 @@
                 <div class="section-header-row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:18px;">
                     <div>
                         <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-utensils" style="color:#e74c3c;"></i> Mis Locales Gastronómicos</h2>
-                        <small style="color:var(--text-secondary);">Gestioná tus restaurantes, cervecerías, parrillas o chocolaterías con promos y WhatsApp.</small>
+                        <small style="color:var(--text-secondary);">Gestioná tus restaurantes, cervecerías, parrillas o chocolaterías con fotos, promociones y WhatsApp.</small>
                     </div>
                     <button class="btn-add-movil" onclick="openGastronomyEditor()" style="background:#e74c3c;">
                         <i class="fas fa-plus"></i> Agregar Local Gastronómico
@@ -397,9 +530,9 @@
         </div>
     </main>
 
-    <!-- MODAL EDITOR DE LOCAL GASTRONÓMICO -->
-    <div id="gastoEditorModal" class="modal-overlay" onclick="closeGastronomyEditor()">
-        <div class="modal-content" onclick="event.stopPropagation()" style="max-width:600px; background:#1e293b; color:white; border-radius:24px; padding:26px; border:1px solid rgba(255,255,255,0.15);">
+    <!-- MODAL EDITOR COMPLETO DE LOCAL GASTRONÓMICO CON AUTOCOMPLETADO DE CALLE, MAPA Y SUBIDA DE FOTOS -->
+    <div id="gastoEditorModal" class="modal-overlay" onclick="closeGastronomyEditor()" style="display:none; z-index:100000;">
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width:680px; width:95%; max-height:90vh; overflow-y:auto; background:#1e293b; color:white; border-radius:24px; padding:26px; border:1px solid rgba(255,255,255,0.15); box-shadow:0 25px 60px rgba(0,0,0,0.8);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
                 <h2 style="font-family:'Outfit'; font-size:1.4rem; margin:0;" id="gastoModalTitle"><i class="fas fa-utensils" style="color:#e74c3c;"></i> Publicar Local Gastronómico</h2>
                 <button onclick="closeGastronomyEditor()" style="background:none; border:none; color:#94a3b8; font-size:1.3rem; cursor:pointer;"><i class="fas fa-times"></i></button>
@@ -407,7 +540,10 @@
 
             <form onsubmit="handleSaveGastronomyForm(event)" id="gastoForm">
                 <input type="hidden" id="gastoEditId" value="">
-                
+                <input type="hidden" id="gastoLat" value="-41.1335">
+                <input type="hidden" id="gastoLng" value="-71.3103">
+                <input type="hidden" id="gastoExistingImagesInput" value="[]">
+
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:12px;">
                     <div class="form-group-custom">
                         <label style="font-size:0.82rem; font-weight:700;">Nombre del Local</label>
@@ -415,36 +551,59 @@
                     </div>
                     <div class="form-group-custom">
                         <label style="font-size:0.82rem; font-weight:700;">Tipo de Gastronomía</label>
-                        <select id="gastoType" style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
+                        <select id="gastoType" onchange="toggleCustomGastronomyType(this.value)" style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
                             <option value="Cervecería Artesanal">🍺 Cervecería Artesanal</option>
-                            <option value="Parrilla Argentina">🥩 Parrilla Argentina</option>
+                            <option value="Parrilla Argentina">🥩 Parrilla Argentina / Asador</option>
                             <option value="Chocolatería y Heladería">🍫 Chocolatería y Heladería</option>
                             <option value="Restaurante y Pizzería">🍕 Restaurante y Pizzería</option>
                             <option value="Bodegón Tradicional">🥘 Bodegón Tradicional</option>
-                            <option value="Cafetería de Montaña">☕ Cafetería de Montaña</option>
+                            <option value="Cafetería de Montaña">☕ Cafetería / Casa de Té</option>
+                            <option value="Sushi y Cocina de Autor">🍣 Sushi / Cocina de Autor</option>
+                            <option value="Hamburguesería y Minutas">🍔 Hamburguesería y Minutas</option>
+                            <option value="otro">✨ Otro (Especificar personalizado)</option>
                         </select>
                     </div>
                 </div>
 
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:12px;">
-                    <div class="form-group-custom">
-                        <label style="font-size:0.82rem; font-weight:700;">Ubicación / Dirección</label>
-                        <input type="text" id="gastoLocation" required placeholder="Ej: Circuito Chico Km 24.7" style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
+                <!-- CAMPO CONDICIONAL SI ELIGE "OTRO" TIPO DE GASTRONOMÍA -->
+                <div class="form-group-custom" id="customGastronomyTypeBox" style="display:none; margin-bottom:12px;">
+                    <label style="font-size:0.82rem; font-weight:700; color:#38bdf8;">¿Cuál es el tipo de negocio? (Especificá cómo querés que figure)</label>
+                    <input type="text" id="gastoCustomTypeInput" placeholder="Ej: Pastelería Francesa, Comida Vegana, Bar de Tapas..." style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #38bdf8; color:white;">
+                </div>
+
+                <!-- AUTOCOMPLETADO DE DIRECCIÓN / CALLES (BARILOCHE Y ALREDEDORES) -->
+                <div class="form-group-custom" style="position:relative; margin-bottom:12px;">
+                    <label style="font-size:0.82rem; font-weight:700;">Ubicación / Dirección en Bariloche (con autocompletado y numeración)</label>
+                    <div style="position:relative; display:flex; align-items:center;">
+                        <input type="text" id="gastoLocation" required oninput="handleGastoAddressInput(this.value)" placeholder="Escribí la calle (Ej: Mitre 450, Bustillo Km 5, San Martín...)" style="width:100%; height:44px; border-radius:10px; padding:8px 38px 8px 12px; background:#0f172a; border:1px solid #334155; color:white;" autocomplete="off">
+                        <i class="fas fa-search" style="position:absolute; right:12px; color:#94a3b8;"></i>
                     </div>
+                    <div id="gastoAddressSuggestions" class="address-suggestions-box" style="display:none;"></div>
+                </div>
+
+                <!-- MINI MAPA LEAFLET CON PIN ARRASTRABLE PARA AJUSTE EXACTO -->
+                <div style="margin-bottom:14px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <small style="color:#94a3b8;"><i class="fas fa-map-pin" style="color:#ef4444;"></i> Arrastrá el marcador en el mapa para ubicar la entrada exacta:</small>
+                        <span id="gastoCoordsBadge" style="font-size:0.75rem; color:#38bdf8; font-weight:700;">-41.1335, -71.3103</span>
+                    </div>
+                    <div id="gastoPickerMapContainer" style="height:170px; border-radius:12px; border:1px solid #334155; z-index:1;"></div>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:12px;">
                     <div class="form-group-custom">
                         <label style="font-size:0.82rem; font-weight:700;">Teléfono / WhatsApp de Reservas</label>
                         <input type="text" id="gastoPhone" required placeholder="Ej: 5492944123456" style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
                     </div>
-                </div>
-
-                <div class="form-group-custom" style="margin-bottom:12px;">
-                    <label style="font-size:0.82rem; font-weight:700;">Especialidades de la Casa</label>
-                    <input type="text" id="gastoSpecialty" placeholder="Ej: Ojo de bife, Trucha ahumada, Cervezas exclusivas" style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
+                    <div class="form-group-custom">
+                        <label style="font-size:0.82rem; font-weight:700;">Especialidades de la Casa</label>
+                        <input type="text" id="gastoSpecialty" placeholder="Ej: Ojo de bife, Trucha ahumada, Cerveza IPA" style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
+                    </div>
                 </div>
 
                 <div class="form-group-custom" style="margin-bottom:12px;">
                     <label style="font-size:0.82rem; font-weight:700;">Promoción / Beneficio para Clientes</label>
-                    <input type="text" id="gastoPromo" placeholder="Ej: Happy Hour 17 a 19hs - 2x1 en Pintas" style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
+                    <input type="text" id="gastoPromo" placeholder="Ej: Happy Hour 17 a 19hs - 20% OFF en efectivo" style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
                 </div>
 
                 <div class="form-group-custom" style="margin-bottom:12px;">
@@ -452,15 +611,24 @@
                     <textarea id="gastoDesc" rows="2" placeholder="Describí el ambiente, atención y propuesta gastronómica..." style="width:100%; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white; resize:vertical;"></textarea>
                 </div>
 
+                <!-- SUBIDA REAL DE HASTA 3 FOTOS (GUARDADAS EN EL SERVIDOR) -->
                 <div class="form-group-custom" style="margin-bottom:16px;">
-                    <label style="font-size:0.82rem; font-weight:700;">URL de Foto Principal</label>
-                    <input type="url" id="gastoImgUrl" placeholder="https://images.unsplash.com/photo-..." style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
+                    <label style="font-size:0.82rem; font-weight:700; display:block; margin-bottom:6px;"><i class="fas fa-camera"></i> Fotos del Local (Hasta 3 fotos)</label>
+                    
+                    <div class="image-upload-zone" onclick="document.getElementById('gastoFileInput').click()">
+                        <i class="fas fa-cloud-arrow-up" style="font-size:1.8rem; color:#38bdf8; margin-bottom:6px; display:block;"></i>
+                        <b style="color:#ffffff; font-size:0.9rem; display:block;">Hacé clic para seleccionar hasta 3 fotos</b>
+                        <small style="color:#94a3b8;">Formatos JPG, PNG, WEBP (Se guardan automáticamente en tu ficha)</small>
+                        <input type="file" id="gastoFileInput" multiple accept="image/*" style="display:none;" onchange="handleGastoFilesSelect(event)">
+                    </div>
+
+                    <div id="gastoImagePreviewGrid" class="image-preview-grid"></div>
                 </div>
 
-                <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
                     <button type="button" onclick="closeGastronomyEditor()" style="background:#334155; color:white; border:none; padding:10px 18px; border-radius:10px; cursor:pointer;">Cancelar</button>
-                    <button type="submit" id="btnSaveGasto" style="background:#e74c3c; color:white; border:none; padding:10px 22px; font-weight:800; border-radius:10px; cursor:pointer;">
-                        <i class="fas fa-check"></i> Guardar Local
+                    <button type="submit" id="btnSaveGasto" style="background:#e74c3c; color:white; border:none; padding:10px 24px; font-weight:800; border-radius:10px; cursor:pointer;">
+                        <i class="fas fa-check"></i> Guardar Local Gastronómico
                     </button>
                 </div>
             </form>
@@ -492,14 +660,22 @@
     </nav>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="auth_manager.js?v=2230"></script>
-    <script src="app.js?v=2230"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="auth_manager.js?v=2240"></script>
+    <script src="app.js?v=2240"></script>
     <script>
         let currentPrices = { excursiones: 10000, alojamiento: 10000, gastronomia: 10000, combo_2_descuento: 10, combo_3_descuento: 20 };
         let currentProviderData = null;
         let myFleetMoviles = [];
         let myAccommodations = [];
         let myGastronomy = [];
+
+        // Variables de fotos y mapa de gastronomía
+        let gastoSelectedFiles = [];
+        let gastoExistingImages = [];
+        let gastoPickerMap = null;
+        let gastoPickerMarker = null;
+        let gastoAddressDebounce = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             loadPrices();
@@ -607,6 +783,8 @@
                     if (currentProviderData) {
                         document.getElementById('fleetCompanyName').value = currentProviderData.business_name || '';
                         document.getElementById('fleetCompanyPhone').value = currentProviderData.phone || '';
+                        if (document.getElementById('fleetMpLink')) document.getElementById('fleetMpLink').value = currentProviderData.mp_link || '';
+                        if (document.getElementById('fleetMpPublicKey')) document.getElementById('fleetMpPublicKey').value = currentProviderData.mp_public_key || '';
                         myFleetMoviles = currentProviderData.moviles || [];
                     }
 
@@ -622,6 +800,9 @@
                     renderMyAccommodations(myAccommodations);
                     renderMyGastronomy(myGastronomy);
 
+                    // Verificar estado de suscripción / canje del usuario
+                    checkUserSubscriptionState(email);
+
                     // Si tiene un solo servicio elegido, abrir su pestaña directamente
                     if (services.length === 1) {
                         switchDashboardTab(services[0]);
@@ -629,6 +810,92 @@
                 }
             } catch (e) {
                 console.error('Error al cargar perfil:', e);
+            }
+        }
+
+        async function checkUserSubscriptionState(email) {
+            const banner = document.getElementById('panelSubBanner');
+            const title = document.getElementById('subNoticeTitle');
+            const details = document.getElementById('subNoticeDetails');
+            const icon = document.getElementById('subBannerIcon');
+
+            try {
+                const res = await fetch(`save_alojamiento.php?action=check_subscription&email=${encodeURIComponent(email)}&t=${Date.now()}`);
+                const data = await res.json();
+
+                if (data && (data.is_admin || (data.active && data.expires_at))) {
+                    if (data.is_admin) {
+                        title.textContent = 'Cuenta de Administrador Vitalicia';
+                        details.textContent = 'Acceso total permanente e ilimitado para gestionar todos los servicios.';
+                        title.style.color = '#e74c3c';
+                        icon.className = 'fas fa-user-shield';
+                        icon.style.color = '#e74c3c';
+                    } else {
+                        const expDate = new Date(data.expires_at);
+                        const formatted = expDate.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                        title.textContent = 'Suscripción / Beneficio Activo';
+                        details.textContent = `Tu cuenta está activa en el mapa hasta el ${formatted}.`;
+                        title.style.color = '#10b981';
+                        icon.className = 'fas fa-calendar-check';
+                        icon.style.color = '#10b981';
+                    }
+                } else {
+                    title.textContent = 'Suscripción No Activa / Vencida';
+                    details.textContent = 'Pagá con Mercado Pago ($10.000) o canjeá tu código promocional para que tus fichas aparezcan en el mapa.';
+                    title.style.color = '#ef4444';
+                    icon.className = 'fas fa-exclamation-circle';
+                    icon.style.color = '#ef4444';
+                }
+            } catch (e) {}
+        }
+
+        function openRedeemCodeBox() {
+            const box = document.getElementById('redeemPromoBox');
+            if (box) {
+                box.style.display = (box.style.display === 'none' || !box.style.display) ? 'block' : 'none';
+            }
+        }
+
+        async function handleRedeemUserCode() {
+            if (!window.authManager.currentUser) return;
+            const email = window.authManager.currentUser.email;
+            const codeInput = document.getElementById('inputUserPromoCode');
+            const resultMsg = document.getElementById('userPromoResultMsg');
+            const btn = document.getElementById('btnSubmitUserCode');
+
+            const code = codeInput ? codeInput.value.trim().toUpperCase() : '';
+            if (!code) {
+                resultMsg.textContent = '⚠️ Ingresá un código.';
+                resultMsg.style.color = '#ef4444';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            try {
+                const res = await fetch('save_alojamiento.php?action=redeem_code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, code })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    resultMsg.textContent = '🎉 ¡' + data.message + '!';
+                    resultMsg.style.color = '#10b981';
+                    codeInput.value = '';
+                    checkUserSubscriptionState(email);
+                    if (window.authManager) window.authManager.updateUI();
+                } else {
+                    resultMsg.textContent = '❌ ' + (data.message || 'Código inválido o agotado');
+                    resultMsg.style.color = '#ef4444';
+                }
+            } catch (e) {
+                resultMsg.textContent = 'Error al validar el código';
+                resultMsg.style.color = '#ef4444';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Canjear';
             }
         }
 
@@ -717,6 +984,8 @@
                         services: selectedServices,
                         business_name: document.getElementById('fleetCompanyName')?.value || '',
                         phone: document.getElementById('fleetCompanyPhone')?.value || '',
+                        mp_link: document.getElementById('fleetMpLink')?.value || '',
+                        mp_public_key: document.getElementById('fleetMpPublicKey')?.value || '',
                         moviles: myFleetMoviles
                     })
                 });
@@ -744,7 +1013,7 @@
             await saveSelectedServicesConfig();
 
             btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-floppy-disk"></i> Guardar Flota de Combis';
+            btn.innerHTML = '<i class="fas fa-floppy-disk"></i> Guardar Flota de Combis y Cobros';
         }
 
         function renderMyAccommodations(list) {
@@ -799,6 +1068,15 @@
             `).join('');
         }
 
+        // ==================== GESTIÓN Y EDITOR DE LOCAL GASTRONÓMICO ====================
+
+        function toggleCustomGastronomyType(val) {
+            const box = document.getElementById('customGastronomyTypeBox');
+            if (box) {
+                box.style.display = (val === 'otro') ? 'block' : 'none';
+            }
+        }
+
         function openGastronomyEditor() {
             document.getElementById('gastoEditId').value = '';
             document.getElementById('gastoName').value = '';
@@ -807,9 +1085,23 @@
             document.getElementById('gastoSpecialty').value = '';
             document.getElementById('gastoPromo').value = '';
             document.getElementById('gastoDesc').value = '';
-            document.getElementById('gastoImgUrl').value = '';
+            document.getElementById('gastoType').value = 'Cervecería Artesanal';
+            document.getElementById('gastoCustomTypeInput').value = '';
+            toggleCustomGastronomyType('Cervecería Artesanal');
+
+            gastoSelectedFiles = [];
+            gastoExistingImages = [];
+            document.getElementById('gastoExistingImagesInput').value = '[]';
+            renderGastoImagePreviews();
+
+            document.getElementById('gastoLat').value = '-41.1335';
+            document.getElementById('gastoLng').value = '-71.3103';
+            document.getElementById('gastoCoordsBadge').textContent = '-41.1335, -71.3103';
+
             document.getElementById('gastoModalTitle').innerHTML = '<i class="fas fa-utensils" style="color:#e74c3c;"></i> Agregar Local Gastronómico';
             document.getElementById('gastoEditorModal').style.display = 'flex';
+
+            initGastoPickerMap([-41.1335, -71.3103]);
         }
 
         function editGastronomyItem(id) {
@@ -818,19 +1110,217 @@
 
             document.getElementById('gastoEditId').value = item.id;
             document.getElementById('gastoName').value = item.name || '';
-            document.getElementById('gastoType').value = item.type || 'Restaurante';
+            
+            const standardTypes = ['Cervecería Artesanal', 'Parrilla Argentina', 'Chocolatería y Heladería', 'Restaurante y Pizzería', 'Bodegón Tradicional', 'Cafetería de Montaña', 'Sushi y Cocina de Autor', 'Hamburguesería y Minutas'];
+            if (standardTypes.includes(item.type)) {
+                document.getElementById('gastoType').value = item.type;
+                toggleCustomGastronomyType(item.type);
+            } else {
+                document.getElementById('gastoType').value = 'otro';
+                toggleCustomGastronomyType('otro');
+                document.getElementById('gastoCustomTypeInput').value = item.type || '';
+            }
+
             document.getElementById('gastoLocation').value = item.location || '';
             document.getElementById('gastoPhone').value = item.phone || '';
             document.getElementById('gastoSpecialty').value = item.specialty || '';
             document.getElementById('gastoPromo').value = item.promo || '';
             document.getElementById('gastoDesc').value = item.description || '';
-            document.getElementById('gastoImgUrl').value = (item.images && item.images[0]) || item.image || '';
+
+            gastoSelectedFiles = [];
+            gastoExistingImages = item.images || (item.image ? [item.image] : []);
+            document.getElementById('gastoExistingImagesInput').value = JSON.stringify(gastoExistingImages);
+            renderGastoImagePreviews();
+
+            const lat = parseFloat(item.lat) || -41.1335;
+            const lng = parseFloat(item.lng) || -71.3103;
+            document.getElementById('gastoLat').value = lat;
+            document.getElementById('gastoLng').value = lng;
+            document.getElementById('gastoCoordsBadge').textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+
             document.getElementById('gastoModalTitle').innerHTML = '<i class="fas fa-edit" style="color:#e74c3c;"></i> Editar Local Gastronómico';
             document.getElementById('gastoEditorModal').style.display = 'flex';
+
+            initGastoPickerMap([lat, lng]);
         }
 
         function closeGastronomyEditor() {
             document.getElementById('gastoEditorModal').style.display = 'none';
+        }
+
+        // AUTOCOMPLETADO DE DIRECCIÓN / CALLE PARA GASTRONOMÍA
+        function handleGastoAddressInput(val) {
+            clearTimeout(gastoAddressDebounce);
+            const suggBox = document.getElementById('gastoAddressSuggestions');
+            const clean = val.trim();
+
+            if (clean.length < 2) {
+                if (suggBox) suggBox.style.display = 'none';
+                return;
+            }
+
+            gastoAddressDebounce = setTimeout(() => {
+                fetchGastoAddressSuggestions(clean);
+            }, 250);
+        }
+
+        async function fetchGastoAddressSuggestions(query) {
+            const suggBox = document.getElementById('gastoAddressSuggestions');
+            if (!suggBox) return;
+
+            try {
+                let items = [];
+
+                // 1. Photon API sesgado en Bariloche
+                try {
+                    const photonUrl = `https://photon.komoot.io/api/?q=${encodeURIComponent(query + ' Bariloche')}&lat=-41.1335&lon=-71.3103&limit=8`;
+                    const res = await fetch(photonUrl);
+                    const data = await res.json();
+                    if (data && data.features && data.features.length > 0) {
+                        items = data.features.map(f => {
+                            const lon = f.geometry.coordinates[0];
+                            const lat = f.geometry.coordinates[1];
+                            const p = f.properties || {};
+                            const street = p.street || p.name || query;
+                            const num = p.housenumber ? ` ${p.housenumber}` : '';
+                            const neighborhood = p.district || p.suburb || p.locality || p.city || 'Bariloche';
+                            const label = `${street}${num}, ${neighborhood}`;
+                            return { lat, lon, street, num, neighborhood, label };
+                        });
+                    }
+                } catch (ePhoton) {}
+
+                // 2. Fallback con OpenStreetMap Nominatim
+                if (items.length === 0) {
+                    const nomUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', San Carlos de Bariloche, Argentina')}&viewbox=-71.60,-41.05,-71.10,-41.30&bounded=0&limit=6&addressdetails=1`;
+                    const nomRes = await fetch(nomUrl, { headers: { 'Accept-Language': 'es' } });
+                    const nomData = await nomRes.json();
+                    if (nomData && nomData.length > 0) {
+                        items = nomData.map(item => {
+                            const lat = parseFloat(item.lat);
+                            const lon = parseFloat(item.lon);
+                            const addr = item.address || {};
+                            const road = addr.road || addr.pedestrian || addr.street || item.name || query;
+                            const houseNumber = addr.house_number ? ` ${addr.house_number}` : '';
+                            const suburb = addr.suburb || addr.neighbourhood || addr.city_district || 'Bariloche';
+                            const label = `${road}${houseNumber}, ${suburb}`;
+                            return { lat, lon, street: road, num: houseNumber, neighborhood: suburb, label };
+                        });
+                    }
+                }
+
+                if (items.length === 0) {
+                    suggBox.innerHTML = '<div class="suggestion-item" style="color:#94a3b8; cursor:default;"><i class="fas fa-info-circle"></i> No se encontraron sugerencias exactas. Arrastrá el marcador en el mapa.</div>';
+                    suggBox.style.display = 'block';
+                    return;
+                }
+
+                suggBox.innerHTML = items.map(item => `
+                    <div class="suggestion-item" onclick="selectGastoAddress(${item.lat}, ${item.lon}, '${item.label.replace(/'/g, "\\'")}')">
+                        <i class="fas fa-location-dot" style="color:#e74c3c; font-size:1.1rem; flex-shrink:0;"></i>
+                        <div>
+                            <div style="font-weight:700; color:#fff;">${item.street}${item.num}</div>
+                            <small style="color:#94a3b8; font-size:0.75rem;">${item.neighborhood}, San Carlos de Bariloche</small>
+                        </div>
+                    </div>
+                `).join('');
+
+                suggBox.style.display = 'block';
+            } catch (e) {
+                console.warn('Error al buscar dirección de gastronomía:', e);
+            }
+        }
+
+        function selectGastoAddress(lat, lon, label) {
+            document.getElementById('gastoLat').value = lat.toFixed(6);
+            document.getElementById('gastoLng').value = lon.toFixed(6);
+            document.getElementById('gastoLocation').value = label;
+            document.getElementById('gastoCoordsBadge').textContent = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+
+            const suggBox = document.getElementById('gastoAddressSuggestions');
+            if (suggBox) suggBox.style.display = 'none';
+
+            if (gastoPickerMap && gastoPickerMarker) {
+                gastoPickerMap.setView([lat, lon], 15);
+                gastoPickerMarker.setLatLng([lat, lon]);
+            }
+        }
+
+        function initGastoPickerMap(coords) {
+            setTimeout(() => {
+                const container = document.getElementById('gastoPickerMapContainer');
+                if (!container) return;
+
+                if (!gastoPickerMap) {
+                    gastoPickerMap = L.map('gastoPickerMapContainer', { zoomControl: false }).setView(coords, 14);
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                        maxZoom: 18
+                    }).addTo(gastoPickerMap);
+
+                    gastoPickerMarker = L.marker(coords, { draggable: true }).addTo(gastoPickerMap);
+
+                    gastoPickerMarker.on('dragend', function (e) {
+                        const pos = e.target.getLatLng();
+                        document.getElementById('gastoLat').value = pos.lat.toFixed(6);
+                        document.getElementById('gastoLng').value = pos.lng.toFixed(6);
+                        document.getElementById('gastoCoordsBadge').textContent = `${pos.lat.toFixed(4)}, ${pos.lng.toFixed(4)}`;
+                    });
+                } else {
+                    gastoPickerMap.invalidateSize();
+                    gastoPickerMap.setView(coords, 14);
+                    gastoPickerMarker.setLatLng(coords);
+                }
+            }, 300);
+        }
+
+        // SUBIDA Y PREVIEWS DE FOTOS (HASTA 3 FOTOS)
+        function handleGastoFilesSelect(e) {
+            const files = Array.from(e.target.files);
+            const totalAllowed = 3 - gastoExistingImages.length;
+            const newFiles = files.slice(0, totalAllowed);
+
+            gastoSelectedFiles = gastoSelectedFiles.concat(newFiles).slice(0, totalAllowed);
+            renderGastoImagePreviews();
+        }
+
+        function removeGastoExistingImage(idx) {
+            gastoExistingImages.splice(idx, 1);
+            document.getElementById('gastoExistingImagesInput').value = JSON.stringify(gastoExistingImages);
+            renderGastoImagePreviews();
+        }
+
+        function removeGastoNewFile(idx) {
+            gastoSelectedFiles.splice(idx, 1);
+            renderGastoImagePreviews();
+        }
+
+        function renderGastoImagePreviews() {
+            const grid = document.getElementById('gastoImagePreviewGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            gastoExistingImages.forEach((imgUrl, idx) => {
+                const card = document.createElement('div');
+                card.className = 'image-preview-card';
+                card.innerHTML = `
+                    <img src="${imgUrl}" alt="Foto ${idx + 1}">
+                    <span class="image-preview-badge">Foto ${idx + 1}</span>
+                    <button type="button" class="btn-remove-preview-img" onclick="removeGastoExistingImage(${idx})" title="Eliminar foto"><i class="fas fa-times"></i></button>
+                `;
+                grid.appendChild(card);
+            });
+
+            gastoSelectedFiles.forEach((file, idx) => {
+                const objectUrl = URL.createObjectURL(file);
+                const card = document.createElement('div');
+                card.className = 'image-preview-card';
+                card.innerHTML = `
+                    <img src="${objectUrl}" alt="Nueva ${idx + 1}">
+                    <span class="image-preview-badge" style="background:#10b981;">Nueva ${idx + 1}</span>
+                    <button type="button" class="btn-remove-preview-img" onclick="removeGastoNewFile(${idx})" title="Eliminar foto"><i class="fas fa-times"></i></button>
+                `;
+                grid.appendChild(card);
+            });
         }
 
         async function handleSaveGastronomyForm(e) {
@@ -840,23 +1330,30 @@
 
             const btn = document.getElementById('btnSaveGasto');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subiendo y guardando...';
 
             const editId = document.getElementById('gastoEditId').value;
-            const imgUrl = document.getElementById('gastoImgUrl').value.trim();
-            const existingImages = imgUrl ? [imgUrl] : [];
+            const selectType = document.getElementById('gastoType').value;
+            const finalType = (selectType === 'otro') ? (document.getElementById('gastoCustomTypeInput').value.trim() || 'Gastronomía') : selectType;
 
             const formData = new FormData();
             formData.append('owner_email', email);
             if (editId) formData.append('id', editId);
             formData.append('name', document.getElementById('gastoName').value.trim());
-            formData.append('type', document.getElementById('gastoType').value);
+            formData.append('type', finalType);
             formData.append('location', document.getElementById('gastoLocation').value.trim());
             formData.append('phone', document.getElementById('gastoPhone').value.trim());
             formData.append('specialty', document.getElementById('gastoSpecialty').value.trim());
             formData.append('promo', document.getElementById('gastoPromo').value.trim());
             formData.append('description', document.getElementById('gastoDesc').value.trim());
-            formData.append('existing_images', JSON.stringify(existingImages));
+            formData.append('lat', document.getElementById('gastoLat').value);
+            formData.append('lng', document.getElementById('gastoLng').value);
+            formData.append('existing_images', JSON.stringify(gastoExistingImages));
+
+            // Adjuntar hasta 3 fotos subidas
+            gastoSelectedFiles.forEach((file) => {
+                formData.append('images[]', file);
+            });
 
             try {
                 const res = await fetch('save_alojamiento.php?action=save_gastronomia', {
@@ -865,7 +1362,7 @@
                 });
                 const data = await res.json();
                 if (data.status === 'success') {
-                    alert('🎉 ¡Local gastronómico guardado con éxito!');
+                    alert('🎉 ¡Local gastronómico guardado y publicado con éxito!');
                     closeGastronomyEditor();
                     loadUserDashboard(email);
                 } else {
@@ -875,7 +1372,7 @@
                 alert('Error al guardar local gastronómico');
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-check"></i> Guardar Local';
+                btn.innerHTML = '<i class="fas fa-check"></i> Guardar Local Gastronómico';
             }
         }
 
