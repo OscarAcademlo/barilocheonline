@@ -9,9 +9,8 @@
     "lat": -41.0777,
     "lng": -71.5422,
     "images": [
-      "https://images.unsplash.com/photo-1574096079513-a82f09919cf7?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1538488881522-4326c363863f?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&q=80&w=800"
+      "img/gastronomia/patagonia.jpg",
+      "img/gastronomia/cerveza_cabeza.jpg"
     ],
     "description": "El refugio icónico de Cerveza Patagonia. Imperdible vista panorámica al lago Nahuel Huapi, cervezas tiradas exclusivas y un menú que combina carnes ahumadas, pizzas y tablas de montaña.",
     "specialty": "Cerveza Patagonia, Carnes Ahumadas, Entradas",
@@ -28,12 +27,11 @@
     "type": "Parrilla Argentina",
     "location": "Villegas 347, Centro",
     "rating": 4.9,
-    "lat": -41.133,
-    "lng": -71.309,
+    "lat": -41.1345,
+    "lng": -71.3092,
     "images": [
-      "https://images.unsplash.com/photo-1544025162-8e6ff05b38ed?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=800"
+      "img/gastronomia/alberto.jpg",
+      "img/gastronomia/fonda.jpg"
     ],
     "description": "La parrilla más clásica y recomendada de Bariloche. Cortes de carne de primera calidad, porciones súper abundantes y las mejores papas fritas provenzal de la Patagonia.",
     "specialty": "Ojo de bife, Bife de Chorizo, Papas fritas",
@@ -50,12 +48,10 @@
     "type": "Chocolatería y Heladería",
     "location": "Mitre 202, Centro",
     "rating": 4.9,
-    "lat": -41.134,
-    "lng": -71.311,
+    "lat": -41.1338,
+    "lng": -71.3115,
     "images": [
-      "https://images.unsplash.com/photo-1621510456681-2330135e5871?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1579372786545-d24232daf58c?auto=format&fit=crop&q=80&w=800"
+      "img/gastronomia/rapanui.jpg"
     ],
     "description": "El paraíso dulce en pleno centro. Degustá chocolates artesanales, sus famosos 'Franui' y helados únicos en el local tradicional con pista de patinaje sobre hielo.",
     "specialty": "Chocolates Artesanales, Franui, Pista de Hielo",
@@ -72,12 +68,10 @@
     "type": "Restaurante y Heladería",
     "location": "Moreno y Quaglia, Centro",
     "rating": 4.6,
-    "lat": -41.135,
-    "lng": -71.308,
+    "lat": -41.1355,
+    "lng": -71.3075,
     "images": [
-      "https://images.unsplash.com/photo-1590947132387-155cc02f3212?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=800"
+      "img/gastronomia/jauja.jpg"
     ],
     "description": "Un clásico con opciones para todos los gustos: pizzas a la piedra, pastas caseras, trucha patagónica, platos vegetarianos y los helados más originales de la región.",
     "specialty": "Trucha patagónica, Pastas caseras, Helados",
@@ -94,12 +88,10 @@
     "type": "Bodegón Tradicional",
     "location": "Mitre 1130, Bariloche",
     "rating": 4.8,
-    "lat": -41.131,
-    "lng": -71.298,
+    "lat": -41.1310,
+    "lng": -71.2980,
     "images": [
-      "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1544025162-8e6ff05b38ed?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=800"
+      "img/gastronomia/fonda.jpg"
     ],
     "description": "El bodegón más famoso de Bariloche por sus milanesas gigantes a la napolitana. Platos tradicionales, caseros y súper abundantes que alimentan a toda la familia.",
     "specialty": "Milanesa Napolitana Gigante, Pastas, Papas",

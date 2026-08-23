@@ -971,7 +971,7 @@ if ($action === 'save_gastronomia') {
     $existingImages = json_decode($_POST['existing_images'] ?? '[]', true) ?: [];
     $allImages = array_merge($existingImages, $uploadedImages);
     if (empty($allImages)) {
-        $allImages = ['https://images.unsplash.com/photo-1574096079513-a82f09919cf7?auto=format&fit=crop&q=80&w=800'];
+        $allImages = ['img/gastronomia/patagonia.jpg'];
     }
 
     $gastoId = $_POST['id'] ?? ('gasto_' . time());
