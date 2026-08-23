@@ -135,12 +135,12 @@ function renderGastronomy() {
     if (count) count.textContent = `${GASTRONOMY.length} opciones gastronómicas en Bariloche`;
 
     list.innerHTML = GASTRONOMY.map(rest => {
-        const coverImg = (rest.images && rest.images[0]) || rest.image || 'https://images.unsplash.com/photo-1574096079513-a82f09919cf7?auto=format&fit=crop&q=80&w=800';
+        const coverImg = (rest.images && rest.images.length > 0 && rest.images[0]) ? rest.images[0] : (rest.image || 'https://images.unsplash.com/photo-1574096079513-a82f09919cf7?auto=format&fit=crop&q=80&w=800');
 
         return `
             <div class="accommodation-card-airbnb" onclick="showGastronomyDetails('${rest.id}')">
                 <div class="accommodation-img-wrapper">
-                    <img src="${coverImg}" alt="${rest.name}">
+                    <img src="${coverImg}" alt="${rest.name}" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800';">
                     <div class="accommodation-price-badge" style="background:#e67e22; border-radius: 10px; font-size:0.75rem; font-weight:800;">${rest.type || 'Gastronomía'}</div>
                 </div>
                 <div class="accommodation-info-airbnb">
@@ -295,7 +295,7 @@ function renderFilteredGastronomy(listToRender) {
         return `
             <div class="accommodation-card-airbnb" onclick="showGastronomyDetails('${rest.id}')">
                 <div class="accommodation-img-wrapper">
-                    <img src="${coverImg}" alt="${rest.name}">
+                    <img src="${coverImg}" alt="${rest.name}" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800';">
                     <div class="accommodation-price-badge" style="background:#e67e22; border-radius: 10px; font-size:0.75rem; font-weight:800;">${rest.type || 'Gastronomía'}</div>
                 </div>
                 <div class="accommodation-info-airbnb">
