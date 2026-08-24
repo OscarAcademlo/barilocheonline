@@ -105,6 +105,30 @@ window.handleCompanyChange = (companyName) => {
     vehicleTracks = {};
 };
 
+const COMPANY_PALETTE = [
+    '#0084FF', // Azul Bariloche
+    '#6C5CE7', // Violeta Real
+    '#00B894', // Verde Esmeralda
+    '#E17055', // Naranja Terracota
+    '#E84393', // Rosa Intenso
+    '#F39C12', // Amarillo Oro
+    '#00CEC9', // Turquesa
+    '#D63031', // Rojo Rubí
+    '#0984E3', // Azul Cielo
+    '#10B981'  // Verde Menta
+];
+
+function getCompanyColor(companyName) {
+    if (!companyName) return '#0084FF';
+    let hash = 0;
+    const str = companyName.toLowerCase().trim();
+    for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % COMPANY_PALETTE.length;
+    return COMPANY_PALETTE[index];
+}
+
 /**
  * 3. RENDERIZAR Y ANIMAR VEHÍCULOS Y SU RECORRIDO EN TIEMPO REAL
  */
@@ -147,35 +171,42 @@ function renderLiveVehicles(vehicles) {
         // Evita duplicados entre datos de Broadcast (sin id) y datos de DB (con id)
         const key = `${(veh.company_name || '').trim().toLowerCase()}|${(veh.vehicle_code || '').trim().toLowerCase()}`;
         const latLng = [veh.lat, veh.lng];
+        const compColor = getCompanyColor(veh.company_name);
 
         // --- ACTUALIZAR TRAZADO DEL RECORRIDO EN TIEMPO REAL ---
         if (!vehicleTracks[key]) {
-            vehicleTracks[key] = [];
+            vehicleTracks[key] = [latLng];
         }
         
         const track = vehicleTracks[key];
         const lastPoint = track.length > 0 ? track[track.length - 1] : null;
         
-        // Agregar punto si es nuevo o se ha movido
-        if (!lastPoint || (Math.abs(lastPoint[0] - veh.lat) > 0.00002 || Math.abs(lastPoint[1] - veh.lng) > 0.00002)) {
-            track.push(latLng);
-            // Limitar longitud máxima de la traza para rendimiento óptimo
-            if (track.length > 1000) track.shift();
-        }
-
-        // Dibujar o actualizar polilínea del recorrido
-        if (track.length > 1) {
-            if (vehiclePolylines[key]) {
-                vehiclePolylines[key].setLatLngs(track);
-            } else {
-                vehiclePolylines[key] = L.polyline(track, {
-                    color: '#0084FF',
-                    weight: 5,
-                    opacity: 0.85,
-                    lineCap: 'round',
-                    lineJoin: 'round',
-                    dashArray: null
-                }).addTo(map);
+        if (lastPoint) {
+            // Calcular distancia en metros desde el último punto
+            const distMeters = map.distance(lastPoint, latLng);
+            
+            // Si hubo un salto brusco mayor a 500 metros (reinicio de GPS o punto de prueba anterior), reiniciar traza
+            if (distMeters > 500) {
+                vehicleTracks[key] = [latLng];
+                if (vehiclePolylines[key]) {
+                    vehiclePolylines[key].setLatLngs([latLng]);
+                }
+            } else if (distMeters >= 12 && (veh.speed || 0) > 2) {
+                // Solo registrar nuevo punto si el vehículo REALMENTE se desplazó más de 12 metros y está en movimiento
+                track.push(latLng);
+                if (track.length > 500) track.shift();
+                
+                if (vehiclePolylines[key]) {
+                    vehiclePolylines[key].setLatLngs(track);
+                } else {
+                    vehiclePolylines[key] = L.polyline(track, {
+                        color: compColor,
+                        weight: 4,
+                        opacity: 0.8,
+                        lineCap: 'round',
+                        lineJoin: 'round'
+                    }).addTo(map);
+                }
             }
         }
 
@@ -193,18 +224,18 @@ function renderLiveVehicles(vehicles) {
         );
         const companyPhone = currentCompany?.phone || '+5492944123456';
 
-        // Marcador combi BLANCA con animación de pulso y orientación
+        // Marcador combi con COLOR PERSONALIZADO DE EMPRESA Y NOMBRE
         const iconHtml = `
-            <div class="combi-live-marker ${isMoving ? 'is-moving' : ''}">
-                <div class="combi-pulse-wave"></div>
-                <div class="combi-body-card" style="${heading > 0 ? `transform: rotate(${heading}deg);` : ''}">
+            <div class="combi-live-marker ${isMoving ? 'is-moving' : ''}" style="--comp-color: ${compColor};">
+                <div class="combi-pulse-wave" style="border-color: ${compColor};"></div>
+                <div class="combi-body-card" style="${heading > 0 ? `transform: rotate(${heading}deg);` : ''} border-color: ${compColor};">
                     <div class="combi-icon-graphic">
                         <svg viewBox="0 0 64 64" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Carrocería Combi BLANCA brillante -->
-                            <rect x="8" y="10" width="48" height="38" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+                            <!-- Carrocería Combi BLANCA brillante con borde del color de empresa -->
+                            <rect x="8" y="10" width="48" height="38" rx="9" fill="#ffffff" stroke="${compColor}" stroke-width="1.8"/>
                             <path d="M8 23H56V38C56 43.5 51.5 48 46 48H18C12.5 48 8 43.5 8 38V23Z" fill="#f8fafc"/>
-                            <!-- Techo / Franja de contraste azul Bariloche -->
-                            <path d="M8 18H56V23H8V18Z" fill="#0084ff"/>
+                            <!-- Techo / Franja de color distintivo de la empresa -->
+                            <path d="M8 18H56V23H8V18Z" fill="${compColor}"/>
                             <!-- Parabrisas frontal y ventanillas oscuras -->
                             <rect x="12" y="13" width="18" height="9" rx="2.5" fill="#1e293b"/>
                             <rect x="34" y="13" width="18" height="9" rx="2.5" fill="#1e293b"/>
@@ -220,9 +251,12 @@ function renderLiveVehicles(vehicles) {
                         </svg>
                     </div>
                 </div>
-                <div class="combi-badge-pill">
-                    <b>${veh.vehicle_code || 'Combi'}</b>
-                    <span class="combi-speed-pill">${speedText}</span>
+                <div class="combi-badge-pill" style="border-color: ${compColor};">
+                    <div class="combi-company-tag" style="background: ${compColor};">${companyName}</div>
+                    <div class="combi-info-subrow">
+                        <b>${veh.vehicle_code || 'Combi'}</b>
+                        <span class="combi-speed-pill">${speedText}</span>
+                    </div>
                 </div>
             </div>
         `;

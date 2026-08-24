@@ -1259,8 +1259,8 @@ body {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: rgba(0, 132, 255, 0.2);
-    border: 2px solid #0084ff;
+    background: rgba(0, 132, 255, 0.15);
+    border: 2px solid var(--comp-color, #0084ff);
     animation: combiPulse 2s infinite ease-out;
     z-index: 1;
 }
@@ -1274,13 +1274,13 @@ body {
     position: relative;
     z-index: 2;
     background: #ffffff;
-    border: 2px solid #0084ff;
+    border: 2px solid var(--comp-color, #0084ff);
     border-radius: 12px;
     padding: 3px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 18px rgba(0, 132, 255, 0.55), 0 2px 8px rgba(0,0,0,0.25);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0,0,0,0.15);
     transition: transform 0.3s ease;
 }
 
@@ -1290,27 +1290,50 @@ body {
 
 .combi-badge-pill {
     position: absolute;
-    bottom: -16px;
+    bottom: -26px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(15, 23, 42, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(15, 23, 42, 0.96);
+    border: 1.5px solid var(--comp-color, #0084ff);
     color: #ffffff;
-    padding: 2px 7px;
-    border-radius: 7px;
+    padding: 3px 8px;
+    border-radius: 9px;
     font-size: 0.65rem;
-    font-weight: 800;
     white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+    z-index: 3;
+    pointer-events: none;
+}
+
+.combi-company-tag {
+    font-size: 0.68rem;
+    font-weight: 900;
+    color: #ffffff;
+    padding: 1px 6px;
+    border-radius: 5px;
+    letter-spacing: 0.2px;
+    max-width: 130px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.combi-info-subrow {
     display: flex;
     align-items: center;
     gap: 4px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.5);
-    z-index: 3;
+    font-size: 0.65rem;
+    font-weight: 700;
+    margin-top: 1px;
 }
 
 .combi-speed-pill {
     color: #00cec9;
-    font-weight: 700;
+    font-weight: 800;
 }
 
 /* ==========================================================================
