@@ -361,7 +361,7 @@
                     <button onclick="openRedeemCodeBox()" class="btn-owner-edit" style="background:#e67e22; color:white; border:none; padding:8px 14px; font-weight:800; border-radius:10px; cursor:pointer;">
                         <i class="fas fa-gift"></i> Canjear Código Promo
                     </button>
-                    <button onclick="if(window.openSubscriptionModal) window.openSubscriptionModal()" class="btn-owner-edit" style="background:#10b981; color:white; border:none; padding:8px 14px; font-weight:800; border-radius:10px; cursor:pointer;">
+                    <button onclick="startMercadoPagoCheckout()" class="btn-owner-edit" style="background:#10b981; color:white; border:none; padding:8px 14px; font-weight:800; border-radius:10px; cursor:pointer;">
                         <i class="fas fa-credit-card"></i> Pagar con Mercado Pago
                     </button>
                 </div>
@@ -779,6 +779,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             loadPrices();
+            checkPaymentReturnParams();
             if (window.authManager) {
                 window.authManager.onAuthChange((user) => {
                     const loggedOut = document.getElementById('loggedOutView');
@@ -796,6 +797,68 @@
                 });
             }
         });
+
+        async function checkPaymentReturnParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const paymentStatus = urlParams.get('payment');
+            const email = urlParams.get('email') || (window.authManager?.currentUser?.email);
+            const plan = urlParams.get('plan') || 'mercadopago_1m';
+
+            if (paymentStatus === 'success' && email) {
+                try {
+                    const res = await fetch(`save_alojamiento.php?action=confirm_payment&email=${encodeURIComponent(email)}&plan=${encodeURIComponent(plan)}`);
+                    const data = await res.json();
+                    if (data.status === 'success') {
+                        alert('🎉 ¡Pago acreditado exitosamente con Mercado Pago!\nTu suscripción y cupos han sido habilitados.');
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                        checkUserSubscriptionState(email);
+                    }
+                } catch (e) {
+                    console.error('Error al confirmar pago:', e);
+                }
+            } else if (paymentStatus === 'failure') {
+                alert('⚠️ El pago con Mercado Pago no se completó. Podés reintentar cuando gustes.');
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+
+        async function startMercadoPagoCheckout(plan = '') {
+            if (!window.authManager?.currentUser) {
+                window.authManager.openModal();
+                return;
+            }
+            const email = window.authManager.currentUser.email;
+
+            if (!plan) {
+                const choice = prompt('Seleccioná el plan a pagar:\n1. Excursiones 1 Móvil ($50.000)\n2. Excursiones hasta 3 Móviles ($70.000)\n3. Excursiones Flota 5 Móviles ($120.000)\n4. Alojamiento ($10.000)\n5. Gastronomía ($10.000)\n6. Guías y Servicios ($10.000)\n\nIngresá el número (1 al 6):', '1');
+                if (!choice) return;
+                const map = {
+                    '1': 'excursion-1v',
+                    '2': 'excursion-3v',
+                    '3': 'excursion-5v',
+                    '4': 'alojamiento',
+                    '5': 'gastronomia',
+                    '6': 'servicios_prof'
+                };
+                plan = map[choice.trim()] || 'excursion-1v';
+            }
+
+            try {
+                const res = await fetch('save_alojamiento.php?action=create_preference', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, plan })
+                });
+                const data = await res.json();
+                if (data.status === 'success' && data.init_point) {
+                    window.location.href = data.init_point;
+                } else {
+                    alert('Error al generar link de Mercado Pago: ' + (data.message || 'Error'));
+                }
+            } catch (e) {
+                alert('Error de conexión con Mercado Pago');
+            }
+        }
 
         async function loadPrices() {
             try {

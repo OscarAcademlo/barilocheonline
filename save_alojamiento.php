@@ -202,20 +202,22 @@ if ($action === 'create_mp_preference') {
     $prices = file_exists($pricesFile) ? json_decode(file_get_contents($pricesFile), true) : [];
 
     $planPriceMap = [
-        'excursion-1v'  => intval($prices['excursiones_1v'] ?? 50000),
-        'excursion-3v'  => intval($prices['excursiones_3v'] ?? 70000),
-        'excursion-5v'  => intval($prices['excursiones_5v'] ?? 120000),
-        'alojamiento'   => intval($prices['alojamiento'] ?? 10000),
-        'gastronomia'   => intval($prices['gastronomia'] ?? 10000),
+        'excursion-1v'   => intval($prices['excursiones_1v'] ?? 50000),
+        'excursion-3v'   => intval($prices['excursiones_3v'] ?? 70000),
+        'excursion-5v'   => intval($prices['excursiones_5v'] ?? 120000),
+        'alojamiento'    => intval($prices['alojamiento'] ?? 10000),
+        'gastronomia'    => intval($prices['gastronomia'] ?? 10000),
+        'servicios_prof' => intval($prices['servicios_prof'] ?? 10000),
     ];
     $planPrice = $planPriceMap[$plan] ?? intval($prices['alojamiento'] ?? 10000);
 
     $planLabels = [
-        'excursion-1v'  => 'Excursiones - 1 Vehículo GPS (1 mes)',
-        'excursion-3v'  => 'Excursiones - Hasta 3 Vehículos GPS (1 mes)',
-        'excursion-5v'  => 'Excursiones - Flota 5 Vehículos GPS (1 mes)',
-        'alojamiento'   => 'Publicación Alojamiento (1 mes)',
-        'gastronomia'   => 'Publicación Gastronomía (1 mes)',
+        'excursion-1v'   => 'Excursiones - 1 Vehículo GPS (1 mes)',
+        'excursion-3v'   => 'Excursiones - Hasta 3 Vehículos GPS (1 mes)',
+        'excursion-5v'   => 'Excursiones - Flota 5 Vehículos GPS (1 mes)',
+        'alojamiento'    => 'Publicación Alojamiento (1 mes)',
+        'gastronomia'    => 'Publicación Gastronomía (1 mes)',
+        'servicios_prof' => 'Guías & Servicios Profesionales (1 mes)',
     ];
     $planLabel = $planLabels[$plan] ?? 'Suscripción Bariloche.Online (1 mes)';
 
@@ -233,13 +235,13 @@ if ($action === 'create_mp_preference') {
             'email' => $email
         ],
         'back_urls' => [
-            'success' => "https://bariloche.online/alojamiento.html?payment=success&email=" . urlencode($email),
-            'failure' => "https://bariloche.online/alojamiento.html?payment=failure",
-            'pending' => "https://bariloche.online/alojamiento.html?payment=pending&email=" . urlencode($email)
+            'success' => "https://bariloche.online/perfil.html?payment=success&email=" . urlencode($email) . "&plan=" . urlencode($plan),
+            'failure' => "https://bariloche.online/perfil.html?payment=failure",
+            'pending' => "https://bariloche.online/perfil.html?payment=pending&email=" . urlencode($email) . "&plan=" . urlencode($plan)
         ],
         'notification_url' => "https://bariloche.online/save_alojamiento.php?action=webhook",
         'auto_return' => 'approved',
-        'external_reference' => "sub_{$email}_" . time()
+        'external_reference' => "sub_{$email}_" . str_replace('-', '_', $plan) . "_" . time()
     ];
 
     $ch = curl_init('https://api.mercadopago.com/checkout/preferences');
@@ -276,6 +278,7 @@ if ($action === 'create_mp_preference') {
 // 5. CONFIRMAR PAGO EXITOSO
 if ($action === 'confirm_payment') {
     $email = strtolower(trim($_GET['email'] ?? $_POST['email'] ?? ''));
+    $plan = trim($_GET['plan'] ?? $_POST['plan'] ?? 'mercadopago_1m');
     if (empty($email)) {
         echo json_encode(['status' => 'error', 'message' => 'Email requerido']);
         exit;
@@ -290,7 +293,7 @@ if ($action === 'confirm_payment') {
         if (strtolower($s['email'] ?? '') === $email) {
             $s['active'] = true;
             $s['expires_at'] = $expiresAt;
-            $s['plan'] = 'mercadopago_1m';
+            $s['plan'] = $plan;
             $s['updated_at'] = date('c');
             $updated = true;
             break;
@@ -300,7 +303,7 @@ if ($action === 'confirm_payment') {
     if (!$updated) {
         $subs[] = [
             'email' => $email,
-            'plan' => 'mercadopago_1m',
+            'plan' => $plan,
             'months' => 1,
             'active' => true,
             'created_at' => date('c'),
@@ -338,7 +341,12 @@ if ($action === 'webhook' || $action === 'mp_webhook' || isset($_GET['data_id'])
             if (($paymentInfo['status'] ?? '') === 'approved') {
                 $payerEmail = strtolower(trim($paymentInfo['payer']['email'] ?? ''));
                 $extRef = $paymentInfo['external_reference'] ?? '';
-                if (preg_match('/sub_([^_]+)_/', $extRef, $matches)) {
+                $planDetected = 'mercadopago_1m';
+
+                if (preg_match('/sub_([^_]+)_([^_]+)_/', $extRef, $matches)) {
+                    $payerEmail = strtolower(trim($matches[1]));
+                    $planDetected = trim($matches[2]);
+                } elseif (preg_match('/sub_([^_]+)_/', $extRef, $matches)) {
                     $payerEmail = strtolower(trim($matches[1]));
                 }
 
@@ -352,7 +360,7 @@ if ($action === 'webhook' || $action === 'mp_webhook' || isset($_GET['data_id'])
                         if (strtolower($s['email'] ?? '') === $payerEmail) {
                             $s['active'] = true;
                             $s['expires_at'] = $expiresAt;
-                            $s['plan'] = 'mercadopago_1m';
+                            $s['plan'] = $planDetected;
                             $s['updated_at'] = date('c');
                             $s['payment_id'] = $paymentId;
                             $updated = true;
@@ -362,7 +370,7 @@ if ($action === 'webhook' || $action === 'mp_webhook' || isset($_GET['data_id'])
                     if (!$updated) {
                         $subs[] = [
                             'email' => $payerEmail,
-                            'plan' => 'mercadopago_1m',
+                            'plan' => $planDetected,
                             'months' => 1,
                             'active' => true,
                             'created_at' => date('c'),
@@ -884,10 +892,41 @@ if ($action === 'save_multiservice_provider') {
     $selectedServices = is_array($data['services'] ?? null) ? $data['services'] : [];
     $moviles = is_array($data['moviles'] ?? null) ? $data['moviles'] : [];
 
-    // Limpiar y formatear móviles (Máximo 5 unidades por empresa según límites de plan)
+    // Calcular cupo máximo estricto según suscripción contratada o código promo
+    $isAdmin = ($email === ADMIN_EMAIL);
+    $maxAllowedMoviles = 1;
+    if ($isAdmin) {
+        $maxAllowedMoviles = 5;
+    } else {
+        $subsFile = __DIR__ . '/suscripciones.json';
+        $subs = file_exists($subsFile) ? json_decode(file_get_contents($subsFile), true) : [];
+        $hasActiveSub = false;
+        $now = time();
+        if (is_array($subs)) {
+            foreach ($subs as $s) {
+                if (strtolower(trim($s['email'] ?? '')) === $email && !empty($s['active'])) {
+                    $exp = strtotime($s['expires_at'] ?? '');
+                    if ($exp >= $now) {
+                        $hasActiveSub = true;
+                        $plan = strtolower(trim($s['plan'] ?? ''));
+                        if (strpos($plan, '5v') !== false || strpos($plan, 'flota') !== false) {
+                            $maxAllowedMoviles = 5;
+                        } elseif (strpos($plan, '3v') !== false) {
+                            $maxAllowedMoviles = 3;
+                        } else {
+                            $maxAllowedMoviles = 1;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    // Limpiar y formatear móviles respetando el cupo contratado
     $cleanMoviles = [];
     foreach ($moviles as $m) {
-        if (count($cleanMoviles) >= 5) break; // Límite estricto máximo 5
+        if (count($cleanMoviles) >= $maxAllowedMoviles) break; // Límite estricto según plan (1, 3 o 5)
         $cleanMoviles[] = [
             'id' => $m['id'] ?? ('movil_' . uniqid()),
             'codigo' => trim($m['codigo'] ?? 'Combi'),
@@ -1701,6 +1740,35 @@ if ($action === 'save_servicio') {
         http_response_code(400);
         echo json_encode(['status' => 'error', 'message' => 'Email requerido']);
         exit;
+    }
+
+    // 1. VALIDACIÓN ESTRICTA DE SUSCRIPCIÓN ACTIVA O ADMIN
+    $isAdmin = ($email === ADMIN_EMAIL);
+    if (!$isAdmin) {
+        $subsFile = __DIR__ . '/suscripciones.json';
+        $subs = file_exists($subsFile) ? json_decode(file_get_contents($subsFile), true) : [];
+        $hasActiveSub = false;
+        $now = time();
+        if (is_array($subs)) {
+            foreach ($subs as $sub) {
+                if (strtolower(trim($sub['email'] ?? '')) === $email && !empty($sub['active'])) {
+                    $exp = strtotime($sub['expires_at'] ?? '');
+                    if ($exp >= $now) {
+                        $hasActiveSub = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if (!$hasActiveSub) {
+            http_response_code(403);
+            echo json_encode([
+                'status' => 'error',
+                'code' => 'SUBSCRIPTION_REQUIRED',
+                'message' => '⛔ No tienes una suscripción activa ni código de gratuidad válido. Por favor abona tu suscripción o canjea tu código en Mi Panel antes de publicar.'
+            ]);
+            exit;
+        }
     }
 
     $srvId = trim($data['id'] ?? '') ?: ('srv_' . uniqid());

@@ -68,6 +68,7 @@
         <a href="index.html" class="logo" style="text-decoration:none; color:inherit;"><b>B</b> BARILOCHE.ONLINE</a>
         <nav class="nav-desktop">
             <a href="mapa.html" class="nav-link"><i class="fas fa-satellite-dish"></i> EN VIVO</a>
+            <a href="servicios.html" class="nav-link">SERVICIOS</a>
             <a href="comer.html" class="nav-link">COMER</a>
             <a href="alojamiento.html" class="nav-link">DORMIR</a>
             <a href="radios.html" class="nav-link">MEDIOS</a>
@@ -81,12 +82,21 @@
     </header>
     <main class="app-content">
         <div class="browse-header">
-            <h1>Sumá tu Negocio</h1>
-            <p>Completá el formulario para solicitar publicidad.</p>
+            <h1>Sumá tu Negocio a Bariloche.Online</h1>
+            <p>Completá el formulario para activar tu publicidad o aboná directamente con Mercado Pago.</p>
         </div>
         
         <div class="profile-card" style="background:var(--bg-secondary); padding:30px; border-radius:30px; border:1px solid var(--border); box-shadow:var(--shadow);">
             
+            <div id="planSummaryBox" style="display:none; background:rgba(0,132,255,0.08); border:1.5px solid #0084ff; border-radius:18px; padding:18px; margin-bottom:24px; text-align:center;">
+                <div style="font-size:0.85rem; font-weight:700; color:var(--text-secondary);">PLAN SELECCIONADO</div>
+                <h2 id="planSummaryTitle" style="font-family:'Outfit'; font-size:1.4rem; color:var(--primary); margin:4px 0 10px;"></h2>
+                <div id="planSummaryPrice" style="font-size:1.6rem; font-weight:900; color:#00b894; margin-bottom:15px;"></div>
+                <button type="button" onclick="paySelectedPlanMP()" style="background:#10b981; color:white; border:none; padding:14px 28px; border-radius:12px; font-weight:800; font-size:1rem; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 15px rgba(16,185,129,0.35);">
+                    <i class="fas fa-credit-card"></i> Pagar Ahora con Mercado Pago
+                </button>
+            </div>
+
             <div id="statusAlert" class="alert"></div>
 
             <form id="solicitudForm" style="text-align:left;" enctype="multipart/form-data">
@@ -209,12 +219,60 @@
                 btn.disabled = false;
                 btn.style.opacity = '1';
                 
-                // Ocultar alerta
                 setTimeout(() => {
                     alertBox.style.display = 'none';
                 }, 8000);
             }
         });
+
+        const planLabels = {
+            'excursion-1v': { title: 'Excursiones - 1 Móvil / Combi', price: '$50.000 / mes' },
+            'excursion-3v': { title: 'Excursiones - Hasta 3 Móviles', price: '$70.000 / mes' },
+            'excursion-5v': { title: 'Excursiones - Flota 5 Móviles', price: '$120.000 / mes' },
+            'alojamiento': { title: 'Publicación de Alojamiento', price: '$10.000 / mes' },
+            'gastronomia': { title: 'Publicación Gastronómica', price: '$10.000 / mes' },
+            'servicios_prof': { title: 'Guías y Servicios Especiales', price: '$10.000 / mes' }
+        };
+
+        let currentPlanKey = '';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            currentPlanKey = urlParams.get('plan') || '';
+
+            if (currentPlanKey && planLabels[currentPlanKey]) {
+                const box = document.getElementById('planSummaryBox');
+                const title = document.getElementById('planSummaryTitle');
+                const price = document.getElementById('planSummaryPrice');
+                if (box && title && price) {
+                    title.textContent = planLabels[currentPlanKey].title;
+                    price.textContent = planLabels[currentPlanKey].price;
+                    box.style.display = 'block';
+                }
+            }
+        });
+
+        async function paySelectedPlanMP() {
+            const emailInput = document.getElementById('email');
+            const email = (emailInput ? emailInput.value.trim() : '') || prompt('Ingresá tu email para asociar el pago de Mercado Pago:');
+            if (!email) return;
+
+            try {
+                const res = await fetch('save_alojamiento.php?action=create_preference', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, plan: currentPlanKey || 'alojamiento' })
+                });
+                const data = await res.json();
+                if (data.status === 'success' && data.init_point) {
+                    window.location.href = data.init_point;
+                } else {
+                    alert('Error al generar enlace de pago: ' + (data.message || 'Error'));
+                }
+            } catch (e) {
+                alert('Error al conectar con Mercado Pago');
+            }
+        }
     </script>
 
     <!-- App Bottom Nav -->
