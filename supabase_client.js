@@ -154,8 +154,8 @@ class BariRutaSupabaseClient {
                     dbKeys.add(key);
 
                     const dbTime = new Date(dbVehicle.updated_at || 0).getTime();
-                    // Solo considerar si la BD se actualizó en los últimos 15 segundos
-                    const isRecent = (now - dbTime) < 15000;
+                    // Consider DB as recent if updated in the last 45 seconds
+                    const isRecent = (now - dbTime) < 45000;
 
                     const idx = this.vehicles.findIndex(v => this._vehicleKey(v) === key);
                     if (idx >= 0) {
@@ -169,11 +169,11 @@ class BariRutaSupabaseClient {
                     }
                 });
 
-                // Eliminar de memoria los vehículos que ya no están en la BD y no han transmitido en los últimos 8 seg
+                // Eliminar de memoria los vehículos que ya no están en la BD y no han transmitido en los últimos 45 seg
                 this.vehicles = this.vehicles.filter(v => {
                     const key = this._vehicleKey(v);
                     const lastSeen = v._lastSeen || 0;
-                    const isVeryRecent = (now - lastSeen) < 8000;
+                    const isVeryRecent = (now - lastSeen) < 45000;
                     return dbKeys.has(key) || isVeryRecent;
                 });
 
@@ -218,10 +218,10 @@ class BariRutaSupabaseClient {
         }
 
         const now = Date.now();
-        // Umbral ultrarrápido: eliminar si pasaron más de 12 segundos sin señal
+        // Aumentar el umbral a 45 segundos para dar margen si la red móvil de la combi es inestable
         const liveVehicles = this.vehicles.filter(v => {
             const lastSeen = v._lastSeen || new Date(v.updated_at || 0).getTime() || 0;
-            return (now - lastSeen) < 12000;
+            return (now - lastSeen) < 45000;
         });
 
         // Actualizar lista interna purgada

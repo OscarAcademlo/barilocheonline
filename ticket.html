@@ -401,6 +401,19 @@
                 </div>
             </div>
 
+            <!-- BOTÓN DE MODO PRUEBA EXCLUSIVO PARA ADMINISTRADOR -->
+            <div id="adminTestSection" style="display:none; margin-bottom:12px; background:rgba(16, 185, 129, 0.1); border:1.5px dashed #10b981; border-radius:16px; padding:14px; text-align:center;">
+                <div style="font-size:0.85rem; font-weight:800; color:#10b981; margin-bottom:6px;">
+                    🛡️ MODO ADMINISTRADOR ACTIVO (BYPASS / $0)
+                </div>
+                <small style="color:var(--text-secondary); display:block; margin-bottom:10px; font-size:0.78rem;">
+                    Al pulsar cualquier botón de compra o este botón, se emite el ticket a $0 y se notifica inmediatamente a la combi en vivo.
+                </small>
+                <button type="button" id="btnAdminTest" onclick="handleAdminTestTicket()" style="width:100%; padding:14px; border-radius:14px; background:linear-gradient(135deg, #10b981, #059669); color:white; border:none; font-weight:900; font-size:0.95rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(16,185,129,0.35);">
+                    <i class="fas fa-bolt"></i> ⚡ Emitir Ticket de Prueba (Admin $0)
+                </button>
+            </div>
+
             <!-- BOTÓN DE CONSULTA POR WHATSAPP -->
             <a href="#" id="waBookingLink" target="_blank" class="btn-pay-wa">
                 <i class="fab fa-whatsapp"></i> Reservar y Coordinar por WhatsApp
@@ -573,31 +586,6 @@
         }
 
         async function handlePayTicketWithMP() {
-            const name = document.getElementById('custName').value.trim();
-            let phone = document.getElementById('custPhone').value.trim();
-            const hotel = document.getElementById('custHotel').value.trim();
-
-            if (!name || !phone) {
-                alert('Por favor completá tu Nombre y Teléfono/WhatsApp para generar tu ticket.');
-                return;
-            }
-
-            const btn = document.getElementById('btnPayMP');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Obteniendo ubicación GPS (Requerido)...';
-
-            // FORZAR GPS SI O SI
-            if (!touristLat || !touristLng) {
-                try {
-                    await getExactGPSLocation();
-                } catch (e) {
-                    alert('Para confirmar la reserva necesitamos acceder a tu ubicación GPS en tiempo real para que el chofer pueda recogerte. Por favor, permití el acceso a la ubicación en tu navegador.');
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-credit-card"></i> Pagar con Tarjeta / Mercado Pago (Con o sin cuenta)';
-                    return;
-                }
-            }
-
             // ADMIN BYPASS: Si es el administrador general (oscarns@gmail.com), emitir el ticket de prueba directamente sin cobrar
             const user = window.authManager && window.authManager.currentUser;
             const isAdmin = isUserAdmin 
@@ -605,6 +593,15 @@
                             || localStorage.getItem('bariloche_user_email') === 'oscarns@gmail.com';
             if (isAdmin) {
                 return handleAdminTestTicket();
+            }
+
+            const name = document.getElementById('custName').value.trim();
+            let phone = document.getElementById('custPhone').value.trim();
+            const hotel = document.getElementById('custHotel').value.trim();
+
+            if (!name || !phone) {
+                alert('Por favor completá tu Nombre y Teléfono/WhatsApp para generar tu ticket.');
+                return;
             }
 
             // Auto-formatear 549
@@ -620,6 +617,8 @@
             const chofer = params.get('chofer') || 'Chofer Asignado';
             const totalAmount = basePrice * passengers;
 
+            const btn = document.getElementById('btnPayMP');
+            btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Conectando con Mercado Pago...';
 
             try {
@@ -671,10 +670,15 @@
             const combi = params.get('combi') || 'Combi 01';
             const chofer = params.get('chofer') || 'Chofer Asignado';
 
+            const btn = document.getElementById('btnAdminTest');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Emitiendo ticket de prueba y notificando combi...';
+            }
             const btnMP = document.getElementById('btnPayMP');
             if (btnMP) {
                 btnMP.disabled = true;
-                btnMP.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Conectando...';
+                btnMP.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Emitiendo ticket de prueba...';
             }
 
             try {
@@ -708,16 +712,24 @@
                     showSuccessScreen(successParams);
                 } else {
                     alert('Error en modo prueba: ' + (data.message || 'No autorizado'));
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-bolt"></i> ⚡ Emitir Ticket de Prueba (Admin $0)';
+                    }
                     if (btnMP) {
                         btnMP.disabled = false;
-                        btnMP.innerHTML = '<i class="fas fa-credit-card"></i> Pagar con Tarjeta / Mercado Pago (Con o sin cuenta)';
+                        btnMP.innerHTML = '<i class="fas fa-bolt"></i> ⚡ Emitir Ticket de Prueba (Admin Bypass / $0)';
                     }
                 }
-            } catch (err) {
-                alert('Error de conexión al emitir ticket.');
+            } catch (e) {
+                alert('Error al emitir ticket de prueba');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-bolt"></i> ⚡ Emitir Ticket de Prueba (Admin $0)';
+                }
                 if (btnMP) {
                     btnMP.disabled = false;
-                    btnMP.innerHTML = '<i class="fas fa-credit-card"></i> Pagar con Tarjeta / Mercado Pago (Con o sin cuenta)';
+                    btnMP.innerHTML = '<i class="fas fa-bolt"></i> ⚡ Emitir Ticket de Prueba (Admin Bypass / $0)';
                 }
             }
         }
@@ -738,7 +750,7 @@
                                 || localStorage.getItem('bariloche_user_email') === 'oscarns@gmail.com';
                 
                 if (isAdmin) {
-                    isUserAdmin = true;
+                    enableAdminBypassMode();
                 }
             }, 500);
         }
