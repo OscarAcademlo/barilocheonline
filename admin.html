@@ -615,6 +615,17 @@
                     </label>
                 </div>
 
+                <!-- GESTIÓN DIRECTA DE FLOTA Y CHOFERES DENTRO DEL MODAL ADMIN -->
+                <div id="adminEditProvFleetSection" style="background:var(--bg-secondary); border:1px solid var(--border); border-radius:14px; padding:14px; margin-bottom:18px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <b style="font-size:0.9rem; color:var(--primary);"><i class="fas fa-van-shuttle"></i> Móviles y Choferes (<span id="adminEditProvFleetCount">0</span>)</b>
+                        <button type="button" onclick="addMovilToAdminEditProv()" style="background:#0084ff; color:white; border:none; border-radius:8px; padding:6px 12px; font-size:0.78rem; font-weight:700; cursor:pointer;">
+                            <i class="fas fa-plus"></i> + Agregar Chofer/Móvil
+                        </button>
+                    </div>
+                    <div id="adminEditProvFleetList" style="display:flex; flex-direction:column; gap:10px; max-height:300px; overflow-y:auto; padding-right:4px;"></div>
+                </div>
+
                 <button type="submit" id="btnSaveProvSubmit" class="btn-submit-pickup" style="background:#6c5ce7; color:white; font-weight:800;">
                     <i class="fas fa-floppy-disk"></i> Guardar Cambios del Cliente
                 </button>
@@ -1501,6 +1512,8 @@
         // ==========================================
         // 5. EDICIÓN Y BORRADO DE CLIENTES
         // ==========================================
+        let currentAdminEditProvMoviles = [];
+
         function openEditProviderModal(email = '', isNew = false) {
             const modal = document.getElementById('editProviderModal');
             const p = allProvidersData.find(item => item.email === email) || {};
@@ -1520,7 +1533,83 @@
             document.getElementById('editProvExpiresAt').value = sub.expires_at ? sub.expires_at.split('T')[0] : '';
             document.getElementById('editProvIsActive').checked = (p.is_active !== false);
 
+            currentAdminEditProvMoviles = JSON.parse(JSON.stringify(p.moviles || []));
+            renderAdminEditProvMoviles();
+
             modal.style.display = 'flex';
+        }
+
+        function renderAdminEditProvMoviles() {
+            const container = document.getElementById('adminEditProvFleetList');
+            const countLabel = document.getElementById('adminEditProvFleetCount');
+            if (countLabel) countLabel.textContent = currentAdminEditProvMoviles.length;
+            if (!container) return;
+
+            if (currentAdminEditProvMoviles.length === 0) {
+                container.innerHTML = `<small style="color:var(--text-secondary); padding:10px 0; text-align:center; display:block;">No hay móviles agregados. Tocá "+ Agregar Chofer/Móvil".</small>`;
+                return;
+            }
+
+            container.innerHTML = currentAdminEditProvMoviles.map((m, index) => `
+                <div style="background:var(--bg-main); border:1px solid var(--border); border-radius:10px; padding:10px; position:relative;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <b style="font-size:0.82rem; color:var(--primary);">🚐 Unidad #${index + 1}</b>
+                        <button type="button" onclick="removeMovilFromAdminEditProv('${m.id}')" style="background:none; border:none; color:#e74c3c; cursor:pointer; font-size:0.85rem;" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:6px;">
+                        <div>
+                            <label style="font-size:0.7rem; font-weight:700; display:block;">Chofer</label>
+                            <input type="text" value="${m.chofer_nombre || ''}" onchange="updateAdminEditProvMovilProp('${m.id}', 'chofer_nombre', this.value)" placeholder="Nombre chofer" style="width:100%; height:32px; font-size:0.8rem; border-radius:6px; border:1px solid var(--border); padding:4px 8px; background:var(--bg-secondary); color:var(--text-primary);">
+                        </div>
+                        <div>
+                            <label style="font-size:0.7rem; font-weight:700; display:block;">Vehículo (Marca/Modelo)</label>
+                            <input type="text" value="${m.marca || ''}" onchange="updateAdminEditProvMovilProp('${m.id}', 'marca', this.value)" placeholder="Ej. Sprinter" style="width:100%; height:32px; font-size:0.8rem; border-radius:6px; border:1px solid var(--border); padding:4px 8px; background:var(--bg-secondary); color:var(--text-primary);">
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:6px; margin-bottom:6px;">
+                        <div>
+                            <label style="font-size:0.7rem; font-weight:700; display:block;">Últ. 3 Patente</label>
+                            <input type="text" maxlength="3" value="${m.patente_ultimos3 || ''}" onchange="updateAdminEditProvMovilProp('${m.id}', 'patente_ultimos3', this.value)" placeholder="789" style="width:100%; height:32px; font-size:0.8rem; text-transform:uppercase; font-weight:800; border-radius:6px; border:1px solid var(--border); padding:4px 8px; background:var(--bg-secondary); color:var(--text-primary);">
+                        </div>
+                        <div>
+                            <label style="font-size:0.7rem; font-weight:700; display:block;">Usuario App</label>
+                            <input type="text" value="${m.usuario || ''}" onchange="updateAdminEditProvMovilProp('${m.id}', 'usuario', this.value)" placeholder="usuario" style="width:100%; height:32px; font-size:0.8rem; border-radius:6px; border:1px solid var(--border); padding:4px 8px; background:var(--bg-secondary); color:var(--text-primary);">
+                        </div>
+                        <div>
+                            <label style="font-size:0.7rem; font-weight:700; display:block;">Clave App</label>
+                            <input type="text" value="${m.password || ''}" onchange="updateAdminEditProvMovilProp('${m.id}', 'password', this.value)" placeholder="1234" style="width:100%; height:32px; font-size:0.8rem; font-weight:700; border-radius:6px; border:1px solid var(--border); padding:4px 8px; background:var(--bg-secondary); color:var(--text-primary);">
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addMovilToAdminEditProv() {
+            const num = currentAdminEditProvMoviles.length + 1;
+            currentAdminEditProvMoviles.push({
+                id: 'movil_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+                codigo: `Combi ${num < 10 ? '0' + num : num}`,
+                marca: 'Mercedes-Benz Sprinter',
+                color: 'Blanco',
+                patente_ultimos3: '123',
+                chofer_nombre: '',
+                usuario: `chofer${num}`,
+                password: Math.floor(1000 + Math.random() * 9000).toString(),
+                is_active: true
+            });
+            renderAdminEditProvMoviles();
+        }
+
+        function removeMovilFromAdminEditProv(id) {
+            currentAdminEditProvMoviles = currentAdminEditProvMoviles.filter(m => m.id !== id);
+            renderAdminEditProvMoviles();
+        }
+
+        function updateAdminEditProvMovilProp(id, prop, val) {
+            const m = currentAdminEditProvMoviles.find(item => item.id === id);
+            if (m) m[prop] = val;
         }
 
         function closeEditProviderModal() {
@@ -1555,14 +1644,15 @@
                         phone,
                         services,
                         expires_at,
-                        is_active
+                        is_active,
+                        moviles: currentAdminEditProvMoviles
                     })
                 });
                 const data = await res.json();
                 if (data.status === 'success') {
                     closeEditProviderModal();
                     loadAllProvidersAdmin();
-                    alert('✅ Cliente actualizado correctamente.');
+                    alert('✅ Cliente y flota actualizados correctamente.');
                 } else {
                     alert('Error: ' + data.message);
                 }
