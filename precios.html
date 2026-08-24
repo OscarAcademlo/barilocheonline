@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Precios y Planes | Bariloche.Online</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="description" content="Publicá tu excursión, alojamiento o restaurante en Bariloche.Online. Planes desde $10.000/mes.">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css?v=2213">
+    <style>
+        .pricing-hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            padding: 70px 5% 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .pricing-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(ellipse at 30% 50%, rgba(0,132,255,0.15) 0%, transparent 60%),
+                        radial-gradient(ellipse at 70% 30%, rgba(0,206,201,0.12) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .pricing-hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(0,132,255,0.2); border: 1px solid rgba(0,132,255,0.4);
+            color: #60b4ff; padding: 6px 18px; border-radius: 30px;
+            font-size: 0.8rem; font-weight: 700; margin-bottom: 20px;
+            font-family: 'Outfit', sans-serif;
+        }
+        .pricing-hero h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+            color: #fff; margin: 0 0 16px; line-height: 1.1;
+        }
+        .pricing-hero h1 span {
+            background: linear-gradient(135deg, #0084ff, #00cec9);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .pricing-hero p { color: rgba(255,255,255,0.7); font-size: 1.05rem; max-width: 560px; margin: 0 auto; line-height: 1.6; }
+
+        .pricing-section { max-width: 1100px; margin: 0 auto; padding: 60px 5%; }
+        .pricing-section-title { text-align: center; margin-bottom: 40px; }
+        .pricing-section-title h2 { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 900; color: var(--text-primary); margin: 0 0 8px; }
+        .pricing-section-title p { color: var(--text-secondary); font-size: 0.95rem; margin: 0; }
+
+        .pricing-category-label {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 0.75rem;
+            padding: 5px 14px; border-radius: 20px; margin-bottom: 16px;
+            text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .label-excursion { background: rgba(0,132,255,0.12); color: #0084ff; border: 1px solid rgba(0,132,255,0.2); }
+        .label-dormir { background: rgba(99,102,241,0.12); color: #818cf8; border: 1px solid rgba(99,102,241,0.2); }
+        .label-comer { background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.2); }
+
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 60px; }
+        .pricing-card {
+            background: var(--bg-secondary); border: 1.5px solid var(--border);
+            border-radius: 24px; padding: 32px 28px; position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex; flex-direction: column;
+        }
+        .pricing-card:hover { transform: translateY(-4px); box-shadow: 0 20px 50px rgba(0,0,0,0.15); }
+        .pricing-card.featured { border-color: #0084ff; box-shadow: 0 0 0 1px #0084ff, 0 20px 50px rgba(0,132,255,0.2); }
+        .featured-badge {
+            position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+            background: linear-gradient(135deg, #0084ff, #00cec9); color: white;
+            font-size: 0.7rem; font-weight: 800; padding: 4px 14px;
+            border-radius: 20px; white-space: nowrap; font-family: 'Outfit', sans-serif; letter-spacing: 0.04em;
+        }
+        .card-icon {
+            width: 48px; height: 48px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; margin-bottom: 18px;
+        }
+        .icon-blue { background: linear-gradient(135deg, rgba(0,132,255,0.15), rgba(0,206,201,0.15)); color: #0084ff; }
+        .icon-purple { background: rgba(99,102,241,0.15); color: #818cf8; }
+        .icon-amber { background: rgba(245,158,11,0.15); color: #f59e0b; }
+
+        .card-plan-name { font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; }
+        .card-price { font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 2.4rem; color: var(--text-primary); line-height: 1; margin-bottom: 4px; }
+        .card-price sup { font-size: 1.1rem; font-weight: 700; vertical-align: top; margin-top: 8px; color: var(--text-secondary); }
+        .card-period { font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 20px; }
+        .card-divider { height: 1px; background: var(--border); margin: 16px 0; }
+        .card-features { list-style: none; padding: 0; margin: 0 0 24px; flex: 1; }
+        .card-features li { display: flex; align-items: flex-start; gap: 10px; font-size: 0.88rem; color: var(--text-primary); padding: 6px 0; line-height: 1.4; }
+        .card-features li i { color: #22c55e; margin-top: 2px; flex-shrink: 0; font-size: 0.8rem; }
+        .card-features li.muted { color: var(--text-secondary); }
+        .card-features li.muted i { color: var(--text-secondary); }
+
+        .btn-contratar { display: block; text-align: center; padding: 13px; border-radius: 14px; font-weight: 800; font-size: 0.9rem; text-decoration: none; transition: all 0.2s ease; font-family: 'Outfit', sans-serif; cursor: pointer; }
+        .btn-contratar-primary { background: linear-gradient(135deg, #0084ff, #0066cc); color: white; box-shadow: 0 6px 20px rgba(0,132,255,0.3); border: none; }
+        .btn-contratar-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 28px rgba(0,132,255,0.4); }
+        .btn-contratar-outline { background: transparent; color: var(--text-primary); border: 2px solid var(--border); }
+        .btn-contratar-outline:hover { border-color: var(--primary); color: var(--primary); }
+
+        .simple-plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 60px; }
+        .simple-plan-card { background: var(--bg-secondary); border: 1.5px solid var(--border); border-radius: 24px; padding: 32px 28px; display: flex; align-items: center; gap: 24px; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .simple-plan-card:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
+        .simple-plan-icon { width: 60px; height: 60px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
+        .simple-plan-body { flex: 1; }
+        .simple-plan-body h3 { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-primary); margin: 0 0 4px; }
+        .simple-plan-body p { font-size: 0.83rem; color: var(--text-secondary); margin: 0 0 10px; line-height: 1.4; }
+        .simple-plan-price { font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 1.6rem; color: var(--text-primary); }
+        .simple-plan-price small { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); }
+
+        .guarantee-section { background: linear-gradient(135deg, rgba(0,132,255,0.06), rgba(0,206,201,0.06)); border: 1px solid rgba(0,132,255,0.15); border-radius: 24px; padding: 40px; text-align: center; margin-bottom: 60px; }
+        .guarantee-section h3 { font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 1.4rem; color: var(--text-primary); margin: 0 0 10px; }
+        .guarantee-section p { color: var(--text-secondary); font-size: 0.9rem; max-width: 500px; margin: 0 auto 20px; line-height: 1.6; }
+        .guarantee-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+        .g-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--bg-secondary); border: 1px solid var(--border); padding: 7px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 600; color: var(--text-primary); }
+        .g-pill i { color: #22c55e; }
+
+        .section-separator { display: flex; align-items: center; gap: 16px; margin: 10px 0 40px; }
+        .section-separator hr { flex: 1; border: none; border-top: 1px solid var(--border); }
+        .section-separator span { font-family: 'Outfit', sans-serif; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); white-space: nowrap; text-transform: uppercase; letter-spacing: 0.08em; }
+
+        @media (max-width: 600px) {
+            .pricing-grid, .simple-plans-grid { grid-template-columns: 1fr; }
+            .simple-plan-card { flex-direction: column; text-align: center; }
+            .pricing-hero { padding: 50px 5% 60px; }
+            .guarantee-section { padding: 28px 20px; }
+        }
+    </style>
+</head>
+<body class="page-pricing native-app">
+
+    <header class="main-header">
+        <a href="index.html" class="logo" style="text-decoration:none; color:inherit;"><b>B</b> BARILOCHE.ONLINE</a>
+        <nav class="nav-desktop">
+            <a href="mapa.html" class="nav-link"><i class="fas fa-satellite-dish"></i> EN VIVO</a>
+            <a href="comer.html" class="nav-link">COMER</a>
+            <a href="alojamiento.html" class="nav-link">DORMIR</a>
+            <a href="radios.html" class="nav-link">MEDIOS</a>
+            <a href="vuelos.html" class="nav-link">VUELOS</a>
+            <a href="precios.html" class="nav-link active" style="color:#0084ff; font-weight:800;"><i class="fas fa-tag"></i> PRECIOS</a>
+        </nav>
+        <div class="header-icons">
+            <div id="userAuthStatus"></div>
+            <div class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()"><i class="fas fa-moon"></i></div>
+        </div>
+    </header>
+
+    <div class="pricing-hero">
+        <div style="position:relative; z-index:1;">
+            <div class="pricing-hero-badge"><span class="pulse-beacon"></span> Publicite en Bariloche.Online</div>
+            <h1>Llegá a miles de turistas<br><span>que visitan Bariloche</span></h1>
+            <p>Mostrá tu excursión, alojamiento o restaurante a los visitantes en tiempo real. Activación en 24 hs.</p>
+        </div>
+    </div>
+
+    <div class="pricing-section">
+
+        <!-- EXCURSIONES -->
+        <div class="pricing-section-title">
+            <div class="pricing-category-label label-excursion"><i class="fas fa-satellite-dish"></i> Excursiones &amp; Transporte</div>
+            <h2>Mostrá tus vehículos en vivo</h2>
+            <p>Tus combis y micros aparecen en el mapa en tiempo real con GPS. Los turistas te ven moverse.</p>
+        </div>
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <div class="card-icon icon-blue"><i class="fas fa-van-shuttle"></i></div>
+                <div class="card-plan-name">Individual</div>
+                <div class="card-price"><sup>$</sup>50.000</div>
+                <div class="card-period">por mes · 1 vehículo</div>
+                <div class="card-divider"></div>
+                <ul class="card-features">
+                    <li><i class="fas fa-check-circle"></i> 1 vehículo GPS en tiempo real</li>
+                    <li><i class="fas fa-check-circle"></i> Pin animado en el mapa BariRuta</li>
+                    <li><i class="fas fa-check-circle"></i> Card de empresa con contacto</li>
+                    <li><i class="fas fa-check-circle"></i> Botón WhatsApp directo</li>
+                    <li><i class="fas fa-check-circle"></i> Botón Comprar Ticket</li>
+                    <li><i class="fas fa-check-circle"></i> App Android para chofer</li>
+                </ul>
+                <a href="solicitar.html?plan=excursion-1v" class="btn-contratar btn-contratar-outline">Comenzar</a>
+            </div>
+            <div class="pricing-card featured">
+                <div class="featured-badge">⭐ MÁS ELEGIDO</div>
+                <div class="card-icon icon-blue"><i class="fas fa-bus"></i></div>
+                <div class="card-plan-name">Empresa</div>
+                <div class="card-price"><sup>$</sup>70.000</div>
+                <div class="card-period">por mes · hasta 3 vehículos</div>
+                <div class="card-divider"></div>
+                <ul class="card-features">
+                    <li><i class="fas fa-check-circle"></i> Hasta 3 vehículos GPS en vivo</li>
+                    <li><i class="fas fa-check-circle"></i> Pines animados en BariRuta</li>
+                    <li><i class="fas fa-check-circle"></i> Card de empresa destacada</li>
+                    <li><i class="fas fa-check-circle"></i> WhatsApp + Teléfono visible</li>
+                    <li><i class="fas fa-check-circle"></i> Venta de tickets online</li>
+                    <li><i class="fas fa-check-circle"></i> App Android para cada chofer</li>
+                </ul>
+                <a href="solicitar.html?plan=excursion-3v" class="btn-contratar btn-contratar-primary">Contratar ahora</a>
+            </div>
+            <div class="pricing-card">
+                <div class="card-icon icon-blue"><i class="fas fa-truck-moving"></i></div>
+                <div class="card-plan-name">Flota</div>
+                <div class="card-price"><sup>$</sup>120.000</div>
+                <div class="card-period">por mes · 5 vehículos</div>
+                <div class="card-divider"></div>
+                <ul class="card-features">
+                    <li><i class="fas fa-check-circle"></i> Hasta 5 vehículos GPS en vivo</li>
+                    <li><i class="fas fa-check-circle"></i> Todos los pines en BariRuta</li>
+                    <li><i class="fas fa-check-circle"></i> Badge Flota Oficial</li>
+                    <li><i class="fas fa-check-circle"></i> WhatsApp + múltiples contactos</li>
+                    <li><i class="fas fa-check-circle"></i> Venta de tickets + historial</li>
+                    <li><i class="fas fa-check-circle"></i> App Android para toda la flota</li>
+                </ul>
+                <a href="solicitar.html?plan=excursion-5v" class="btn-contratar btn-contratar-outline">Contratar</a>
+            </div>
+        </div>
+
+        <!-- ALOJAMIENTO -->
+        <div class="section-separator"><hr><span>Alojamiento · Dónde Dormir</span><hr></div>
+        <div class="pricing-section-title">
+            <div class="pricing-category-label label-dormir"><i class="fas fa-bed"></i> Alojamiento</div>
+            <h2>Publicá tu cabaña, depto o hotel</h2>
+            <p>Aparecé en el mapa con tu precio, fotos y contacto directo. Sin comisiones por reserva.</p>
+        </div>
+        <div class="simple-plans-grid">
+            <div class="simple-plan-card">
+                <div class="simple-plan-icon icon-purple"><i class="fas fa-house"></i></div>
+                <div class="simple-plan-body">
+                    <h3>Publicación de Alojamiento</h3>
+                    <p>Tu propiedad con fotos, amenities, precio por noche, pin en el mapa y contacto por WhatsApp.</p>
+                    <div class="simple-plan-price">$10.000 <small>/ mes por publicación</small></div>
+                </div>
+            </div>
+            <div class="simple-plan-card" style="background:linear-gradient(135deg,rgba(99,102,241,0.06),rgba(139,92,246,0.06));border-color:rgba(99,102,241,0.25);">
+                <div class="simple-plan-icon" style="background:rgba(99,102,241,0.15);color:#818cf8;"><i class="fas fa-star"></i></div>
+                <div class="simple-plan-body">
+                    <h3>Incluye</h3>
+                    <p style="margin:0;">
+                        <span style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><i class="fas fa-check" style="color:#22c55e;"></i> Galería de fotos ilimitada</span>
+                        <span style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><i class="fas fa-check" style="color:#22c55e;"></i> Pin de precio en el mapa</span>
+                        <span style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><i class="fas fa-check" style="color:#22c55e;"></i> Contacto WhatsApp directo</span>
+                        <span style="display:flex;align-items:center;gap:6px;"><i class="fas fa-check" style="color:#22c55e;"></i> Selector de amenities</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div style="text-align:center; margin-top:-30px; margin-bottom:50px;">
+            <a href="solicitar.html?plan=alojamiento" class="btn-contratar btn-contratar-primary" style="display:inline-block; width:auto; padding:13px 40px;">Publicar mi Alojamiento</a>
+        </div>
+
+        <!-- GASTRONOMIA -->
+        <div class="section-separator"><hr><span>Gastronomía · Dónde Comer</span><hr></div>
+        <div class="pricing-section-title">
+            <div class="pricing-category-label label-comer"><i class="fas fa-utensils"></i> Gastronomía</div>
+            <h2>Sumá tu restaurante, café o bar</h2>
+            <p>Tu local en el listado de gastronomía con fotos, categoría, precio promedio y contacto directo.</p>
+        </div>
+        <div class="simple-plans-grid">
+            <div class="simple-plan-card">
+                <div class="simple-plan-icon icon-amber"><i class="fas fa-utensils"></i></div>
+                <div class="simple-plan-body">
+                    <h3>Publicación Gastronómica</h3>
+                    <p>Tu local con fotos, descripción, tipo de cocina, precio promedio y botón de WhatsApp.</p>
+                    <div class="simple-plan-price">$10.000 <small>/ mes por publicación</small></div>
+                </div>
+            </div>
+            <div class="simple-plan-card" style="background:linear-gradient(135deg,rgba(245,158,11,0.06),rgba(239,68,68,0.04));border-color:rgba(245,158,11,0.25);">
+                <div class="simple-plan-icon" style="background:rgba(245,158,11,0.15);color:#f59e0b;"><i class="fas fa-star"></i></div>
+                <div class="simple-plan-body">
+                    <h3>Incluye</h3>
+                    <p style="margin:0;">
+                        <span style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><i class="fas fa-check" style="color:#22c55e;"></i> Fotos y descripción del local</span>
+                        <span style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><i class="fas fa-check" style="color:#22c55e;"></i> Categoría (parrilla, vegano, café...)</span>
+                        <span style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><i class="fas fa-check" style="color:#22c55e;"></i> Precio promedio visible</span>
+                        <span style="display:flex;align-items:center;gap:6px;"><i class="fas fa-check" style="color:#22c55e;"></i> WhatsApp + redes sociales</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div style="text-align:center; margin-top:-30px; margin-bottom:50px;">
+            <a href="solicitar.html?plan=gastronomia" class="btn-contratar btn-contratar-primary" style="display:inline-block; width:auto; padding:13px 40px;">Publicar mi Restaurante</a>
+        </div>
+
+        <!-- GARANTIAS -->
+        <div class="guarantee-section">
+            <div style="font-size:2.5rem;margin-bottom:12px;">🤝</div>
+            <h3>Sin sorpresas. Sin comisiones.</h3>
+            <p>Pagás una tarifa mensual fija y te quedás con cada reserva o consulta que recibís. Nosotros solo conectamos turistas con vos.</p>
+            <div class="guarantee-pills">
+                <div class="g-pill"><i class="fas fa-check-circle"></i> Activación en 24 hs</div>
+                <div class="g-pill"><i class="fas fa-check-circle"></i> Sin contrato de permanencia</div>
+                <div class="g-pill"><i class="fas fa-check-circle"></i> Sin comisión por reserva</div>
+                <div class="g-pill"><i class="fas fa-check-circle"></i> Soporte por WhatsApp</div>
+                <div class="g-pill"><i class="fas fa-check-circle"></i> Editá tu perfil cuando quieras</div>
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <div style="text-align:center;padding-bottom:40px;">
+            <h3 style="font-family:'Outfit',sans-serif;font-size:1.5rem;font-weight:900;color:var(--text-primary);margin:0 0 10px;">Hablemos por WhatsApp</h3>
+            <p style="color:var(--text-secondary);margin:0 0 24px;font-size:0.9rem;">Te explicamos todo en minutos y activamos tu publicación en el día.</p>
+            <a href="https://wa.me/5492944000000?text=Hola!%20quiero%20publicar%20en%20Bariloche.Online" target="_blank"
+               style="display:inline-flex;align-items:center;gap:10px;background:#25d366;color:white;text-decoration:none;padding:14px 28px;border-radius:16px;font-weight:800;font-size:1rem;font-family:'Outfit',sans-serif;box-shadow:0 8px 24px rgba(37,211,102,0.3);">
+                <i class="fab fa-whatsapp" style="font-size:1.3rem;"></i> Consultar por WhatsApp
+            </a>
+        </div>
+    </div>
+
+    <nav class="mobile-nav">
+        <a href="mapa.html" class="mobile-nav-item"><i class="fas fa-satellite-dish"></i><span>En Vivo</span></a>
+        <a href="comer.html" class="mobile-nav-item"><i class="fas fa-utensils"></i><span>Comer</span></a>
+        <a href="alojamiento.html" class="mobile-nav-item"><i class="fas fa-bed"></i><span>Dormir</span></a>
+        <a href="radios.html" class="mobile-nav-item"><i class="fas fa-broadcast-tower"></i><span>Medios</span></a>
+        <a href="vuelos.html" class="mobile-nav-item"><i class="fas fa-plane"></i><span>Vuelos</span></a>
+    </nav>
+
+    <script src="auth_manager.js?v=2212"></script>
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const cur = html.getAttribute('data-theme');
+            html.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+            localStorage.setItem('theme', html.getAttribute('data-theme'));
+            const btn = document.getElementById('theme-toggle-btn');
+            if (btn) btn.innerHTML = cur === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+        }
+        const saved = localStorage.getItem('theme');
+        if (saved) {
+            document.documentElement.setAttribute('data-theme', saved);
+            const btn = document.getElementById('theme-toggle-btn');
+            if (btn) btn.innerHTML = saved === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        }
+    </script>
+</body>
+</html>
