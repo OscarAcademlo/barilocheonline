@@ -303,22 +303,37 @@
             <div class="section-header-row">
                 <div>
                     <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-tags" style="color:#00b894;"></i> Tarifas y Precios de Suscripción</h2>
-                    <small style="color:var(--text-secondary);">Define el valor mensual de cada servicio y los descuentos automáticos por paquetes combinados.</small>
+                    <small style="color:var(--text-secondary);">Estos precios se cobran con Mercado Pago. Cambiálos aquí y se actualizan automáticamente.</small>
                 </div>
             </div>
 
             <form onsubmit="handleSaveServicePrices(event)">
-                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
-                    <div class="form-group-custom">
-                        <label><i class="fas fa-van-shuttle" style="color:#0084ff;"></i> Excursiones / Combis (ARS)</label>
-                        <input type="number" id="priceExcursiones" class="form-control-custom" min="0" step="500" required>
+                <!-- EXCURSIONES -->
+                <div style="margin-bottom:12px;">
+                    <p style="font-weight:700; font-size:0.85rem; color:#0084ff; margin:0 0 10px; display:flex; align-items:center; gap:6px;"><i class="fas fa-satellite-dish"></i> Planes Excursiones / BariRuta</p>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
+                        <div class="form-group-custom">
+                            <label><i class="fas fa-van-shuttle" style="color:#0084ff;"></i> 1 Vehículo (ARS)</label>
+                            <input type="number" id="priceExc1v" class="form-control-custom" min="0" step="1000" required>
+                        </div>
+                        <div class="form-group-custom">
+                            <label><i class="fas fa-bus" style="color:#0084ff;"></i> Hasta 3 Vehículos (ARS)</label>
+                            <input type="number" id="priceExc3v" class="form-control-custom" min="0" step="1000" required>
+                        </div>
+                        <div class="form-group-custom">
+                            <label><i class="fas fa-truck-moving" style="color:#0084ff;"></i> Flota 5 Vehículos (ARS)</label>
+                            <input type="number" id="priceExc5v" class="form-control-custom" min="0" step="1000" required>
+                        </div>
                     </div>
+                </div>
+                <!-- ALOJAMIENTO + GASTRONOMIA -->
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 12px;">
                     <div class="form-group-custom">
-                        <label><i class="fas fa-bed" style="color:#e67e22;"></i> Alojamiento (ARS)</label>
+                        <label><i class="fas fa-bed" style="color:#818cf8;"></i> Alojamiento /mes (ARS)</label>
                         <input type="number" id="priceAlojamiento" class="form-control-custom" min="0" step="500" required>
                     </div>
                     <div class="form-group-custom">
-                        <label><i class="fas fa-utensils" style="color:#e74c3c;"></i> Gastronomía (ARS)</label>
+                        <label><i class="fas fa-utensils" style="color:#f59e0b;"></i> Gastronomía /mes (ARS)</label>
                         <input type="number" id="priceGastronomia" class="form-control-custom" min="0" step="500" required>
                     </div>
                     <div class="form-group-custom">
@@ -334,6 +349,7 @@
                 <button type="submit" id="btnSavePrices" class="btn-submit-pickup" style="background:#00b894; color:white; font-weight:800; width:auto; padding:12px 24px;">
                     <i class="fas fa-floppy-disk"></i> Guardar Tarifas
                 </button>
+                <small id="pricesSavedMsg" style="display:none; color:#00b894; font-weight:700; margin-left:12px;"><i class="fas fa-check-circle"></i> Guardado</small>
             </form>
         </div>
 
@@ -1002,9 +1018,11 @@
                 const res = await fetch('save_alojamiento.php?action=get_service_prices&t=' + Date.now());
                 const prices = await res.json();
                 if (prices) {
-                    document.getElementById('priceExcursiones').value = prices.excursiones || 10000;
-                    document.getElementById('priceAlojamiento').value = prices.alojamiento || 10000;
-                    document.getElementById('priceGastronomia').value = prices.gastronomia || 10000;
+                    document.getElementById('priceExc1v').value        = prices.excursiones_1v || 50000;
+                    document.getElementById('priceExc3v').value        = prices.excursiones_3v || 70000;
+                    document.getElementById('priceExc5v').value        = prices.excursiones_5v || 120000;
+                    document.getElementById('priceAlojamiento').value  = prices.alojamiento || 10000;
+                    document.getElementById('priceGastronomia').value  = prices.gastronomia || 10000;
                     document.getElementById('discount2Services').value = prices.combo_2_descuento || 10;
                     document.getElementById('discount3Services').value = prices.combo_3_descuento || 20;
                 }
@@ -1020,12 +1038,14 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
 
             const payload = {
-                admin_email: 'oscarns@gmail.com',
-                excursiones: parseInt(document.getElementById('priceExcursiones').value) || 10000,
-                alojamiento: parseInt(document.getElementById('priceAlojamiento').value) || 10000,
-                gastronomia: parseInt(document.getElementById('priceGastronomia').value) || 10000,
-                combo_2_descuento: parseInt(document.getElementById('discount2Services').value) || 10,
-                combo_3_descuento: parseInt(document.getElementById('discount3Services').value) || 20
+                admin_email:        'oscarns@gmail.com',
+                excursiones_1v:     parseInt(document.getElementById('priceExc1v').value)        || 50000,
+                excursiones_3v:     parseInt(document.getElementById('priceExc3v').value)        || 70000,
+                excursiones_5v:     parseInt(document.getElementById('priceExc5v').value)        || 120000,
+                alojamiento:        parseInt(document.getElementById('priceAlojamiento').value)  || 10000,
+                gastronomia:        parseInt(document.getElementById('priceGastronomia').value)  || 10000,
+                combo_2_descuento:  parseInt(document.getElementById('discount2Services').value) || 10,
+                combo_3_descuento:  parseInt(document.getElementById('discount3Services').value) || 20
             };
 
             try {
@@ -1036,7 +1056,8 @@
                 });
                 const data = await res.json();
                 if (data.status === 'success') {
-                    alert('✅ Tarifas de suscripción actualizadas con éxito.');
+                    const msg = document.getElementById('pricesSavedMsg');
+                    if (msg) { msg.style.display = 'inline'; setTimeout(() => msg.style.display='none', 3000); }
                 } else {
                     alert('Error: ' + (data.message || 'No se pudieron guardar las tarifas'));
                 }

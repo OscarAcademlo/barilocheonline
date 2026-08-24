@@ -165,6 +165,7 @@ if ($action === 'create_mp_preference') {
     $raw = file_get_contents('php://input');
     $data = json_decode($raw, true) ?: $_POST;
     $email = strtolower(trim($data['email'] ?? ''));
+    $plan  = strtolower(trim($data['plan'] ?? 'alojamiento')); // excursion-1v, excursion-3v, excursion-5v, alojamiento, gastronomia
 
     if (empty($email)) {
         http_response_code(400);
@@ -172,14 +173,36 @@ if ($action === 'create_mp_preference') {
         exit;
     }
 
+    // Leer precio desde precios_servicios.json (dinámico)
+    $pricesFile = __DIR__ . '/precios_servicios.json';
+    $prices = file_exists($pricesFile) ? json_decode(file_get_contents($pricesFile), true) : [];
+
+    $planPriceMap = [
+        'excursion-1v'  => intval($prices['excursiones_1v'] ?? 50000),
+        'excursion-3v'  => intval($prices['excursiones_3v'] ?? 70000),
+        'excursion-5v'  => intval($prices['excursiones_5v'] ?? 120000),
+        'alojamiento'   => intval($prices['alojamiento'] ?? 10000),
+        'gastronomia'   => intval($prices['gastronomia'] ?? 10000),
+    ];
+    $planPrice = $planPriceMap[$plan] ?? intval($prices['alojamiento'] ?? 10000);
+
+    $planLabels = [
+        'excursion-1v'  => 'Excursiones - 1 Vehículo GPS (1 mes)',
+        'excursion-3v'  => 'Excursiones - Hasta 3 Vehículos GPS (1 mes)',
+        'excursion-5v'  => 'Excursiones - Flota 5 Vehículos GPS (1 mes)',
+        'alojamiento'   => 'Publicación Alojamiento (1 mes)',
+        'gastronomia'   => 'Publicación Gastronomía (1 mes)',
+    ];
+    $planLabel = $planLabels[$plan] ?? 'Suscripción Bariloche.Online (1 mes)';
+
     $preferenceData = [
         'items' => [
             [
-                'title' => 'Suscripción Publicación Alojamiento (1 Mes) - Bariloche.Online',
-                'description' => 'Aparición destacada con mapa y WhatsApp en Bariloche.Online',
-                'quantity' => 1,
+                'title'       => $planLabel . ' - Bariloche.Online',
+                'description' => 'Aparición destacada en Bariloche.Online',
+                'quantity'    => 1,
                 'currency_id' => 'ARS',
-                'unit_price' => PRICE_ARS
+                'unit_price'  => $planPrice
             ]
         ],
         'payer' => [
@@ -635,12 +658,14 @@ if ($action === 'get_service_prices') {
     $pricesFile = __DIR__ . '/precios_servicios.json';
     if (!file_exists($pricesFile)) {
         $defaultPrices = [
-            'excursiones' => 10000,
-            'alojamiento' => 10000,
-            'gastronomia' => 10000,
+            'excursiones_1v'    => 50000,
+            'excursiones_3v'    => 70000,
+            'excursiones_5v'    => 120000,
+            'alojamiento'       => 10000,
+            'gastronomia'       => 10000,
             'combo_2_descuento' => 10,
             'combo_3_descuento' => 20,
-            'updated_at' => date('c')
+            'updated_at'        => date('c')
         ];
         file_put_contents($pricesFile, json_encode($defaultPrices, JSON_PRETTY_PRINT));
     }
@@ -662,13 +687,15 @@ if ($action === 'save_service_prices') {
 
     $pricesFile = __DIR__ . '/precios_servicios.json';
     $prices = [
-        'excursiones' => max(0, intval($data['excursiones'] ?? 10000)),
-        'alojamiento' => max(0, intval($data['alojamiento'] ?? 10000)),
-        'gastronomia' => max(0, intval($data['gastronomia'] ?? 10000)),
+        'excursiones_1v'    => max(0, intval($data['excursiones_1v']    ?? 50000)),
+        'excursiones_3v'    => max(0, intval($data['excursiones_3v']    ?? 70000)),
+        'excursiones_5v'    => max(0, intval($data['excursiones_5v']    ?? 120000)),
+        'alojamiento'       => max(0, intval($data['alojamiento']       ?? 10000)),
+        'gastronomia'       => max(0, intval($data['gastronomia']       ?? 10000)),
         'combo_2_descuento' => max(0, min(100, intval($data['combo_2_descuento'] ?? 10))),
         'combo_3_descuento' => max(0, min(100, intval($data['combo_3_descuento'] ?? 20))),
-        'updated_at' => date('c'),
-        'updated_by' => $adminEmail
+        'updated_at'        => date('c'),
+        'updated_by'        => $adminEmail
     ];
 
     file_put_contents($pricesFile, json_encode($prices, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
