@@ -1263,6 +1263,55 @@ if ($action === 'admin_delete_provider') {
     exit;
 }
 
+// 19b. PANEL ADMIN: ELIMINAR MÓVIL ESPECÍFICO DE UN PROVEEDOR
+if ($action === 'admin_delete_movil') {
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true) ?: $_POST;
+    $adminEmail = strtolower(trim($data['admin_email'] ?? ''));
+
+    if ($adminEmail !== ADMIN_EMAIL) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
+        exit;
+    }
+
+    $targetEmail = strtolower(trim($data['target_email'] ?? ''));
+    $movilId = trim($data['movil_id'] ?? '');
+
+    $provFile = __DIR__ . '/proveedores_servicios.json';
+    $providers = file_exists($provFile) ? json_decode(file_get_contents($provFile), true) : [];
+    if (!is_array($providers)) $providers = [];
+
+    $deleted = false;
+    foreach ($providers as &$p) {
+        if (strtolower(trim($p['email'] ?? '')) === $targetEmail) {
+            $moviles = $p['moviles'] ?? [];
+            $newMoviles = [];
+            foreach ($moviles as $m) {
+                if (($m['id'] ?? '') !== $movilId) {
+                    $newMoviles[] = $m;
+                } else {
+                    $deleted = true;
+                }
+            }
+            $p['moviles'] = $newMoviles;
+            $p['cantidad_moviles'] = count($newMoviles);
+            break;
+        }
+    }
+    unset($p);
+
+    if ($deleted) {
+        file_put_contents($provFile, json_encode($providers, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        echo json_encode(['status' => 'success', 'message' => 'Móvil eliminado correctamente']);
+        exit;
+    }
+
+    http_response_code(404);
+    echo json_encode(['status' => 'error', 'message' => 'Móvil no encontrado']);
+    exit;
+}
+
 // 20. PANEL ADMIN: ENVIAR MENSAJE A USUARIO
 if ($action === 'admin_send_user_message') {
     $raw = file_get_contents('php://input');
@@ -1513,10 +1562,255 @@ if ($action === 'delete_gastronomia') {
     if ($deleted) {
         file_put_contents($file, json_encode($newList, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         echo json_encode(['status' => 'success', 'message' => 'Local gastronómico eliminado']);
-    } else {
-        http_response_code(404);
-        echo json_encode(['status' => 'error', 'message' => 'Local no encontrado']);
+        exit;
     }
+
+    http_response_code(404);
+    echo json_encode(['status' => 'error', 'message' => 'Local no encontrado']);
+    exit;
+}
+
+// 25. OBTENER CATEGORÍAS DE SERVICIOS DINÁMICAS
+if ($action === 'get_service_categories') {
+    $file = __DIR__ . '/categorias_servicios.json';
+    if (!file_exists($file)) {
+        file_put_contents($file, '[]');
+    }
+    echo file_get_contents($file);
+    exit;
+}
+
+// 26. GUARDAR / EDITAR CATEGORÍA DE SERVICIOS (SOLO ADMIN)
+if ($action === 'admin_save_category') {
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true) ?: $_POST;
+    $adminEmail = strtolower(trim($data['admin_email'] ?? ''));
+
+    if ($adminEmail !== ADMIN_EMAIL) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'Acceso denegado: solo el administrador puede gestionar categorías']);
+        exit;
+    }
+
+    $file = __DIR__ . '/categorias_servicios.json';
+    $cats = file_exists($file) ? json_decode(file_get_contents($file), true) : [];
+    if (!is_array($cats)) $cats = [];
+
+    $catId = trim($data['id'] ?? '');
+    $catName = trim($data['name'] ?? '');
+    $catIcon = trim($data['icon'] ?? 'fa-briefcase');
+    $catDesc = trim($data['description'] ?? '');
+
+    if (empty($catName)) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'El nombre de la categoría es obligatorio']);
+        exit;
+    }
+
+    if (empty($catId)) {
+        $catId = strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', str_replace(' ', '_', $catName))) . '_' . uniqid();
+    }
+
+    $item = [
+        'id' => $catId,
+        'name' => $catName,
+        'icon' => $catIcon,
+        'description' => $catDesc,
+        'is_active' => isset($data['is_active']) ? (bool)$data['is_active'] : true
+    ];
+
+    $found = false;
+    foreach ($cats as &$c) {
+        if ($c['id'] === $catId) {
+            $c = array_merge($c, $item);
+            $found = true;
+            break;
+        }
+    }
+    unset($c);
+
+    if (!$found) {
+        $cats[] = $item;
+    }
+
+    file_put_contents($file, json_encode($cats, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    @chmod($file, 0666);
+
+    echo json_encode(['status' => 'success', 'message' => 'Categoría guardada con éxito', 'data' => $item]);
+    exit;
+}
+
+// 27. ELIMINAR CATEGORÍA DE SERVICIOS (SOLO ADMIN)
+if ($action === 'admin_delete_category') {
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true) ?: $_POST;
+    $adminEmail = strtolower(trim($data['admin_email'] ?? ''));
+    $catId = trim($data['id'] ?? '');
+
+    if ($adminEmail !== ADMIN_EMAIL) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
+        exit;
+    }
+
+    $file = __DIR__ . '/categorias_servicios.json';
+    $cats = file_exists($file) ? json_decode(file_get_contents($file), true) : [];
+    $newList = array_values(array_filter($cats, function($c) use ($catId) {
+        return ($c['id'] ?? '') !== $catId;
+    }));
+
+    file_put_contents($file, json_encode($newList, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    echo json_encode(['status' => 'success', 'message' => 'Categoría eliminada']);
+    exit;
+}
+
+// 28. OBTENER SERVICIOS PROFESIONALES (Guías, Mascotas, etc.)
+if ($action === 'get_servicios') {
+    $file = __DIR__ . '/servicios_profesionales.json';
+    if (!file_exists($file)) {
+        file_put_contents($file, '[]');
+    }
+    $list = json_decode(file_get_contents($file), true);
+    if (!is_array($list)) $list = [];
+
+    $category = trim($_GET['category'] ?? '');
+    $email = strtolower(trim($_GET['email'] ?? ''));
+
+    if (!empty($category)) {
+        $list = array_values(array_filter($list, function($s) use ($category) {
+            return ($s['category_id'] ?? '') === $category;
+        }));
+    }
+    if (!empty($email)) {
+        $list = array_values(array_filter($list, function($s) use ($email) {
+            return strtolower(trim($s['email'] ?? '')) === $email;
+        }));
+    }
+
+    echo json_encode($list);
+    exit;
+}
+
+// 29. GUARDAR / EDITAR SERVICIO PROFESIONAL
+if ($action === 'save_servicio') {
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true) ?: $_POST;
+    $email = strtolower(trim($data['email'] ?? ''));
+
+    if (empty($email)) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'Email requerido']);
+        exit;
+    }
+
+    $srvId = trim($data['id'] ?? '') ?: ('srv_' . uniqid());
+    $name = trim($data['name'] ?? '');
+    $categoryId = trim($data['category_id'] ?? '');
+    $specialty = trim($data['specialty'] ?? '');
+    $description = trim($data['description'] ?? '');
+    $phone = trim($data['phone'] ?? '');
+    $location = trim($data['location'] ?? 'Bariloche');
+    $price = trim($data['price'] ?? '');
+    $images = is_array($data['images'] ?? null) ? $data['images'] : [];
+
+    if (empty($name) || empty($categoryId)) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'El nombre y la categoría son obligatorios']);
+        exit;
+    }
+
+    if (empty($images)) {
+        $images = ['https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800'];
+    }
+
+    $newItem = [
+        'id' => $srvId,
+        'email' => $email,
+        'name' => $name,
+        'category_id' => $categoryId,
+        'specialty' => $specialty,
+        'description' => $description,
+        'phone' => $phone,
+        'location' => $location,
+        'price' => $price,
+        'images' => $images,
+        'is_active' => isset($data['is_active']) ? (bool)$data['is_active'] : true,
+        'updated_at' => date('c')
+    ];
+
+    $file = __DIR__ . '/servicios_profesionales.json';
+    $list = file_exists($file) ? json_decode(file_get_contents($file), true) : [];
+    if (!is_array($list)) $list = [];
+
+    $isAdmin = ($email === ADMIN_EMAIL);
+    $foundIndex = -1;
+    foreach ($list as $idx => $item) {
+        if ($item['id'] === $srvId) {
+            if ($item['email'] !== $email && !$isAdmin) {
+                http_response_code(403);
+                echo json_encode(['status' => 'error', 'message' => 'No tienes permiso para editar este servicio']);
+                exit;
+            }
+            $foundIndex = $idx;
+            break;
+        }
+    }
+
+    if ($foundIndex >= 0) {
+        $list[$foundIndex] = array_merge($list[$foundIndex], $newItem);
+    } else {
+        $newItem['created_at'] = date('c');
+        array_unshift($list, $newItem);
+    }
+
+    file_put_contents($file, json_encode($list, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    @chmod($file, 0666);
+
+    echo json_encode(['status' => 'success', 'message' => 'Servicio guardado con éxito', 'data' => $newItem]);
+    exit;
+}
+
+// 30. ELIMINAR SERVICIO PROFESIONAL
+if ($action === 'delete_servicio') {
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true) ?: $_POST;
+    $id = trim($data['id'] ?? '');
+    $email = strtolower(trim($data['email'] ?? ''));
+
+    if (empty($id) || empty($email)) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'ID y email requeridos']);
+        exit;
+    }
+
+    $isAdmin = ($email === ADMIN_EMAIL);
+    $file = __DIR__ . '/servicios_profesionales.json';
+    $list = file_exists($file) ? json_decode(file_get_contents($file), true) : [];
+
+    $newList = [];
+    $deleted = false;
+    foreach ($list as $item) {
+        if ($item['id'] === $id) {
+            if ($item['email'] === $email || $isAdmin) {
+                $deleted = true;
+                continue;
+            } else {
+                http_response_code(403);
+                echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
+                exit;
+            }
+        }
+        $newList[] = $item;
+    }
+
+    if ($deleted) {
+        file_put_contents($file, json_encode($newList, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        echo json_encode(['status' => 'success', 'message' => 'Servicio eliminado']);
+        exit;
+    }
+
+    http_response_code(404);
+    echo json_encode(['status' => 'error', 'message' => 'Servicio no encontrado']);
     exit;
 }
 

@@ -1,0 +1,36 @@
+[
+  {
+    "id": "srv_guia_patagonia_01",
+    "email": "nicolasbariloche@icloud.com",
+    "name": "Nahuel Aventura - Guía de Montaña",
+    "category_id": "guias_montana",
+    "specialty": "Trekking Frey, Tronador y Laguna Negra",
+    "description": "Guía habilitado en el Parque Nacional Nahuel Huapi. Salidas grupales y personalizadas a refugios, ascensos y travesías de media y alta montaña.",
+    "phone": "5492944674774",
+    "location": "Bariloche y Parque Nacional",
+    "price": "Desde $45.000 / día",
+    "images": [
+      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800",
+      "https://images.unsplash.com/photo-1551632811-561732d1e306?w=800"
+    ],
+    "is_active": true,
+    "created_at": "2026-08-24T12:00:00Z"
+  },
+  {
+    "id": "srv_mascotas_pata_01",
+    "email": "oscarns@gmail.com",
+    "name": "Guardería Canina Patitas Bariloche",
+    "category_id": "mascotas",
+    "specialty": "Cuidado diurno y pensión completa con parque libre",
+    "description": "Espacio cerrado de 2.000m2 en Bustillo Km 8. Atención personalizada, juegos y fotos diarias por WhatsApp durante tu excursión.",
+    "phone": "5492944674774",
+    "location": "Av. Bustillo Km 8.5, Bariloche",
+    "price": "Tarifa diaria $15.000",
+    "images": [
+      "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=800",
+      "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=800"
+    ],
+    "is_active": true,
+    "created_at": "2026-08-24T12:00:00Z"
+  }
+]

@@ -1,0 +1,44 @@
+[
+  {
+    "id": "guias_montana",
+    "name": "Guías de Montaña y Trekking",
+    "icon": "fa-mountain-sun",
+    "description": "Profesionales AAGM y guías de senderismo habilitados para expediciones y refugios.",
+    "is_active": true
+  },
+  {
+    "id": "guias_turisticos",
+    "name": "Guías Turísticos Oficiales",
+    "icon": "fa-map-location-dot",
+    "description": "Circuitos históricos, culturales y recorridos personalizados por Bariloche.",
+    "is_active": true
+  },
+  {
+    "id": "mascotas",
+    "name": "Guardería y Cuidado de Mascotas",
+    "icon": "fa-paw",
+    "description": "Alojamiento canino, paseos y cuidadores de confianza durante tus vacaciones.",
+    "is_active": true
+  },
+  {
+    "id": "rentacar",
+    "name": "Alquiler de Autos y 4x4",
+    "icon": "fa-car-side",
+    "description": "Vehículos para recorrer los 7 Lagos, Circuito Chico y la Patagonia.",
+    "is_active": true
+  },
+  {
+    "id": "fotografia",
+    "name": "Fotografía y Dron",
+    "icon": "fa-camera",
+    "description": "Sesiones fotográficas en paisajes icónicos, eventos y videos aéreos.",
+    "is_active": true
+  },
+  {
+    "id": "esqui_snowboard",
+    "name": "Clases de Esquí y Snowboard",
+    "icon": "fa-person-skiing",
+    "description": "Instructores certificados para todos los niveles en Cerro Catedral.",
+    "is_active": true
+  }
+]

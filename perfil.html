@@ -303,6 +303,7 @@
         <a href="index.html" class="logo" style="text-decoration:none; color:inherit;"><b>B</b> BARILOCHE.ONLINE</a>
         <nav class="nav-desktop">
             <a href="mapa.html" class="nav-link"><i class="fas fa-satellite-dish"></i> EN VIVO</a>
+            <a href="servicios.html" class="nav-link">SERVICIOS</a>
             <a href="comer.html" class="nav-link">COMER</a>
             <a href="alojamiento.html" class="nav-link">DORMIR</a>
             <a href="radios.html" class="nav-link">MEDIOS</a>
@@ -395,6 +396,9 @@
                 <button class="service-tab-btn" id="tabBtnGastronomia" onclick="switchDashboardTab('gastronomia')" style="display:none;">
                     <i class="fas fa-utensils" style="color:#e74c3c;"></i> Mis Locales Gastronómicos
                 </button>
+                <button class="service-tab-btn" id="tabBtnServiciosProf" onclick="switchDashboardTab('servicios_prof')" style="display:none;">
+                    <i class="fas fa-briefcase" style="color:#00cec9;"></i> Mis Guías y Servicios
+                </button>
             </div>
 
             <!-- 1. SELECCIÓN DE SERVICIOS Y CALCULADORA DINÁMICA -->
@@ -431,6 +435,15 @@
                             <b style="font-size:1.05rem; display:block;"><i class="fas fa-utensils" style="color:#e74c3c;"></i> Dónde Comer (Gastronomía)</b>
                             <small style="color:var(--text-secondary);">Cervecerías, parrillas y chocolaterías con promos y WhatsApp.</small>
                             <div style="margin-top:6px; font-weight:800; color:#e74c3c;" id="labelPriceGastronomia">$10.000/mes</div>
+                        </div>
+                    </label>
+
+                    <label class="service-check-card" id="cardServiceServiciosProf">
+                        <input type="checkbox" id="checkServiciosProf" onchange="handleServiceSelectionChange()">
+                        <div>
+                            <b style="font-size:1.05rem; display:block;"><i class="fas fa-briefcase" style="color:#00cec9;"></i> Guías & Servicios Especiales</b>
+                            <small style="color:var(--text-secondary);">Guías de montaña, guardería de mascotas, rent a car, fotografía, etc.</small>
+                            <div style="margin-top:6px; font-weight:800; color:#00cec9;" id="labelPriceServiciosProf">$10.000/mes</div>
                         </div>
                     </label>
                 </div>
@@ -534,8 +547,88 @@
                 </div>
                 <div id="myGastronomyList" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:15px; margin-top:15px;"></div>
             </div>
+
+            <!-- 5. GESTIÓN DE GUÍAS Y SERVICIOS PROFESIONALES PROPIOS -->
+            <div class="dash-card" id="tabViewServiciosProf" style="display:none;">
+                <div class="section-header-row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:18px;">
+                    <div>
+                        <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;"><i class="fas fa-briefcase" style="color:#00cec9;"></i> Mis Servicios y Guías Publicados</h2>
+                        <small style="color:var(--text-secondary);">Publicá tus servicios como guía de montaña, guardería de mascotas, rent a car, fotografía, etc., con fotos y contacto directo por WhatsApp.</small>
+                    </div>
+                    <button class="btn-add-movil" onclick="openServicioProfEditor()" style="background:#00cec9; color:#0f172a; font-weight:800;">
+                        <i class="fas fa-plus"></i> + Publicar Nuevo Servicio
+                    </button>
+                </div>
+                <div id="myServiciosProfList" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:15px; margin-top:15px;"></div>
+            </div>
         </div>
     </main>
+
+    <!-- MODAL EDITOR DE SERVICIO PROFESIONAL / GUÍA -->
+    <div id="servicioProfEditorModal" class="modal-overlay" onclick="closeServicioProfEditor()" style="display:none; z-index:100000;">
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width:640px; width:95%; max-height:90vh; overflow-y:auto; background:#1e293b; color:white; border-radius:24px; padding:26px; border:1px solid rgba(255,255,255,0.15); box-shadow:0 25px 60px rgba(0,0,0,0.8);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+                <h2 style="font-family:'Outfit'; font-size:1.3rem; margin:0;" id="srvProfModalTitle"><i class="fas fa-briefcase" style="color:#00cec9;"></i> Publicar Servicio / Guía</h2>
+                <button onclick="closeServicioProfEditor()" style="background:none; border:none; color:#94a3b8; font-size:1.3rem; cursor:pointer;"><i class="fas fa-times"></i></button>
+            </div>
+
+            <form onsubmit="handleSaveServicioProfForm(event)" id="srvProfForm">
+                <input type="hidden" id="srvProfEditId" value="">
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:12px;">
+                    <div class="form-group-custom">
+                        <label style="font-size:0.82rem; font-weight:700;">Nombre del Servicio o Profesional</label>
+                        <input type="text" id="srvProfName" required placeholder="Ej: Nahuel Aventura - Guía" style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
+                    </div>
+                    <div class="form-group-custom">
+                        <label style="font-size:0.82rem; font-weight:700;">Categoría de Servicio</label>
+                        <select id="srvProfCategory" required style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
+                            <option value="">Cargando categorías...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group-custom" style="margin-bottom:12px;">
+                    <label style="font-size:0.82rem; font-weight:700;">Especialidad / Título destacado</label>
+                    <input type="text" id="srvProfSpecialty" required placeholder="Ej: Trekking Frey, Tronador y Refugios" style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
+                </div>
+
+                <div class="form-group-custom" style="margin-bottom:12px;">
+                    <label style="font-size:0.82rem; font-weight:700;">Descripción detallada de la propuesta</label>
+                    <textarea id="srvProfDescription" rows="3" placeholder="Contá qué incluye el servicio, experiencia, equipamiento, horarios..." required style="width:100%; border-radius:10px; padding:10px 12px; background:#0f172a; border:1px solid #334155; color:white;"></textarea>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:12px;">
+                    <div class="form-group-custom">
+                        <label style="font-size:0.82rem; font-weight:700;">📱 Celular / WhatsApp (con 549)</label>
+                        <input type="tel" id="srvProfPhone" required placeholder="Ej: 5492944674774" style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
+                    </div>
+                    <div class="form-group-custom">
+                        <label style="font-size:0.82rem; font-weight:700;">Ubicación / Zona de Cobertura</label>
+                        <input type="text" id="srvProfLocation" placeholder="Ej: Bariloche y P.N. Nahuel Huapi" style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:15px;">
+                    <div class="form-group-custom">
+                        <label style="font-size:0.82rem; font-weight:700;">Tarifa / Precio Orientativo</label>
+                        <input type="text" id="srvProfPrice" placeholder="Ej: Desde $35.000 / día" style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
+                    </div>
+                    <div class="form-group-custom">
+                        <label style="font-size:0.82rem; font-weight:700;">Foto Principal (URL o Unsplash)</label>
+                        <input type="url" id="srvProfImageUrl" placeholder="https://..." style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px;">
+                    <button type="button" onclick="closeServicioProfEditor()" style="background:#334155; color:white; border:none; padding:12px 20px; border-radius:12px; font-weight:700; cursor:pointer;">Cancelar</button>
+                    <button type="submit" id="btnSaveSrvProf" style="background:#00cec9; color:#0f172a; border:none; padding:12px 28px; border-radius:12px; font-weight:800; cursor:pointer;">
+                        <i class="fas fa-floppy-disk"></i> Guardar y Publicar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- MODAL EDITOR COMPLETO DE LOCAL GASTRONÓMICO CON AUTOCOMPLETADO DE CALLE, MAPA Y SUBIDA DE FOTOS -->
     <div id="gastoEditorModal" class="modal-overlay" onclick="closeGastronomyEditor()" style="display:none; z-index:100000;">
@@ -646,23 +739,23 @@
     <nav class="mobile-nav">
         <a href="mapa.html" class="mobile-nav-item">
             <i class="fas fa-satellite-dish"></i>
-            <span>Excursiones</span>
+            <span>En Vivo</span>
         </a>
-        <a href="radios.html" class="mobile-nav-item">
-            <i class="fas fa-radio"></i>
-            <span>Radios</span>
+        <a href="servicios.html" class="mobile-nav-item">
+            <i class="fas fa-briefcase"></i>
+            <span>Servicios</span>
         </a>
-        <a href="vuelos.html" class="mobile-nav-item">
-            <i class="fas fa-plane"></i>
-            <span>Vuelos</span>
+        <a href="comer.html" class="mobile-nav-item">
+            <i class="fas fa-utensils"></i>
+            <span>Comer</span>
         </a>
         <a href="alojamiento.html" class="mobile-nav-item">
             <i class="fas fa-bed"></i>
             <span>Dormir</span>
         </a>
-        <a href="comer.html" class="mobile-nav-item">
-            <i class="fas fa-utensils"></i>
-            <span>Comer</span>
+        <a href="vuelos.html" class="mobile-nav-item">
+            <i class="fas fa-plane"></i>
+            <span>Vuelos</span>
         </a>
     </nav>
 
@@ -722,27 +815,40 @@
 
         function switchDashboardTab(tabId) {
             document.querySelectorAll('.service-tab-btn').forEach(btn => btn.classList.remove('active'));
-            const activeBtn = document.getElementById('tabBtn' + tabId.charAt(0).toUpperCase() + tabId.slice(1));
-            if (activeBtn) activeBtn.classList.add('active');
+            if (tabId === 'servicios_prof') {
+                const btn = document.getElementById('tabBtnServiciosProf');
+                if (btn) btn.classList.add('active');
+            } else {
+                const activeBtn = document.getElementById('tabBtn' + tabId.charAt(0).toUpperCase() + tabId.slice(1));
+                if (activeBtn) activeBtn.classList.add('active');
+            }
 
             document.getElementById('tabViewServicios').style.display = (tabId === 'servicios') ? 'block' : 'none';
             document.getElementById('tabViewExcursiones').style.display = (tabId === 'excursiones') ? 'block' : 'none';
             document.getElementById('tabViewAlojamiento').style.display = (tabId === 'alojamiento') ? 'block' : 'none';
             document.getElementById('tabViewGastronomia').style.display = (tabId === 'gastronomia') ? 'block' : 'none';
+            document.getElementById('tabViewServiciosProf').style.display = (tabId === 'servicios_prof') ? 'block' : 'none';
         }
 
         function handleServiceSelectionChange() {
             const chkExc = document.getElementById('checkExcursiones').checked;
             const chkAcc = document.getElementById('checkAlojamiento').checked;
             const chkGas = document.getElementById('checkGastronomia').checked;
+            const chkSrv = document.getElementById('checkServiciosProf') ? document.getElementById('checkServiciosProf').checked : false;
 
             document.getElementById('cardServiceExcursiones').classList.toggle('selected', chkExc);
             document.getElementById('cardServiceAlojamiento').classList.toggle('selected', chkAcc);
             document.getElementById('cardServiceGastronomia').classList.toggle('selected', chkGas);
+            if (document.getElementById('cardServiceServiciosProf')) {
+                document.getElementById('cardServiceServiciosProf').classList.toggle('selected', chkSrv);
+            }
 
             document.getElementById('tabBtnExcursiones').style.display = chkExc ? 'inline-flex' : 'none';
             document.getElementById('tabBtnAlojamiento').style.display = chkAcc ? 'inline-flex' : 'none';
             document.getElementById('tabBtnGastronomia').style.display = chkGas ? 'inline-flex' : 'none';
+            if (document.getElementById('tabBtnServiciosProf')) {
+                document.getElementById('tabBtnServiciosProf').style.display = chkSrv ? 'inline-flex' : 'none';
+            }
 
             calculateTotalPrice();
         }
@@ -751,16 +857,18 @@
             const chkExc = document.getElementById('checkExcursiones').checked;
             const chkAcc = document.getElementById('checkAlojamiento').checked;
             const chkGas = document.getElementById('checkGastronomia').checked;
+            const chkSrv = document.getElementById('checkServiciosProf') ? document.getElementById('checkServiciosProf').checked : false;
 
             let count = 0;
             let sum = 0;
             if (chkExc) { count++; sum += (currentPrices.excursiones || 10000); }
             if (chkAcc) { count++; sum += (currentPrices.alojamiento || 10000); }
             if (chkGas) { count++; sum += (currentPrices.gastronomia || 10000); }
+            if (chkSrv) { count++; sum += 10000; }
 
             let discount = 0;
             if (count === 2) discount = currentPrices.combo_2_descuento || 10;
-            if (count === 3) discount = currentPrices.combo_3_descuento || 20;
+            if (count >= 3) discount = currentPrices.combo_3_descuento || 20;
 
             const finalPrice = Math.round(sum * (1 - discount / 100));
             document.getElementById('totalCalculatedPrice').textContent = count > 0 ? `$${finalPrice.toLocaleString('es-AR')} / mes` : '$0 / mes';
@@ -785,6 +893,9 @@
                     document.getElementById('checkExcursiones').checked = services.includes('excursiones');
                     document.getElementById('checkAlojamiento').checked = services.includes('alojamiento');
                     document.getElementById('checkGastronomia').checked = services.includes('gastronomia');
+                    if (document.getElementById('checkServiciosProf')) {
+                        document.getElementById('checkServiciosProf').checked = services.includes('servicios_prof');
+                    }
                     handleServiceSelectionChange();
 
                     if (currentProviderData) {
@@ -806,6 +917,8 @@
 
                     renderMyAccommodations(myAccommodations);
                     renderMyGastronomy(myGastronomy);
+                    loadMyServiciosProf(email);
+                    loadServiceCategoriesForSelect();
 
                     // Verificar estado de suscripción / canje del usuario
                     checkUserSubscriptionState(email);
@@ -1544,6 +1657,220 @@
                     loadUserAdminMessages(window.authManager.currentUser.email);
                 }
             } catch (e) {}
+        }
+
+        // ==========================================
+        // GESTIÓN DE GUÍAS Y SERVICIOS PROFESIONALES
+        // ==========================================
+        let availableServiceCategories = [];
+        let myServiciosProf = [];
+
+        async function loadServiceCategoriesForSelect() {
+            try {
+                const res = await fetch(`save_alojamiento.php?action=get_service_categories&t=${Date.now()}`);
+                const data = await res.json();
+                availableServiceCategories = Array.isArray(data) ? data : [];
+                
+                const select = document.getElementById('srvProfCategory');
+                if (select) {
+                    select.innerHTML = '<option value="">-- Seleccioná una categoría --</option>' +
+                        availableServiceCategories.filter(c => c.is_active !== false).map(c => `
+                            <option value="${c.id}">${c.name}</option>
+                        `).join('');
+                }
+            } catch (e) {
+                console.error('Error al cargar categorías:', e);
+            }
+        }
+
+        async function loadMyServiciosProf(email) {
+            const container = document.getElementById('myServiciosProfList');
+            if (!container) return;
+
+            try {
+                const res = await fetch(`save_alojamiento.php?action=get_servicios&email=${encodeURIComponent(email)}&t=${Date.now()}`);
+                const data = await res.json();
+                myServiciosProf = Array.isArray(data) ? data : [];
+                renderMyServiciosProf();
+            } catch (e) {
+                container.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#ef4444;">Error al cargar tus servicios.</div>';
+            }
+        }
+
+        function renderMyServiciosProf() {
+            const container = document.getElementById('myServiciosProfList');
+            if (!container) return;
+
+            if (myServiciosProf.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column:1/-1; text-align:center; padding:30px; border:2px dashed var(--border); border-radius:18px;">
+                        <i class="fas fa-briefcase" style="font-size:2rem; color:var(--text-secondary); margin-bottom:10px; display:block;"></i>
+                        <b style="color:var(--text-primary); display:block; margin-bottom:5px;">Aún no publicaste ningún servicio o guía</b>
+                        <small style="color:var(--text-secondary); display:block; margin-bottom:15px;">Hacé clic en el botón para publicar tu propuesta con fotos y contacto directo por WhatsApp.</small>
+                        <button onclick="openServicioProfEditor()" style="background:#00cec9; color:#0f172a; border:none; padding:10px 20px; border-radius:10px; font-weight:800; cursor:pointer;">
+                            <i class="fas fa-plus"></i> Publicar Servicio Ahora
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = myServiciosProf.map(s => {
+                const cat = availableServiceCategories.find(c => c.id === s.category_id);
+                const img = (s.images && s.images.length > 0) ? s.images[0] : 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800';
+                return `
+                    <div style="background:var(--bg-main); border:1.5px solid var(--border); border-radius:18px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
+                        <div style="height:140px; background:url('${img}') center/cover no-repeat; position:relative;">
+                            <span style="position:absolute; top:10px; left:10px; background:rgba(0,206,201,0.9); color:#0f172a; font-size:0.75rem; font-weight:800; padding:3px 8px; border-radius:6px;">
+                                <i class="fas ${cat?.icon || 'fa-briefcase'}"></i> ${cat?.name || s.category_id}
+                            </span>
+                        </div>
+                        <div style="padding:15px; flex:1; display:flex; flex-direction:column; justify-content:space-between;">
+                            <div>
+                                <b style="font-size:1.05rem; display:block; margin-bottom:4px; color:var(--text-primary);">${s.name}</b>
+                                <small style="color:var(--primary); font-weight:700; display:block; margin-bottom:8px;">${s.specialty || ''}</small>
+                                <p style="font-size:0.85rem; color:var(--text-secondary); margin:0 0 10px 0; line-height:1.4;">${s.description ? s.description.substring(0, 110) + '...' : ''}</p>
+                                <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+                                    <span><i class="fas fa-location-dot"></i> ${s.location || 'Bariloche'}</span>
+                                    <b style="color:#00b894;">${s.price || ''}</b>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:8px;">
+                                <button onclick="openServicioProfEditor('${s.id}')" style="flex:1; background:var(--bg-secondary); color:var(--text-primary); border:1px solid var(--border); padding:8px; border-radius:8px; font-weight:700; font-size:0.8rem; cursor:pointer;">
+                                    <i class="fas fa-pen"></i> Editar
+                                </button>
+                                <button onclick="deleteMyServicioProf('${s.id}')" style="background:rgba(239,68,68,0.1); color:#ef4444; border:none; padding:8px 12px; border-radius:8px; font-weight:700; font-size:0.8rem; cursor:pointer;" title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openServicioProfEditor(id = '') {
+            const modal = document.getElementById('servicioProfEditorModal');
+            if (!modal) return;
+
+            loadServiceCategoriesForSelect();
+
+            if (id) {
+                const s = myServiciosProf.find(item => item.id === id);
+                if (!s) return;
+                document.getElementById('srvProfModalTitle').innerHTML = '<i class="fas fa-pen" style="color:#00cec9;"></i> Editar Servicio / Guía';
+                document.getElementById('srvProfEditId').value = s.id;
+                document.getElementById('srvProfName').value = s.name || '';
+                document.getElementById('srvProfCategory').value = s.category_id || '';
+                document.getElementById('srvProfSpecialty').value = s.specialty || '';
+                document.getElementById('srvProfDescription').value = s.description || '';
+                document.getElementById('srvProfPhone').value = s.phone || '';
+                document.getElementById('srvProfLocation').value = s.location || '';
+                document.getElementById('srvProfPrice').value = s.price || '';
+                document.getElementById('srvProfImageUrl').value = (s.images && s.images.length > 0) ? s.images[0] : '';
+            } else {
+                document.getElementById('srvProfModalTitle').innerHTML = '<i class="fas fa-briefcase" style="color:#00cec9;"></i> Publicar Servicio / Guía';
+                document.getElementById('srvProfEditId').value = '';
+                document.getElementById('srvProfName').value = '';
+                document.getElementById('srvProfCategory').value = '';
+                document.getElementById('srvProfSpecialty').value = '';
+                document.getElementById('srvProfDescription').value = '';
+                document.getElementById('srvProfPhone').value = currentProviderData?.phone || '';
+                document.getElementById('srvProfLocation').value = 'Bariloche';
+                document.getElementById('srvProfPrice').value = '';
+                document.getElementById('srvProfImageUrl').value = '';
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function closeServicioProfEditor() {
+            const modal = document.getElementById('servicioProfEditorModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        async function handleSaveServicioProfForm(e) {
+            e.preventDefault();
+            if (!window.authManager.currentUser) return;
+            const email = window.authManager.currentUser.email;
+
+            const id = document.getElementById('srvProfEditId').value.trim();
+            const name = document.getElementById('srvProfName').value.trim();
+            const category_id = document.getElementById('srvProfCategory').value.trim();
+            const specialty = document.getElementById('srvProfSpecialty').value.trim();
+            const description = document.getElementById('srvProfDescription').value.trim();
+            let phone = document.getElementById('srvProfPhone').value.trim().replace(/\D/g, '');
+            const location = document.getElementById('srvProfLocation').value.trim();
+            const price = document.getElementById('srvProfPrice').value.trim();
+            const imageUrl = document.getElementById('srvProfImageUrl').value.trim();
+
+            if (phone) {
+                if (phone.length === 10 && phone.startsWith('294')) phone = '549' + phone;
+                else if (phone.length === 11 && phone.startsWith('0294')) phone = '549' + phone.substring(1);
+                else if (!phone.startsWith('54') && phone.length >= 8) phone = '549' + phone;
+            }
+
+            const images = imageUrl ? [imageUrl] : ['https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800'];
+            const btn = document.getElementById('btnSaveSrvProf');
+
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
+                const res = await fetch('save_alojamiento.php?action=save_servicio', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id,
+                        email,
+                        name,
+                        category_id,
+                        specialty,
+                        description,
+                        phone,
+                        location,
+                        price,
+                        images,
+                        is_active: true
+                    })
+                });
+
+                const data = await res.json();
+                if (data.status === 'success') {
+                    closeServicioProfEditor();
+                    loadMyServiciosProf(email);
+                    alert('🎉 ¡Servicio guardado con éxito!');
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (err) {
+                alert('Error al guardar servicio: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-floppy-disk"></i> Guardar y Publicar';
+            }
+        }
+
+        async function deleteMyServicioProf(id) {
+            if (!confirm('¿Estás seguro de que deseás eliminar esta publicación?')) return;
+            if (!window.authManager.currentUser) return;
+            const email = window.authManager.currentUser.email;
+
+            try {
+                const res = await fetch('save_alojamiento.php?action=delete_servicio', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, email })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    loadMyServiciosProf(email);
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (e) {
+                alert('Error al eliminar');
+            }
         }
     </script>
 </body>
