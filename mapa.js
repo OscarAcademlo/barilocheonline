@@ -238,7 +238,7 @@ function renderLiveVehicles(vehicles) {
                     <div class="combi-icon-graphic">
                         <svg viewBox="0 0 64 64" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <!-- Carrocería Combi BLANCA brillante con borde del color de empresa -->
-                            <rect x="8" y="10" width="48" height="38" rx="9" fill="#ffffff" stroke="${compColor}" stroke-width="1.8"/>
+                            <rect x="8" y="10" width="48" height="38" rx="9" fill="#ffffff" stroke="${compColor}" stroke-width="2"/>
                             <path d="M8 23H56V38C56 43.5 51.5 48 46 48H18C12.5 48 8 43.5 8 38V23Z" fill="#f8fafc"/>
                             <!-- Techo / Franja de color distintivo de la empresa -->
                             <path d="M8 18H56V23H8V18Z" fill="${compColor}"/>
@@ -257,6 +257,7 @@ function renderLiveVehicles(vehicles) {
                         </svg>
                     </div>
                 </div>
+                <!-- ETIQUETA DIRECTA EN EL MAPA: EMPRESA, CHOFER Y UNIDAD -->
                 <div class="combi-badge-pill" style="border-color: ${compColor};">
                     <div class="combi-company-tag" style="background: ${compColor};">${companyName}</div>
                     <div class="combi-driver-tag"><i class="fas fa-user-tie"></i> ${driverName}</div>
@@ -292,7 +293,7 @@ function renderLiveVehicles(vehicles) {
 
                 <!-- CUERPO DE LA TARJETA -->
                 <div class="uber-card-body">
-                    <div style="font-size:0.75rem; font-weight:900; color:${compColor}; text-transform:uppercase; margin-top:8px; margin-bottom:2px; letter-spacing:0.3px;">
+                    <div style="font-size:0.78rem; font-weight:900; color:${compColor}; text-transform:uppercase; margin-top:8px; margin-bottom:2px; letter-spacing:0.3px;">
                         <i class="fas fa-building"></i> ${companyName}
                     </div>
                     <h3 class="uber-excursion-title" style="margin:2px 0 10px 0;">${excursionName}</h3>
@@ -338,7 +339,7 @@ function renderLiveVehicles(vehicles) {
                         <i class="fas fa-ticket-alt"></i> Comprar Ticket
                     </a>
                     <a href="https://wa.me/${companyPhone.replace(/\D/g, '')}?text=${encodeURIComponent(`¡Hola! Estoy viendo en vivo la combi ${veh.vehicle_code || ''} (${vehicleBrand} ***${vehiclePlate}) de ${companyName} con chofer ${driverName} en Bariloche.Online y quiero consultar por la excursión ${excursionName}.`)}" target="_blank" class="uber-btn-whatsapp" title="Consultar por WhatsApp">
-                        <i class="fab fa-whatsapp"></i>
+                        <svg viewBox="0 0 448 512" width="20" height="20" fill="#ffffff" style="display:block;"><path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/></svg>
                     </a>
                 </div>
             </div>
@@ -348,27 +349,22 @@ function renderLiveVehicles(vehicles) {
             // Siempre actualizar posición (movimiento suave)
             vehicleMarkers[key].setLatLng(latLng);
 
-            // Solo actualizar el ícono si cambió algo visual (heading o speed)
-            // Evita el parpadeo por recrear el divIcon en cada broadcast
-            const cached = vehicleIconCache[key];
-            const visualChanged = !cached ||
-                cached.heading !== heading ||
-                cached.isMoving !== isMoving;
+            // Actualizar icono para reflejar siempre empresa, chofer y datos
+            vehicleMarkers[key].setIcon(customIcon);
 
-            if (visualChanged) {
-                vehicleMarkers[key].setIcon(customIcon);
-                vehicleIconCache[key] = { heading, isMoving };
+            // Actualizar popup content SOLO si cambió para evitar titilación de botones
+            if (vehicleMarkers[key]._lastPopupContent !== popupContent) {
+                vehicleMarkers[key].setPopupContent(popupContent);
+                vehicleMarkers[key]._lastPopupContent = popupContent;
             }
-
-            vehicleMarkers[key].setPopupContent(popupContent);
         } else {
             const marker = L.marker(latLng, { icon: customIcon }).addTo(map);
             marker.bindPopup(popupContent, {
-                maxWidth: 290,
+                maxWidth: 300,
                 className: 'uber-popup-container'
             });
+            marker._lastPopupContent = popupContent;
             vehicleMarkers[key] = marker;
-            vehicleIconCache[key] = { heading, isMoving };
         }
     });
 }
