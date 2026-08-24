@@ -1587,6 +1587,10 @@
         }
 
         function addMovilToAdminEditProv() {
+            if (currentAdminEditProvMoviles.length >= 5) {
+                alert('⚠️ El límite máximo permitido es de 5 vehículos por empresa.');
+                return;
+            }
             const num = currentAdminEditProvMoviles.length + 1;
             currentAdminEditProvMoviles.push({
                 id: 'movil_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),

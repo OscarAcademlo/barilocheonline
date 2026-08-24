@@ -913,6 +913,11 @@
         }
 
         function addNewMovilToFleet() {
+            const maxAllowed = 5; // Límite máximo de combis (Planes: 1, 3 o 5 vehículos)
+            if (myFleetMoviles.length >= maxAllowed) {
+                alert(`⚠️ Has alcanzado el límite máximo de ${maxAllowed} vehículos permitido por el sistema. Para flotas mayores, contactá a soporte.`);
+                return;
+            }
             const num = myFleetMoviles.length + 1;
             myFleetMoviles.push({
                 id: 'movil_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),

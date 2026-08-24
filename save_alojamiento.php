@@ -756,8 +756,8 @@ if ($action === 'get_excursion_companies') {
 if ($action === 'driver_login') {
     $raw = file_get_contents('php://input');
     $data = json_decode($raw, true) ?: $_POST ?: $_GET;
-    $username = strtolower(trim($data['usuario'] ?? $data['username'] ?? ''));
-    $password = trim($data['password'] ?? $data['clave'] ?? '');
+    $username = strtolower(trim((string)($data['usuario'] ?? $data['username'] ?? $data['user'] ?? '')));
+    $password = trim((string)($data['password'] ?? $data['clave'] ?? $data['pass'] ?? ''));
 
     if (empty($username) || empty($password)) {
         http_response_code(400);
@@ -783,7 +783,7 @@ if ($action === 'driver_login') {
 
         // Validar si la empresa está al día
         $email = strtolower(trim($p['email'] ?? ''));
-        $isSubActive = ($email === ADMIN_EMAIL);
+        $isSubActive = ($email === ADMIN_EMAIL || ($p['is_active'] ?? true) === true);
         if (!$isSubActive) {
             foreach ($subs as $s) {
                 if (strtolower(trim($s['email'] ?? '')) === $email && !empty($s['active'])) {
@@ -799,8 +799,8 @@ if ($action === 'driver_login') {
         $moviles = $p['moviles'] ?? [];
         foreach ($moviles as $m) {
             if (($m['is_active'] ?? true) === false) continue;
-            $mUser = strtolower(trim($m['usuario'] ?? ''));
-            $mPass = trim($m['password'] ?? '');
+            $mUser = strtolower(trim((string)($m['usuario'] ?? $m['username'] ?? '')));
+            $mPass = trim((string)($m['password'] ?? $m['clave'] ?? ''));
 
             if (!empty($mUser) && $mUser === $username && $mPass === $password) {
                 $matchedMobile = $m;
@@ -860,9 +860,10 @@ if ($action === 'save_multiservice_provider') {
     $selectedServices = is_array($data['services'] ?? null) ? $data['services'] : [];
     $moviles = is_array($data['moviles'] ?? null) ? $data['moviles'] : [];
 
-    // Limpiar y formatear móviles (Marca, Color, 3 últimos dígitos de patente, Chofer, Usuario, Password)
+    // Limpiar y formatear móviles (Máximo 5 unidades por empresa según límites de plan)
     $cleanMoviles = [];
     foreach ($moviles as $m) {
+        if (count($cleanMoviles) >= 5) break; // Límite estricto máximo 5
         $cleanMoviles[] = [
             'id' => $m['id'] ?? ('movil_' . uniqid()),
             'codigo' => trim($m['codigo'] ?? 'Combi'),
