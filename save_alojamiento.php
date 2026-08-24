@@ -2127,6 +2127,95 @@ if ($action === 'get_driver_pickups') {
     exit;
 }
 
+// 35. COMPRA DE TICKET DE PRUEBA PARA ADMINISTRADOR (ADMIN BYPASS / $0)
+if ($action === 'admin_test_ticket') {
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true) ?: $_POST;
+    $adminEmail = strtolower(trim($data['admin_email'] ?? ''));
+
+    if ($adminEmail !== ADMIN_EMAIL) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'Acceso denegado. Solo el administrador general puede emitir tickets de prueba gratuitos.']);
+        exit;
+    }
+
+    $companyName = trim($data['empresa'] ?? '');
+    $excursionName = trim($data['excursion'] ?? 'Excursión Bariloche');
+    $combi = trim($data['combi'] ?? '');
+    $driver = trim($data['chofer'] ?? '');
+    $touristName = trim($data['tourist_name'] ?? 'Admin Test (Oscar)');
+    $touristPhone = trim($data['tourist_phone'] ?? '5492944674774');
+    $pickupAddress = trim($data['pickup_address'] ?? 'Prueba de Recogida GPS / Admin');
+    $pickupLat = isset($data['pickup_lat']) && is_numeric($data['pickup_lat']) ? floatval($data['pickup_lat']) : -41.1335;
+    $pickupLng = isset($data['pickup_lng']) && is_numeric($data['pickup_lng']) ? floatval($data['pickup_lng']) : -71.3103;
+    $passengers = max(1, intval($data['passengers'] ?? 1));
+
+    $ticketId = 'tkt_admin_' . uniqid();
+    $testTicket = [
+        'ticket_id' => $ticketId,
+        'company_name' => $companyName,
+        'combi' => $combi,
+        'driver' => $driver,
+        'excursion_name' => $excursionName,
+        'tourist_name' => $touristName . ' [TEST]',
+        'tourist_phone' => $touristPhone,
+        'pickup_address' => $pickupAddress,
+        'pickup_lat' => $pickupLat,
+        'pickup_lng' => $pickupLng,
+        'passengers' => $passengers,
+        'total_amount' => 0,
+        'status' => 'pagado',
+        'is_admin_test' => true,
+        'paid_at' => date('c'),
+        'created_at' => date('c')
+    ];
+
+    $tktFile = __DIR__ . '/tickets_excursiones.json';
+    $tickets = file_exists($tktFile) ? json_decode(file_get_contents($tktFile), true) : [];
+    if (!is_array($tickets)) $tickets = [];
+    $tickets[] = $testTicket;
+    file_put_contents($tktFile, json_encode($tickets, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+    // Enviar inmediatamente a Supabase tourist_locations para que la app del chofer suene y notifique en vivo
+    $supaPayload = [
+        'company_name' => $companyName,
+        'vehicle_code' => $combi,
+        'tourist_name' => $touristName . ' [TEST ADMIN]',
+        'tourist_phone' => $touristPhone,
+        'address'      => $pickupAddress,
+        'lat'          => $pickupLat,
+        'lng'          => $pickupLng,
+        'passengers'   => $passengers,
+        'status'       => 'pagado',
+        'created_at'   => date('c'),
+        'updated_at'   => date('c')
+    ];
+
+    try {
+        $supaUrl = 'https://pwrlbwplpgzirlcrwepi.supabase.co/rest/v1/tourist_locations';
+        $supaKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB3cmxid3BscGd6aXJsY3J3ZXBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzMzc0NzAsImV4cCI6MjA4NjkxMzQ3MH0.HxEfbABTObu4khKxVhtBaBuCt2RDBm34urnSEJCfJUU';
+        $sc = curl_init($supaUrl);
+        curl_setopt($sc, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($sc, CURLOPT_POST, true);
+        curl_setopt($sc, CURLOPT_POSTFIELDS, json_encode($supaPayload));
+        curl_setopt($sc, CURLOPT_HTTPHEADER, [
+            'apikey: ' . $supaKey,
+            'Authorization: Bearer ' . $supaKey,
+            'Content-Type: application/json',
+            'Prefer: return=minimal'
+        ]);
+        curl_exec($sc);
+        curl_close($sc);
+    } catch (Exception $e) {}
+
+    echo json_encode([
+        'status' => 'success',
+        'message' => 'Ticket de prueba emitido con éxito y chofer notificado en tiempo real.',
+        'ticket' => $testTicket
+    ]);
+    exit;
+}
+
 http_response_code(400);
 echo json_encode(['status' => 'error', 'message' => 'Acción no reconocida']);
 ?>

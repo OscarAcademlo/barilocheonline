@@ -384,6 +384,19 @@
                 <i class="fas fa-credit-card"></i> Pagar con Mercado Pago (Directo a la Empresa)
             </button>
 
+            <!-- BOTÓN DE MODO PRUEBA EXCLUSIVO PARA ADMINISTRADOR -->
+            <div id="adminTestSection" style="display:none; margin-bottom:12px; background:rgba(16, 185, 129, 0.1); border:1.5px dashed #10b981; border-radius:16px; padding:14px; text-align:center;">
+                <div style="font-size:0.85rem; font-weight:800; color:#10b981; margin-bottom:6px;">
+                    🛡️ MODO ADMINISTRADOR DETECTADO
+                </div>
+                <small style="color:var(--text-secondary); display:block; margin-bottom:10px; font-size:0.78rem;">
+                    Comprobá la emisión del ticket, la notificación con sonido y la geolocalización en la App del Chofer sin abonar en Mercado Pago.
+                </small>
+                <button type="button" id="btnAdminTest" onclick="handleAdminTestTicket()" style="width:100%; padding:14px; border-radius:14px; background:linear-gradient(135deg, #10b981, #059669); color:white; border:none; font-weight:900; font-size:0.95rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(16,185,129,0.35);">
+                    <i class="fas fa-bolt"></i> ⚡ Comprar en Modo Prueba (Admin Bypass / $0)
+                </button>
+            </div>
+
             <!-- BOTÓN DE CONSULTA POR WHATSAPP -->
             <a href="#" id="waBookingLink" target="_blank" class="btn-pay-wa">
                 <i class="fab fa-whatsapp"></i> Reservar y Coordinar por WhatsApp
@@ -545,6 +558,87 @@
             }
         }
 
+        async function handleAdminTestTicket() {
+            const adminEmail = (window.authManager && window.authManager.currentUser) 
+                ? window.authManager.currentUser.email 
+                : (localStorage.getItem('bariloche_user_email') || 'oscarns@gmail.com');
+
+            const name = document.getElementById('custName').value.trim() || 'Oscar Stella (Admin)';
+            const phone = document.getElementById('custPhone').value.trim() || '5492944674774';
+            const hotel = document.getElementById('custHotel').value.trim() || 'Prueba de Recogida Admin / GPS';
+
+            const params = new URLSearchParams(window.location.search);
+            const empresa = params.get('empresa') || 'Empresa Oficial';
+            const excursion = params.get('excursion') || 'Circuito Turístico';
+            const combi = params.get('combi') || 'Combi 01';
+            const chofer = params.get('chofer') || 'Chofer Asignado';
+
+            const btn = document.getElementById('btnAdminTest');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Emitiendo ticket de prueba y notificando combi...';
+
+            try {
+                const res = await fetch('save_alojamiento.php?action=admin_test_ticket', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        admin_email: adminEmail,
+                        empresa,
+                        excursion,
+                        combi,
+                        chofer,
+                        tourist_name: name,
+                        tourist_phone: phone,
+                        pickup_address: hotel,
+                        pickup_lat: touristLat,
+                        pickup_lng: touristLng,
+                        passengers
+                    })
+                });
+
+                const data = await res.json();
+                if (data.status === 'success') {
+                    // Mostrar pantalla de éxito inmediatamente
+                    const successParams = new URLSearchParams();
+                    successParams.set('tourist_name', `${name} [PRUEBA ADMIN]`);
+                    successParams.set('excursion', excursion);
+                    successParams.set('combi', combi);
+                    successParams.set('chofer', chofer);
+                    successParams.set('passengers', passengers);
+                    showSuccessScreen(successParams);
+                } else {
+                    alert('Error en modo prueba: ' + (data.message || 'No autorizado'));
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-bolt"></i> ⚡ Comprar en Modo Prueba (Admin Bypass / $0)';
+                }
+            } catch (e) {
+                alert('Error al emitir ticket de prueba');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-bolt"></i> ⚡ Comprar en Modo Prueba (Admin Bypass / $0)';
+            }
+        }
+
+        function checkAdminSessionForTicket() {
+            setTimeout(() => {
+                const user = window.authManager && window.authManager.currentUser;
+                const isAdmin = (user && (user.email === 'oscarns@gmail.com' || (window.authManager.isAdmin && window.authManager.isAdmin()))) 
+                                || localStorage.getItem('bariloche_user_email') === 'oscarns@gmail.com';
+                
+                if (isAdmin) {
+                    const section = document.getElementById('adminTestSection');
+                    if (section) section.style.display = 'block';
+
+                    const nameInput = document.getElementById('custName');
+                    if (nameInput && !nameInput.value) nameInput.value = 'Oscar Stella (Admin)';
+                    const phoneInput = document.getElementById('custPhone');
+                    if (phoneInput && !phoneInput.value) phoneInput.value = '5492944674774';
+                    const hotelInput = document.getElementById('custHotel');
+                    if (hotelInput && !hotelInput.value) hotelInput.value = 'Centro Cívico Bariloche';
+                    updateWhatsAppLink();
+                }
+            }, 600);
+        }
+
         function showSuccessScreen(params) {
             document.getElementById('ticketFormBox').style.display = 'none';
             document.getElementById('ticketHeroBox').style.display = 'none';
@@ -566,6 +660,10 @@
             `;
             successBox.style.display = 'block';
         }
+
+        // Ejecutar comprobación de administrador
+        checkAdminSessionForTicket();
+        document.addEventListener('authReady', checkAdminSessionForTicket);
 
         document.getElementById('custName').addEventListener('input', updateWhatsAppLink);
         document.getElementById('custHotel').addEventListener('input', updateWhatsAppLink);
