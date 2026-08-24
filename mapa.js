@@ -144,11 +144,19 @@ function renderLiveVehicles(vehicles) {
     }
 
     // 1. ELIMINAR MARCADORES Y RECORRIDOS QUE YA NO TRANSMITEN O FUERON RETIRADOS ("Dejar de mostrar")
+    const now = Date.now();
     const activeKeys = new Set();
+    
+    // Identificar qué vehículos siguen activos dentro del umbral de 60s
     vehicles.forEach(v => {
         if (v.lat && v.lng) {
-            // Clave estable company|vehicle_code (misma que en supabase_client.js)
-            activeKeys.add(`${(v.company_name || '').trim().toLowerCase()}|${(v.vehicle_code || '').trim().toLowerCase()}`);
+            // Clave estable company|vehicle_code
+            const key = `${(v.company_name || '').trim().toLowerCase()}|${(v.vehicle_code || '').trim().toLowerCase()}`;
+            // Verificar si el dato es reciente (umbral de 60s para evitar parpadeo)
+            const isRecent = (now - (v.lastUpdate || now)) < 60000;
+            if (isRecent) {
+                activeKeys.add(key);
+            }
         }
     });
 
