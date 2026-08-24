@@ -110,13 +110,24 @@ async function fetchAccommodations() {
     try {
         const res = await fetch('save_alojamiento.php?action=get_alojamientos&t=' + Date.now());
         if (res.ok) {
-            accommodations = await res.json();
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+                accommodations = data;
+            } else {
+                throw new Error('empty');
+            }
         } else {
-            const fallback = await fetch('alojamientos.json?t=' + Date.now());
-            accommodations = await fallback.json();
+            throw new Error('php_error');
         }
     } catch (e) {
-        console.warn('Cargando alojamientos locales:', e);
+        console.warn('Cargando alojamientos locales (fallback):', e);
+        try {
+            const fallback = await fetch('alojamientos.json?t=' + Date.now());
+            accommodations = await fallback.json();
+        } catch (e2) {
+            console.error('Error cargando alojamientos.json:', e2);
+            accommodations = [];
+        }
     }
     applyFilters();
 }
