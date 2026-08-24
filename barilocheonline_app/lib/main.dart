@@ -371,7 +371,6 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
       'company_name': company,
       'vehicle_code': vehicle,
       'driver_name': driver,
-      'excursion_name': excursion.isNotEmpty ? excursion : 'Circuito Chico',
       'lat': pos.latitude,
       'lng': pos.longitude,
       'speed': speedKmH.roundToDouble(),
