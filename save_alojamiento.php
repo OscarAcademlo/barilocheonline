@@ -1547,13 +1547,12 @@ if ($action === 'save_gastronomia') {
 
     $gastoId = $_POST['id'] ?? ('gasto_' . time());
     $features = json_decode($_POST['features'] ?? '[]', true) ?: ['Excelente atención', 'Opciones ricas'];
-
     $newItem = [
         'id' => $gastoId,
         'owner_email' => $email,
         'name' => trim($_POST['name'] ?? 'Mi Local'),
         'type' => trim($_POST['type'] ?? 'Restaurante'),
-        'location' => trim($_POST['location'] ?? 'Centro'),
+        'location' => trim($_POST['location'] ?? 'Ubicación GPS Automática'),
         'rating' => floatval($_POST['rating'] ?? 4.8),
         'lat' => floatval($_POST['lat'] ?? -41.1335),
         'lng' => floatval($_POST['lng'] ?? -71.3103),
@@ -1966,9 +1965,9 @@ if ($action === 'create_ticket_preference') {
     $driver = trim($data['chofer'] ?? '');
     $touristName = trim($data['tourist_name'] ?? '');
     $touristPhone = trim($data['tourist_phone'] ?? '');
-    $pickupAddress = trim($data['pickup_address'] ?? 'Punto de encuentro');
-    $pickupLat = isset($data['pickup_lat']) && is_numeric($data['pickup_lat']) ? floatval($data['pickup_lat']) : null;
-    $pickupLng = isset($data['pickup_lng']) && is_numeric($data['pickup_lng']) ? floatval($data['pickup_lng']) : null;
+    $pickupAddress = trim($data['pickup_address'] ?? 'Ubicación GPS Automática');
+    $pickupLat = isset($data['pickup_lat']) && is_numeric($data['pickup_lat']) ? floatval($data['pickup_lat']) : -41.1335;
+    $pickupLng = isset($data['pickup_lng']) && is_numeric($data['pickup_lng']) ? floatval($data['pickup_lng']) : -71.3103;
     $passengers = max(1, intval($data['passengers'] ?? 1));
     $totalAmount = max(100, intval($data['total_amount'] ?? (25000 * $passengers)));
 
@@ -2207,7 +2206,7 @@ if ($action === 'admin_test_ticket') {
     $driver = trim($data['chofer'] ?? '');
     $touristName = trim($data['tourist_name'] ?? 'Oscar Stella (Admin)');
     $touristPhone = trim($data['tourist_phone'] ?? '5492944674774');
-    $pickupAddress = trim($data['pickup_address'] ?? 'Centro Cívico Bariloche (GPS)');
+    $pickupAddress = trim($data['pickup_address'] ?? 'Ubicación GPS Automática');
     $pickupLat = isset($data['pickup_lat']) && is_numeric($data['pickup_lat']) ? floatval($data['pickup_lat']) : -41.1335;
     $pickupLng = isset($data['pickup_lng']) && is_numeric($data['pickup_lng']) ? floatval($data['pickup_lng']) : -71.3103;
     $passengers = max(1, intval($data['passengers'] ?? 1));

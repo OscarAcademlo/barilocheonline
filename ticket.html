@@ -510,7 +510,9 @@
             const phoneInput = document.getElementById('custPhone');
             if (phoneInput && !phoneInput.value) phoneInput.value = '5492944674774';
             const hotelInput = document.getElementById('custHotel');
-            if (hotelInput && !hotelInput.value) hotelInput.value = 'Centro Cívico Bariloche (GPS)';
+            if (hotelInput && !hotelInput.value && touristLat && touristLng) {
+                hotelInput.value = `Ubicación GPS: ${touristLat.toFixed(5)}, ${touristLng.toFixed(5)}`;
+            }
 
             const btnMP = document.getElementById('btnPayMP');
             if (btnMP) {
@@ -662,7 +664,8 @@
 
             const name = document.getElementById('custName').value.trim() || 'Oscar Stella (Admin)';
             const phone = document.getElementById('custPhone').value.trim() || '5492944674774';
-            const hotel = document.getElementById('custHotel').value.trim() || 'Centro Cívico Bariloche (GPS)';
+            const hotelInput = document.getElementById('custHotel').value.trim();
+            const hotel = hotelInput || (touristLat ? `Ubicación GPS: ${touristLat.toFixed(5)}, ${touristLng.toFixed(5)}` : 'Ubicación GPS Automática');
 
             const params = new URLSearchParams(window.location.search);
             const empresa = params.get('empresa') || 'Empresa Oficial';
