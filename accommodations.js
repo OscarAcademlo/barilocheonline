@@ -292,6 +292,22 @@ function showAccommodationDetails(id) {
                     ${(acc.amenities || ['Wi-Fi', 'Calefacción', 'Parrilla']).map(a => `<span class="amenity-tag"><i class="${getAmenityIcon(a)}"></i> ${a}</span>`).join('')}
                 </div>
             </div>
+
+            <!-- MEDIOS DE PAGO ACEPTADOS -->
+            <div class="modal-section" style="background:rgba(0,132,255,0.05); border:1px solid var(--border); border-radius:14px; padding:14px;">
+                <h3 style="font-size:0.95rem; margin-bottom:8px; color:var(--primary);"><i class="fas fa-wallet"></i> Medios de Pago Aceptados</h3>
+                <div style="display:flex; flex-wrap:wrap; gap:8px; font-size:0.85rem; font-weight:700;">
+                    ${(acc.payment_methods && acc.payment_methods.cash === false) ? '' : '<span style="background:rgba(16,185,129,0.15); color:#10b981; padding:5px 10px; border-radius:8px;">💵 Efectivo</span>'}
+                    ${(acc.payment_methods && (acc.payment_methods.transfer === true || !!acc.transfer_details)) ? '<span style="background:rgba(0,132,255,0.15); color:#0084ff; padding:5px 10px; border-radius:8px;">🏦 Transferencia (Alias/CBU)</span>' : ''}
+                    ${(acc.payment_methods && (acc.payment_methods.mercadopago === true || !!acc.mp_access_token || !!acc.mp_link)) ? '<span style="background:rgba(0,132,255,0.15); color:#0084ff; padding:5px 10px; border-radius:8px;">💳 Tarjetas / Mercado Pago</span>' : ''}
+                    <span style="background:rgba(37,211,102,0.15); color:#25d366; padding:5px 10px; border-radius:8px;">📱 WhatsApp directo</span>
+                </div>
+                ${acc.transfer_details ? `
+                    <div style="margin-top:10px; font-size:0.8rem; background:var(--bg-main); padding:8px 12px; border-radius:8px; border:1px dashed var(--border); user-select:all;">
+                        <b>Datos bancarios para seña:</b> ${acc.transfer_details}
+                    </div>
+                ` : ''}
+            </div>
             
             <div class="modal-price-section">
                 <div class="modal-price">
@@ -765,10 +781,27 @@ function openPublisherModal(editData = null) {
             if (otherContainer) otherContainer.style.display = 'block';
             if (otherInput) otherInput.value = otherAms.join(', ');
         }
+
+        // Medios de pago
+        const pm = editData.payment_methods || {};
+        if (document.getElementById('accPayCash')) document.getElementById('accPayCash').checked = (pm.cash !== false);
+        if (document.getElementById('accPayTransfer')) document.getElementById('accPayTransfer').checked = (pm.transfer === true || !!editData.transfer_details);
+        if (document.getElementById('accPayMP')) document.getElementById('accPayMP').checked = (pm.mercadopago === true || !!editData.mp_access_token || !!editData.mp_link);
+        if (document.getElementById('accTransferDetails')) document.getElementById('accTransferDetails').value = editData.transfer_details || '';
+        if (document.getElementById('accMpAccessToken')) document.getElementById('accMpAccessToken').value = editData.mp_access_token || '';
+        if (document.getElementById('accMpLink')) document.getElementById('accMpLink').value = editData.mp_link || '';
+
+        toggleAccTransferFields();
+        toggleAccMpFields();
     } else {
         title.textContent = 'Publicar Nuevo Alojamiento';
         document.getElementById('accLat').value = '-41.1335';
         document.getElementById('accLng').value = '-71.3103';
+        if (document.getElementById('accPayCash')) document.getElementById('accPayCash').checked = true;
+        if (document.getElementById('accPayTransfer')) document.getElementById('accPayTransfer').checked = false;
+        if (document.getElementById('accPayMP')) document.getElementById('accPayMP').checked = false;
+        toggleAccTransferFields();
+        toggleAccMpFields();
     }
 
     // MOSTRAR FECHA DE VIGENCIA DEL CÓDIGO O SUSCRIPCIÓN ACTIVA
@@ -1065,9 +1098,34 @@ async function deleteAccommodation(id) {
     }
 }
 
+function toggleAccTransferFields() {
+    const chk = document.getElementById('accPayTransfer');
+    const box = document.getElementById('accTransferBox');
+    if (box) box.style.display = (chk && chk.checked) ? 'block' : 'none';
+}
+
+function toggleAccMpFields() {
+    const chk = document.getElementById('accPayMP');
+    const box = document.getElementById('accMpBox');
+    if (box) box.style.display = (chk && chk.checked) ? 'block' : 'none';
+}
+
 async function handlePublisherFormSubmit(e) {
     e.preventDefault();
     if (!currentUser) return;
+
+    const isMpChecked = document.getElementById('accPayMP')?.checked;
+    const mpToken = document.getElementById('accMpAccessToken')?.value.trim() || '';
+    const mpLink = document.getElementById('accMpLink')?.value.trim() || '';
+
+    if (isMpChecked && !mpToken && !mpLink) {
+        alert('⚠️ Has habilitado cobro con Mercado Pago, pero no ingresaste tu Access Token ni Link de pago.\n\nPor favor ingresá tu Access Token de producción (APP_USR-...) o tu Link de pago para que los huéspedes puedan señar, o bien destildá la opción Mercado Pago.');
+        if (document.getElementById('accMpAccessToken')) {
+            document.getElementById('accMpAccessToken').focus();
+            document.getElementById('accMpAccessToken').style.borderColor = '#ef4444';
+        }
+        return;
+    }
 
     const btn = document.getElementById('btnSubmitPublisher');
     btn.disabled = true;
@@ -1076,6 +1134,17 @@ async function handlePublisherFormSubmit(e) {
     const formData = new FormData(document.getElementById('publisherForm'));
     formData.append('owner_email', currentUser.email);
     formData.append('existing_images', JSON.stringify(publisherExistingImages));
+
+    const paymentMethods = {
+        cash: document.getElementById('accPayCash')?.checked ?? true,
+        transfer: document.getElementById('accPayTransfer')?.checked ?? false,
+        mercadopago: isMpChecked ?? false,
+        direct_contact: true
+    };
+    formData.append('payment_methods', JSON.stringify(paymentMethods));
+    formData.append('transfer_details', document.getElementById('accTransferDetails')?.value.trim() || '');
+    formData.append('mp_access_token', mpToken);
+    formData.append('mp_link', mpLink);
 
     // Agregar todas las fotos seleccionadas
     publisherSelectedFiles.forEach(file => {

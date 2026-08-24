@@ -248,7 +248,7 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
         accuracy: LocationAccuracy.bestForNavigation,
         distanceFilter: 0,
         forceLocationManager: true,
-        intervalDuration: const Duration(seconds: 2),
+        intervalDuration: const Duration(seconds: 1),
         foregroundNotificationConfig: const ForegroundNotificationConfig(
           notificationText: "BariRuta transmitiendo ubicación GPS en tiempo real",
           notificationTitle: "BariRuta Chofer en Servicio",
@@ -287,14 +287,9 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
     );
 
     _activePulseTimer?.cancel();
-    _activePulseTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
+    _activePulseTimer = Timer.periodic(const Duration(milliseconds: 1500), (timer) async {
       if (!_isStreaming || !mounted) {
         timer.cancel();
-        return;
-      }
-      final now = DateTime.now();
-      final lastSent = _lastSentAt;
-      if (lastSent != null && now.difference(lastSent).inSeconds < 3) {
         return;
       }
       final pos = _currentPosition;
@@ -321,7 +316,6 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
         event: 'status',
         payload: {'company_name': company, 'vehicle_code': vehicle, 'active': false},
       );
-      await Future.delayed(const Duration(milliseconds: 300));
     } catch (e) {
       debugPrint('Broadcast stop error: $e');
     } finally {
@@ -337,10 +331,18 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
     }
 
     _showSnackBar('🔴 Transmisión finalizada. Combi retirada del mapa.');
-    unawaited(_deleteVehicleFromDB(company, vehicle));
+    await _deleteVehicleFromDB(company, vehicle);
   }
 
   Future<void> _deleteVehicleFromDB(String company, String vehicle) async {
+    try {
+      final supabase = Supabase.instance.client;
+      await supabase.from('vehicles').delete().match({
+        'company_name': company,
+        'vehicle_code': vehicle,
+      });
+    } catch (_) {}
+
     try {
       final uri = Uri.parse(
         '$kSupabaseUrl/rest/v1/vehicles?company_name=eq.${Uri.encodeComponent(company)}&vehicle_code=eq.${Uri.encodeComponent(vehicle)}',

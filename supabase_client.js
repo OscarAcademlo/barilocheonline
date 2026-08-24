@@ -65,6 +65,12 @@ class BariRutaSupabaseClient {
                 this.pollingInterval = setInterval(() => {
                     this.fetchVehicles();
                 }, 1500);
+
+                // Purga instantánea en vivo cada 1 segundo (elimina del mapa combis inactivas al instante)
+                if (this.expireTicker) clearInterval(this.expireTicker);
+                this.expireTicker = setInterval(() => {
+                    this.filterAndNotifyVehicles();
+                }, 1000);
             } catch (e) {
                 console.error('[BariRuta] Error al inicializar Supabase:', e);
                 this.isConnected = false;
@@ -134,26 +140,44 @@ class BariRutaSupabaseClient {
                 .order('updated_at', { ascending: false });
 
             if (!error && data) {
-                // Filtrar vehículos de prueba
+                const now = Date.now();
+                // Filtrar vehículos inválidos o de prueba antigua
                 const cleanData = data.filter(v => 
                     v.company_name && 
                     !v.company_name.toLowerCase().includes('empresa oscar')
                 );
 
-                // 1. Actualizar o insertar los que vinieron de DB
+                // Un mapa de claves presentes en DB
+                const dbKeys = new Set();
                 cleanData.forEach(dbVehicle => {
-                    dbVehicle._lastSeen = Date.now();
-                    const idx = this.vehicles.findIndex(
-                        v => this._vehicleKey(v) === this._vehicleKey(dbVehicle)
-                    );
+                    const key = this._vehicleKey(dbVehicle);
+                    dbKeys.add(key);
+
+                    const dbTime = new Date(dbVehicle.updated_at || 0).getTime();
+                    // Solo considerar si la BD se actualizó en los últimos 15 segundos
+                    const isRecent = (now - dbTime) < 15000;
+
+                    const idx = this.vehicles.findIndex(v => this._vehicleKey(v) === key);
                     if (idx >= 0) {
-                        this.vehicles[idx] = { ...this.vehicles[idx], ...dbVehicle, _lastSeen: Date.now() };
-                    } else {
+                        // Mantener el _lastSeen más reciente entre broadcast y DB
+                        const prevLastSeen = this.vehicles[idx]._lastSeen || 0;
+                        const effectiveLastSeen = isRecent ? Math.max(prevLastSeen, dbTime) : prevLastSeen;
+                        this.vehicles[idx] = { ...this.vehicles[idx], ...dbVehicle, _lastSeen: effectiveLastSeen };
+                    } else if (isRecent) {
+                        dbVehicle._lastSeen = dbTime;
                         this.vehicles.push(dbVehicle);
                     }
                 });
 
-                this.syncCompaniesFromVehicles(cleanData);
+                // Eliminar de memoria los vehículos que ya no están en la BD y no han transmitido en los últimos 8 seg
+                this.vehicles = this.vehicles.filter(v => {
+                    const key = this._vehicleKey(v);
+                    const lastSeen = v._lastSeen || 0;
+                    const isVeryRecent = (now - lastSeen) < 8000;
+                    return dbKeys.has(key) || isVeryRecent;
+                });
+
+                this.syncCompaniesFromVehicles(this.vehicles);
                 this.filterAndNotifyVehicles();
             }
         } catch (e) {
@@ -194,11 +218,14 @@ class BariRutaSupabaseClient {
         }
 
         const now = Date.now();
-        // Mantener activo si se recibió transmisión en los últimos 45 segundos
+        // Umbral ultrarrápido: eliminar si pasaron más de 12 segundos sin señal
         const liveVehicles = this.vehicles.filter(v => {
             const lastSeen = v._lastSeen || new Date(v.updated_at || 0).getTime() || 0;
-            return (now - lastSeen) < 45000;
+            return (now - lastSeen) < 12000;
         });
+
+        // Actualizar lista interna purgada
+        this.vehicles = liveVehicles;
 
         const target = (this.selectedCompany || '').toLowerCase().trim();
 
@@ -222,15 +249,14 @@ class BariRutaSupabaseClient {
     setupRealtime() {
         if (!this.supabase) return;
 
-        // 0. CANAL BROADCAST EFÍMERO DE ULTRABAJA LATENCIA (MÉTODO CCVLITE)
+        // 0. CANAL BROADCAST EFÍMERO DE ULTRABAJA LATENCIA
         this.trackingBroadcastChannel = this.supabase.channel('tracking');
         this.trackingBroadcastChannel
             .on('broadcast', { event: 'location' }, ({ payload }) => {
                 if (!payload || !payload.lat || !payload.lng) return;
                 payload._lastSeen = Date.now();
-                const idx = this.vehicles.findIndex(
-                    v => this._vehicleKey(v) === this._vehicleKey(payload)
-                );
+                const key = this._vehicleKey(payload);
+                const idx = this.vehicles.findIndex(v => this._vehicleKey(v) === key);
                 if (idx >= 0) {
                     this.vehicles[idx] = { ...this.vehicles[idx], ...payload, _lastSeen: Date.now() };
                 } else {
@@ -241,9 +267,8 @@ class BariRutaSupabaseClient {
             })
             .on('broadcast', { event: 'status' }, ({ payload }) => {
                 if (payload && payload.active === false) {
-                    this.vehicles = this.vehicles.filter(
-                        v => this._vehicleKey(v) !== this._vehicleKey(payload)
-                    );
+                    const key = this._vehicleKey(payload);
+                    this.vehicles = this.vehicles.filter(v => this._vehicleKey(v) !== key);
                     this.filterAndNotifyVehicles();
                 }
             })

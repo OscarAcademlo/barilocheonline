@@ -486,42 +486,71 @@
                         </div>
                     </div>
 
-                    <!-- AUTOMATIZACIÓN DE MERCADO PAGO DEL PRESTADOR DE EXCURSIONES (COBRO DIRECTO) -->
+                    <!-- MEDIOS DE PAGO ACEPTADOS POR LA EMPRESA -->
                     <div style="background:rgba(0, 132, 255, 0.05); border:1.5px solid var(--primary); border-radius:18px; padding:20px; margin-bottom:24px;">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px; margin-bottom:8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
                             <div>
-                                <b style="font-size:1.05rem; display:block; color:var(--primary);"><i class="fas fa-credit-card"></i> Cobro Directo en tu Mercado Pago (Tickets & Reservas)</b>
-                                <small style="color:var(--text-secondary); display:block;">El dinero de los tickets abonados por los turistas entra <b>100% directo a tu cuenta de Mercado Pago</b> sin intermediarios.</small>
+                                <b style="font-size:1.05rem; display:block; color:var(--primary);"><i class="fas fa-wallet"></i> Medios de Pago Aceptados para tus Excursiones & Servicios</b>
+                                <small style="color:var(--text-secondary); display:block;">Seleccioná las formas de pago que permitís a los turistas para reservar y abonar sus tickets.</small>
                             </div>
                             <button type="button" onclick="toggleMpInstructions()" style="background:rgba(0,132,255,0.15); color:#0084ff; border:1px solid #0084ff; padding:6px 14px; border-radius:10px; font-weight:700; font-size:0.8rem; cursor:pointer;">
-                                <i class="fas fa-circle-question"></i> Instructivo en 3 Pasos
+                                <i class="fas fa-circle-question"></i> Instructivo Mercado Pago
                             </button>
                         </div>
 
-                        <!-- INSTRUCTIVO DESPLEGABLE -->
+                        <!-- CHECKBOXES DE MEDIOS DE PAGO -->
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:16px;">
+                            <label style="display:flex; align-items:center; gap:8px; background:var(--bg-main); border:1px solid var(--border); padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.9rem;">
+                                <input type="checkbox" id="chkPayCash" checked style="width:18px; height:18px; accent-color:#10b981;">
+                                <span>💵 Efectivo al subir</span>
+                            </label>
+                            <label style="display:flex; align-items:center; gap:8px; background:var(--bg-main); border:1px solid var(--border); padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.9rem;">
+                                <input type="checkbox" id="chkPayTransfer" onchange="toggleTransferFields()" style="width:18px; height:18px; accent-color:#0084ff;">
+                                <span>🏦 Transferencia (CBU/Alias)</span>
+                            </label>
+                            <label style="display:flex; align-items:center; gap:8px; background:var(--bg-main); border:1px solid var(--border); padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.9rem;">
+                                <input type="checkbox" id="chkPayMP" onchange="toggleMpFields()" style="width:18px; height:18px; accent-color:#0084ff;">
+                                <span>💳 Mercado Pago / Tarjetas</span>
+                            </label>
+                            <label style="display:flex; align-items:center; gap:8px; background:var(--bg-main); border:1px solid var(--border); padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.9rem;">
+                                <input type="checkbox" id="chkPayDirect" checked style="width:18px; height:18px; accent-color:#25d366;">
+                                <span>📱 Coordinar por WhatsApp</span>
+                            </label>
+                        </div>
+
+                        <!-- DATOS DE TRANSFERENCIA BANCARIA -->
+                        <div id="transferDetailsBox" style="display:none; background:var(--bg-main); border:1px dashed var(--border); border-radius:14px; padding:14px; margin-bottom:14px;">
+                            <label style="font-size:0.82rem; font-weight:700; display:block; margin-bottom:4px;"><i class="fas fa-building-columns"></i> Datos de tu Cuenta Bancaria (Alias / CBU / CVU / Titular)</label>
+                            <input type="text" id="fleetTransferDetails" placeholder="Ej: Alias: excursiones.sur / CBU: 00000031000... / Banco Santander - Juan Pérez" style="width:100%; height:42px; border-radius:10px; border:1px solid var(--border); padding:6px 12px; font-size:0.88rem; background:var(--bg-secondary); color:var(--text-primary);">
+                        </div>
+
+                        <!-- INSTRUCTIVO DESPLEGABLE MERCADO PAGO -->
                         <div id="mpInstructionsBox" style="display:none; background:var(--bg-main); border:1px dashed #0084ff; border-radius:14px; padding:14px; margin:12px 0; font-size:0.85rem; line-height:1.5;">
                             <b style="color:#0084ff; display:block; margin-bottom:6px;"><i class="fas fa-book-open"></i> ¿Cómo obtener tu Access Token en 2 minutos?</b>
                             <ol style="margin:0; padding-left:20px; color:var(--text-primary);">
-                                <li>Ingresá a <a href="https://www.mercadopago.com.ar/developers/panel/app" target="_blank" style="color:#0084ff; font-weight:700; text-decoration:underline;">Mercado Pago Developers (Panel de Apps)</a> con tu cuenta de Mercado Pago.</li>
-                                <li>Hacé clic en <b>"Crear aplicación"</b> (Nombre sugerido: <i>Mi Empresa - Bariloche Online</i> / Tipo: <i>Pagos en el sitio web</i>).</li>
-                                <li>En el menú izquierdo entrá a <b>"Credenciales de producción"</b>, copiá el <b>"Access Token"</b> (empieza con <code>APP_USR-...</code>) y pegalo en el casillero de abajo.</li>
+                                <li>Ingresá a <a href="https://www.mercadopago.com.ar/developers/panel/app" target="_blank" style="color:#0084ff; font-weight:700; text-decoration:underline;">Mercado Pago Developers (Panel de Apps)</a> con tu cuenta.</li>
+                                <li>Hacé clic en <b>"Crear aplicación"</b> (Nombre: <i>Mi Empresa - Bariloche Online</i> / Tipo: <i>Pagos en el sitio web</i>).</li>
+                                <li>En <b>"Credenciales de producción"</b>, copiá el <b>"Access Token"</b> (empieza con <code>APP_USR-...</code>) y pegalo abajo.</li>
                             </ol>
                         </div>
 
-                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:14px; margin-top:12px;">
-                            <div class="form-group-custom" style="margin-bottom:0;">
-                                <label style="font-size:0.82rem; font-weight:700;">Access Token de Producción (Recomendado para cobro automático)</label>
-                                <div style="display:flex; gap:8px;">
-                                    <input type="password" id="fleetMpAccessToken" placeholder="APP_USR-xxxxxxxxxxxxxxxxxxxx" style="flex:1; height:42px; border-radius:10px; border:1px solid var(--border); padding:6px 12px; font-size:0.88rem; background:var(--bg-main); color:var(--text-primary); font-family:monospace;">
-                                    <button type="button" onclick="testMyMpToken()" style="background:#00b894; color:white; border:none; padding:0 14px; border-radius:10px; font-weight:700; font-size:0.8rem; cursor:pointer; white-space:nowrap;">
-                                        <i class="fas fa-vial"></i> Probar
-                                    </button>
+                        <!-- CAMPOS MERCADO PAGO -->
+                        <div id="mpCredentialsBox" style="display:none; margin-top:12px;">
+                            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:14px;">
+                                <div class="form-group-custom" style="margin-bottom:0;">
+                                    <label style="font-size:0.82rem; font-weight:700;">Access Token de Producción (Obligatorio si cobrás con Mercado Pago)</label>
+                                    <div style="display:flex; gap:8px;">
+                                        <input type="password" id="fleetMpAccessToken" placeholder="APP_USR-xxxxxxxxxxxxxxxxxxxx" style="flex:1; height:42px; border-radius:10px; border:1px solid var(--border); padding:6px 12px; font-size:0.88rem; background:var(--bg-main); color:var(--text-primary); font-family:monospace;">
+                                        <button type="button" onclick="testMyMpToken()" style="background:#00b894; color:white; border:none; padding:0 14px; border-radius:10px; font-weight:700; font-size:0.8rem; cursor:pointer; white-space:nowrap;">
+                                            <i class="fas fa-vial"></i> Probar
+                                        </button>
+                                    </div>
+                                    <div id="mpTokenTestResult" style="font-size:0.8rem; font-weight:700; margin-top:4px;"></div>
                                 </div>
-                                <div id="mpTokenTestResult" style="font-size:0.8rem; font-weight:700; margin-top:4px;"></div>
-                            </div>
-                            <div class="form-group-custom" style="margin-bottom:0;">
-                                <label style="font-size:0.82rem; font-weight:700;">Link de Pago / Alias de Mercado Pago (Alternativo)</label>
-                                <input type="text" id="fleetMpLink" placeholder="Ej: https://mpago.la/xxxx o miempresa.mp" style="width:100%; height:42px; border-radius:10px; border:1px solid var(--border); padding:6px 12px; font-size:0.88rem; background:var(--bg-main); color:var(--text-primary);">
+                                <div class="form-group-custom" style="margin-bottom:0;">
+                                    <label style="font-size:0.82rem; font-weight:700;">Link de Pago / Alias Alternativo (Opcional)</label>
+                                    <input type="text" id="fleetMpLink" placeholder="Ej: https://mpago.la/xxxx o miempresa.mp" style="width:100%; height:42px; border-radius:10px; border:1px solid var(--border); padding:6px 12px; font-size:0.88rem; background:var(--bg-main); color:var(--text-primary);">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -991,6 +1020,17 @@
                         if (document.getElementById('fleetMpAccessToken')) document.getElementById('fleetMpAccessToken').value = currentProviderData.mp_access_token || '';
                         if (document.getElementById('fleetMpLink')) document.getElementById('fleetMpLink').value = currentProviderData.mp_link || '';
                         if (document.getElementById('fleetMpPublicKey')) document.getElementById('fleetMpPublicKey').value = currentProviderData.mp_public_key || '';
+                        if (document.getElementById('fleetTransferDetails')) document.getElementById('fleetTransferDetails').value = currentProviderData.transfer_details || '';
+
+                        const pm = currentProviderData.payment_methods || {};
+                        if (document.getElementById('chkPayCash')) document.getElementById('chkPayCash').checked = (pm.cash !== false);
+                        if (document.getElementById('chkPayTransfer')) document.getElementById('chkPayTransfer').checked = (pm.transfer === true || !!currentProviderData.transfer_details);
+                        if (document.getElementById('chkPayMP')) document.getElementById('chkPayMP').checked = (pm.mercadopago === true || !!currentProviderData.mp_access_token || !!currentProviderData.mp_link);
+                        if (document.getElementById('chkPayDirect')) document.getElementById('chkPayDirect').checked = (pm.direct_contact !== false);
+
+                        toggleTransferFields();
+                        toggleMpFields();
+
                         myFleetMoviles = currentProviderData.moviles || [];
                     }
 
@@ -1248,6 +1288,18 @@
             window.open(waUrl, '_blank');
         }
 
+        function toggleTransferFields() {
+            const chk = document.getElementById('chkPayTransfer');
+            const box = document.getElementById('transferDetailsBox');
+            if (box) box.style.display = (chk && chk.checked) ? 'block' : 'none';
+        }
+
+        function toggleMpFields() {
+            const chk = document.getElementById('chkPayMP');
+            const box = document.getElementById('mpCredentialsBox');
+            if (box) box.style.display = (chk && chk.checked) ? 'block' : 'none';
+        }
+
         async function saveSelectedServicesConfig() {
             if (!window.authManager.currentUser) return;
             const email = window.authManager.currentUser.email;
@@ -1262,6 +1314,29 @@
                 return;
             }
 
+            const isMpChecked = document.getElementById('chkPayMP')?.checked;
+            const mpToken = document.getElementById('fleetMpAccessToken')?.value.trim() || '';
+            const mpLink = document.getElementById('fleetMpLink')?.value.trim() || '';
+
+            // VALIDACIÓN OBLIGATORIA: Si tilda Mercado Pago, debe ingresar las credenciales
+            if (isMpChecked && !mpToken && !mpLink) {
+                alert('⚠️ Has habilitado "Mercado Pago / Tarjetas", pero no ingresaste tu Access Token ni Link de pago.\n\nPor favor ingresá tu Access Token de producción (APP_USR-...) o tu Link de pago para que los turistas puedan abonar, o bien destildá la opción Mercado Pago.');
+                if (document.getElementById('fleetMpAccessToken')) {
+                    document.getElementById('fleetMpAccessToken').focus();
+                    document.getElementById('fleetMpAccessToken').style.borderColor = '#ef4444';
+                }
+                return;
+            }
+
+            const paymentMethods = {
+                cash: document.getElementById('chkPayCash')?.checked ?? true,
+                transfer: document.getElementById('chkPayTransfer')?.checked ?? false,
+                mercadopago: isMpChecked ?? false,
+                direct_contact: document.getElementById('chkPayDirect')?.checked ?? true
+            };
+
+            const transferDetails = document.getElementById('fleetTransferDetails')?.value.trim() || '';
+
             try {
                 const res = await fetch('save_alojamiento.php?action=save_multiservice_provider', {
                     method: 'POST',
@@ -1271,15 +1346,17 @@
                         services: selectedServices,
                         business_name: document.getElementById('fleetCompanyName')?.value || '',
                         phone: document.getElementById('fleetCompanyPhone')?.value || '',
-                        mp_access_token: document.getElementById('fleetMpAccessToken')?.value || '',
-                        mp_link: document.getElementById('fleetMpLink')?.value || '',
+                        mp_access_token: mpToken,
+                        mp_link: mpLink,
                         mp_public_key: document.getElementById('fleetMpPublicKey')?.value || '',
+                        payment_methods: paymentMethods,
+                        transfer_details: transferDetails,
                         moviles: myFleetMoviles
                     })
                 });
                 const data = await res.json();
                 if (data.status === 'success') {
-                    alert('✅ Configuración de servicios y cobros guardada. Los módulos activos ya están disponibles en las pestañas.');
+                    alert('✅ Configuración de servicios, flota y medios de pago guardada con éxito.');
                     handleServiceSelectionChange();
                     if (selectedServices.length > 0) {
                         switchDashboardTab(selectedServices[0]);

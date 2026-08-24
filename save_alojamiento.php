@@ -455,6 +455,15 @@ if ($action === 'save_alojamiento') {
 
     $accId = $_POST['id'] ?? ('acc_' . time());
     $amenities = json_decode($_POST['amenities'] ?? '[]', true) ?: ['Wi-Fi', 'Calefacción'];
+    $paymentMethods = json_decode($_POST['payment_methods'] ?? '{}', true) ?: [
+        'cash' => isset($_POST['pay_cash']) ? (bool)$_POST['pay_cash'] : true,
+        'transfer' => isset($_POST['pay_transfer']) ? (bool)$_POST['pay_transfer'] : true,
+        'mercadopago' => isset($_POST['pay_mp']) ? (bool)$_POST['pay_mp'] : (!empty($_POST['mp_access_token']) || !empty($_POST['mp_link'])),
+        'direct_contact' => true
+    ];
+    $transferDetails = trim($_POST['transfer_details'] ?? '');
+    $mpAccessToken = trim($_POST['mp_access_token'] ?? '');
+    $mpLink = trim($_POST['mp_link'] ?? '');
 
     $newItem = [
         'id' => $accId,
@@ -470,6 +479,10 @@ if ($action === 'save_alojamiento') {
         'description' => trim($_POST['description'] ?? ''),
         'amenities' => $amenities,
         'phone' => preg_replace('/[^\d]/', '', $_POST['phone'] ?? '5492944123456'),
+        'payment_methods' => $paymentMethods,
+        'transfer_details' => $transferDetails,
+        'mp_access_token' => $mpAccessToken,
+        'mp_link' => $mpLink,
         'updated_at' => date('c')
     ];
 
@@ -944,6 +957,14 @@ if ($action === 'save_multiservice_provider') {
         ];
     }
 
+    $paymentMethods = is_array($data['payment_methods'] ?? null) ? $data['payment_methods'] : [
+        'cash' => isset($data['pay_cash']) ? (bool)$data['pay_cash'] : true,
+        'transfer' => isset($data['pay_transfer']) ? (bool)$data['pay_transfer'] : true,
+        'mercadopago' => isset($data['pay_mp']) ? (bool)$data['pay_mp'] : (!empty($mpAccessToken) || !empty($mpLink)),
+        'direct_contact' => true
+    ];
+    $transferDetails = trim($data['transfer_details'] ?? '');
+
     $updated = false;
     foreach ($providers as &$p) {
         if (strtolower(trim($p['email'] ?? '')) === $email) {
@@ -955,6 +976,8 @@ if ($action === 'save_multiservice_provider') {
             if (!empty($mpAccessToken)) $p['mp_access_token'] = $mpAccessToken;
             if (!empty($mpPublicKey)) $p['mp_public_key'] = $mpPublicKey;
             if (!empty($mpLink)) $p['mp_link'] = $mpLink;
+            $p['payment_methods'] = $paymentMethods;
+            $p['transfer_details'] = $transferDetails;
             $p['updated_at'] = date('c');
             $updated = true;
             break;
@@ -974,6 +997,8 @@ if ($action === 'save_multiservice_provider') {
             'mp_access_token' => $mpAccessToken,
             'mp_public_key' => $mpPublicKey,
             'mp_link' => $mpLink,
+            'payment_methods' => $paymentMethods,
+            'transfer_details' => $transferDetails,
             'is_active' => true,
             'created_at' => date('c'),
             'updated_at' => date('c')
@@ -1947,19 +1972,30 @@ if ($action === 'create_ticket_preference') {
     $passengers = max(1, intval($data['passengers'] ?? 1));
     $totalAmount = max(100, intval($data['total_amount'] ?? (25000 * $passengers)));
 
-    // Buscar si la empresa tiene su propio MP_ACCESS_TOKEN
-    $tokenToUse = MP_ACCESS_TOKEN;
+    // Buscar si la empresa tiene su propio MP_ACCESS_TOKEN (NUNCA usar la cuenta de la plataforma como fallback)
+    $tokenToUse = '';
     $provFile = __DIR__ . '/proveedores_servicios.json';
     if (file_exists($provFile)) {
         $providers = json_decode(file_get_contents($provFile), true) ?: [];
         foreach ($providers as $p) {
-            if (strtolower(trim($p['business_name'] ?? '')) === strtolower(trim($companyName)) || strtolower(trim($p['email'] ?? '')) === strtolower(trim($companyName))) {
+            $matchName = !empty($companyName) && strtolower(trim($p['business_name'] ?? '')) === strtolower(trim($companyName));
+            $matchEmail = !empty($companyName) && strtolower(trim($p['email'] ?? '')) === strtolower(trim($companyName));
+            if ($matchName || $matchEmail) {
                 if (!empty($p['mp_access_token'])) {
                     $tokenToUse = trim($p['mp_access_token']);
                     break;
                 }
             }
         }
+    }
+
+    if (empty($tokenToUse)) {
+        http_response_code(400);
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'La empresa ' . htmlspecialchars($companyName) . ' aún no ha ingresado sus credenciales de Mercado Pago para cobros directos. Podés reservar coordinando por WhatsApp, Efectivo o Transferencia.'
+        ]);
+        exit;
     }
 
     $ticketId = 'tkt_' . uniqid();
@@ -2213,6 +2249,67 @@ if ($action === 'admin_test_ticket') {
         'message' => 'Ticket de prueba emitido con éxito y chofer notificado en tiempo real.',
         'ticket' => $testTicket
     ]);
+    exit;
+}
+
+// 36. OBTENER CONFIGURACIÓN DE MEDIOS DE PAGO DE UN PRESTADOR O ALOJAMIENTO
+if ($action === 'get_payment_config') {
+    $empresa = trim($_GET['empresa'] ?? '');
+    $accId = trim($_GET['acc_id'] ?? '');
+
+    $result = [
+        'accepts_mp' => false,
+        'accepts_transfer' => true,
+        'accepts_cash' => true,
+        'accepts_direct' => true,
+        'transfer_details' => '',
+        'mp_link' => '',
+        'business_name' => $empresa
+    ];
+
+    if (!empty($empresa)) {
+        $provFile = __DIR__ . '/proveedores_servicios.json';
+        if (file_exists($provFile)) {
+            $providers = json_decode(file_get_contents($provFile), true) ?: [];
+            foreach ($providers as $p) {
+                if (strtolower(trim($p['business_name'] ?? '')) === strtolower(trim($empresa)) || strtolower(trim($p['email'] ?? '')) === strtolower(trim($empresa))) {
+                    $pm = $p['payment_methods'] ?? [];
+                    $hasMp = !empty($p['mp_access_token']) || !empty($p['mp_link']);
+                    $result['accepts_mp'] = isset($pm['mercadopago']) ? (bool)$pm['mercadopago'] : $hasMp;
+                    $result['accepts_transfer'] = isset($pm['transfer']) ? (bool)$pm['transfer'] : !empty($p['transfer_details']);
+                    $result['accepts_cash'] = isset($pm['cash']) ? (bool)$pm['cash'] : true;
+                    $result['accepts_direct'] = isset($pm['direct_contact']) ? (bool)$pm['direct_contact'] : true;
+                    $result['transfer_details'] = $p['transfer_details'] ?? ($pm['transfer_details'] ?? '');
+                    $result['mp_link'] = $p['mp_link'] ?? '';
+                    $result['phone'] = $p['phone'] ?? '';
+                    break;
+                }
+            }
+        }
+    }
+
+    if (!empty($accId)) {
+        $accFile = __DIR__ . '/alojamientos.json';
+        if (file_exists($accFile)) {
+            $accs = json_decode(file_get_contents($accFile), true) ?: [];
+            foreach ($accs as $a) {
+                if ($a['id'] === $accId) {
+                    $pm = $a['payment_methods'] ?? [];
+                    $hasMp = !empty($a['mp_access_token']) || !empty($a['mp_link']);
+                    $result['accepts_mp'] = isset($pm['mercadopago']) ? (bool)$pm['mercadopago'] : $hasMp;
+                    $result['accepts_transfer'] = isset($pm['transfer']) ? (bool)$pm['transfer'] : !empty($a['transfer_details']);
+                    $result['accepts_cash'] = isset($pm['cash']) ? (bool)$pm['cash'] : true;
+                    $result['accepts_direct'] = isset($pm['direct_contact']) ? (bool)$pm['direct_contact'] : true;
+                    $result['transfer_details'] = $a['transfer_details'] ?? ($pm['transfer_details'] ?? '');
+                    $result['mp_link'] = $a['mp_link'] ?? '';
+                    $result['phone'] = $a['phone'] ?? '';
+                    break;
+                }
+            }
+        }
+    }
+
+    echo json_encode(['status' => 'success', 'config' => $result]);
     exit;
 }
 
