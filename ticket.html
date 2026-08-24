@@ -424,11 +424,13 @@
     <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js?v=2077"></script>
+    <script src="auth_manager.js?v=2077"></script>
     <script>
         let basePrice = 25000;
         let passengers = 1;
         let touristLat = null;
         let touristLng = null;
+        let isUserAdmin = false;
 
         document.addEventListener('DOMContentLoaded', () => {
             const params = new URLSearchParams(window.location.search);
@@ -449,7 +451,76 @@
 
             updatePriceDisplay();
             updateWhatsAppLink();
+            loadCompanyPaymentMethods(empresa);
+
+            // Escuchar estado de autenticación centralizado
+            if (window.authManager) {
+                window.authManager.onAuthChange((user, isAdmin) => {
+                    isUserAdmin = isAdmin || (user && user.email && user.email.toLowerCase().trim() === 'oscarns@gmail.com');
+                    if (isUserAdmin) {
+                        enableAdminBypassMode();
+                    }
+                });
+            } else {
+                checkAdminSessionForTicket();
+            }
         });
+
+        async function loadCompanyPaymentMethods(empresa) {
+            try {
+                const res = await fetch(`save_alojamiento.php?action=get_payment_config&empresa=${encodeURIComponent(empresa)}&t=${Date.now()}`);
+                const data = await res.json();
+                if (data.status === 'success' && data.config) {
+                    const cfg = data.config;
+                    const btnMP = document.getElementById('btnPayMP');
+                    const transBox = document.getElementById('transferPaymentBox');
+                    const transText = document.getElementById('transferDetailsText');
+                    const cashBox = document.getElementById('cashNoticeBox');
+
+                    if (cfg.accepts_mp) {
+                        if (btnMP) {
+                            btnMP.style.display = 'flex';
+                            btnMP.innerHTML = '<i class="fas fa-credit-card"></i> Pagar con Tarjeta / Mercado Pago (Online)';
+                        }
+                    } else if (!isUserAdmin && btnMP) {
+                        btnMP.style.display = 'none';
+                    }
+
+                    if (cfg.accepts_transfer && cfg.transfer_details) {
+                        if (transBox) transBox.style.display = 'block';
+                        if (transText) transText.textContent = cfg.transfer_details;
+                    }
+
+                    if (cfg.accepts_cash && cashBox) {
+                        cashBox.style.display = 'block';
+                    }
+                }
+            } catch (e) {
+                console.warn('No se pudo obtener medios de pago de la empresa:', e);
+            }
+        }
+
+        function enableAdminBypassMode() {
+            isUserAdmin = true;
+            const section = document.getElementById('adminTestSection');
+            if (section) section.style.display = 'block';
+
+            const nameInput = document.getElementById('custName');
+            if (nameInput && !nameInput.value) nameInput.value = 'Oscar Stella (Admin)';
+            const phoneInput = document.getElementById('custPhone');
+            if (phoneInput && !phoneInput.value) phoneInput.value = '5492944674774';
+            const hotelInput = document.getElementById('custHotel');
+            if (hotelInput && !hotelInput.value) hotelInput.value = 'Centro Cívico Bariloche (GPS)';
+
+            const btnMP = document.getElementById('btnPayMP');
+            if (btnMP) {
+                btnMP.style.display = 'flex';
+                btnMP.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                btnMP.style.borderColor = '#10b981';
+                btnMP.innerHTML = '<i class="fas fa-bolt"></i> ⚡ Emitir Ticket de Prueba (Admin Bypass / $0)';
+            }
+            updateWhatsAppLink();
+        }
 
         function captureTouristGPS() {
             if (!navigator.geolocation) {
@@ -517,7 +588,8 @@
         async function handlePayTicketWithMP() {
             // ADMIN BYPASS: Si es el administrador general (oscarns@gmail.com), emitir el ticket de prueba directamente sin cobrar
             const user = window.authManager && window.authManager.currentUser;
-            const isAdmin = (user && (user.email === 'oscarns@gmail.com' || (window.authManager.isAdmin && window.authManager.isAdmin()))) 
+            const isAdmin = isUserAdmin 
+                            || (user && (user.email === 'oscarns@gmail.com' || (window.authManager.isAdmin && window.authManager.isAdmin()))) 
                             || localStorage.getItem('bariloche_user_email') === 'oscarns@gmail.com';
             if (isAdmin) {
                 return handleAdminTestTicket();
@@ -590,7 +662,7 @@
 
             const name = document.getElementById('custName').value.trim() || 'Oscar Stella (Admin)';
             const phone = document.getElementById('custPhone').value.trim() || '5492944674774';
-            const hotel = document.getElementById('custHotel').value.trim() || 'Prueba de Recogida Admin / GPS';
+            const hotel = document.getElementById('custHotel').value.trim() || 'Centro Cívico Bariloche (GPS)';
 
             const params = new URLSearchParams(window.location.search);
             const empresa = params.get('empresa') || 'Empresa Oficial';
@@ -599,8 +671,15 @@
             const chofer = params.get('chofer') || 'Chofer Asignado';
 
             const btn = document.getElementById('btnAdminTest');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Emitiendo ticket de prueba y notificando combi...';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Emitiendo ticket de prueba y notificando combi...';
+            }
+            const btnMP = document.getElementById('btnPayMP');
+            if (btnMP) {
+                btnMP.disabled = true;
+                btnMP.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Emitiendo ticket de prueba...';
+            }
 
             try {
                 const res = await fetch('save_alojamiento.php?action=admin_test_ticket', {
@@ -615,8 +694,8 @@
                         tourist_name: name,
                         tourist_phone: phone,
                         pickup_address: hotel,
-                        pickup_lat: touristLat,
-                        pickup_lng: touristLng,
+                        pickup_lat: touristLat || -41.1335,
+                        pickup_lng: touristLng || -71.3103,
                         passengers
                     })
                 });
@@ -633,13 +712,34 @@
                     showSuccessScreen(successParams);
                 } else {
                     alert('Error en modo prueba: ' + (data.message || 'No autorizado'));
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-bolt"></i> ⚡ Comprar en Modo Prueba (Admin Bypass / $0)';
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-bolt"></i> ⚡ Emitir Ticket de Prueba (Admin $0)';
+                    }
+                    if (btnMP) {
+                        btnMP.disabled = false;
+                        btnMP.innerHTML = '<i class="fas fa-bolt"></i> ⚡ Emitir Ticket de Prueba (Admin Bypass / $0)';
+                    }
                 }
             } catch (e) {
                 alert('Error al emitir ticket de prueba');
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-bolt"></i> ⚡ Comprar en Modo Prueba (Admin Bypass / $0)';
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-bolt"></i> ⚡ Emitir Ticket de Prueba (Admin $0)';
+                }
+                if (btnMP) {
+                    btnMP.disabled = false;
+                    btnMP.innerHTML = '<i class="fas fa-bolt"></i> ⚡ Emitir Ticket de Prueba (Admin Bypass / $0)';
+                }
+            }
+        }
+
+        function copyTransferDetails() {
+            const txt = document.getElementById('transferDetailsText')?.textContent;
+            if (txt) {
+                navigator.clipboard.writeText(txt).then(() => {
+                    alert('📋 Datos bancarios copiados al portapapeles.');
+                });
             }
         }
 
@@ -650,18 +750,9 @@
                                 || localStorage.getItem('bariloche_user_email') === 'oscarns@gmail.com';
                 
                 if (isAdmin) {
-                    const section = document.getElementById('adminTestSection');
-                    if (section) section.style.display = 'block';
-
-                    const nameInput = document.getElementById('custName');
-                    if (nameInput && !nameInput.value) nameInput.value = 'Oscar Stella (Admin)';
-                    const phoneInput = document.getElementById('custPhone');
-                    if (phoneInput && !phoneInput.value) phoneInput.value = '5492944674774';
-                    const hotelInput = document.getElementById('custHotel');
-                    if (hotelInput && !hotelInput.value) hotelInput.value = 'Centro Cívico Bariloche';
-                    updateWhatsAppLink();
+                    enableAdminBypassMode();
                 }
-            }, 600);
+            }, 500);
         }
 
         function showSuccessScreen(params) {
