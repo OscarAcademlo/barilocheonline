@@ -489,14 +489,20 @@
                         </div>
                     </div>
 
-                    <div class="section-header-row" style="border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:15px;">
-                        <h3 style="font-size:1.05rem; margin:0;"><i class="fas fa-car-side"></i> Unidades Registradas (<span id="fleetCountLabel">0</span>)</h3>
+                    <div class="section-header-row" style="border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                        <div>
+                            <h3 style="font-size:1.05rem; margin:0;"><i class="fas fa-car-side" style="color:var(--primary);"></i> Unidades y Choferes (<span id="fleetCountLabel">0</span>)</h3>
+                            <small style="color:var(--text-secondary);">Configurá el usuario y contraseña de cada chofer para que inicien sesión en la App Android.</small>
+                        </div>
+                        <button type="button" class="btn-add-movil" onclick="addNewMovilToFleet()" style="background:#0084ff; color:white; border:none; padding:8px 14px; border-radius:10px; font-weight:700; font-size:0.85rem; cursor:pointer;">
+                            <i class="fas fa-plus"></i> + Agregar Unidad / Chofer
+                        </button>
                     </div>
 
                     <div id="fleetMovilesList" class="fleet-grid"></div>
 
                     <button type="submit" id="btnSaveFleet" class="btn-submit-pickup" style="background:#0084ff; color:white; width:auto; padding:12px 28px; font-weight:800; margin-top:20px; border-radius:12px; border:none; cursor:pointer;">
-                        <i class="fas fa-floppy-disk"></i> Guardar Flota de Combis y Cobros
+                        <i class="fas fa-floppy-disk"></i> Guardar Flota de Combis y Choferes
                     </button>
                 </form>
             </div>
@@ -914,6 +920,9 @@
                 marca: 'Mercedes-Benz Sprinter',
                 color: 'Blanco',
                 patente_ultimos3: '123',
+                chofer_nombre: '',
+                usuario: `chofer${num}`,
+                password: Math.floor(1000 + Math.random() * 9000).toString(),
                 is_active: true
             });
             renderFleetInputs();
@@ -931,30 +940,55 @@
             if (!container) return;
 
             container.innerHTML = myFleetMoviles.map((m, index) => `
-                <div class="movil-card-edit" id="movil_card_${m.id}">
-                    <button type="button" class="btn-del-movil" onclick="removeMovilFromFleet('${m.id}')" title="Eliminar móvil">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    <b style="font-size:0.95rem; margin-bottom:10px; display:block; color:var(--primary);"><i class="fas fa-van-shuttle"></i> Unidad #${index + 1}</b>
+                <div class="movil-card-edit" id="movil_card_${m.id}" style="background:var(--bg-main); border:1.5px solid var(--border); border-radius:18px; padding:18px; position:relative; margin-bottom:16px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:8px;">
+                        <b style="font-size:0.95rem; color:var(--primary);"><i class="fas fa-van-shuttle"></i> Unidad #${index + 1}: ${m.codigo || 'Combi'}</b>
+                        <button type="button" class="btn-del-movil" onclick="removeMovilFromFleet('${m.id}')" title="Eliminar unidad" style="background:rgba(231,76,60,0.1); color:#e74c3c; border:none; border-radius:8px; padding:6px 10px; cursor:pointer;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                     
-                    <div class="form-group-custom" style="margin-bottom:8px;">
-                        <label style="font-size:0.75rem; font-weight:700;">Nombre / Código de la Unidad</label>
-                        <input type="text" class="form-control-custom" value="${m.codigo}" onchange="updateMovilProp('${m.id}', 'codigo', this.value)" placeholder="Ej. Combi 01" required style="width:100%; height:40px; border-radius:8px; border:1px solid var(--border); padding:6px 10px; font-size:0.88rem; background:var(--bg-secondary); color:var(--text-primary);">
-                    </div>
-
-                    <div class="form-group-custom" style="margin-bottom:8px;">
-                        <label style="font-size:0.75rem; font-weight:700;">Marca / Modelo</label>
-                        <input type="text" class="form-control-custom" value="${m.marca}" onchange="updateMovilProp('${m.id}', 'marca', this.value)" placeholder="Ej. Renault Master" required style="width:100%; height:40px; border-radius:8px; border:1px solid var(--border); padding:6px 10px; font-size:0.88rem; background:var(--bg-secondary); color:var(--text-primary);">
-                    </div>
-
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px; margin-bottom:10px;">
                         <div class="form-group-custom" style="margin-bottom:0;">
-                            <label style="font-size:0.75rem; font-weight:700;">Color</label>
-                            <input type="text" class="form-control-custom" value="${m.color}" onchange="updateMovilProp('${m.id}', 'color', this.value)" placeholder="Ej. Blanco" required style="width:100%; height:40px; border-radius:8px; border:1px solid var(--border); padding:6px 10px; font-size:0.88rem; background:var(--bg-secondary); color:var(--text-primary);">
+                            <label style="font-size:0.75rem; font-weight:700;">👤 Nombre del Chofer</label>
+                            <input type="text" class="form-control-custom" value="${m.chofer_nombre || ''}" onchange="updateMovilProp('${m.id}', 'chofer_nombre', this.value)" placeholder="Ej. Carlos López" required style="width:100%; height:40px; border-radius:8px; border:1px solid var(--border); padding:6px 10px; font-size:0.88rem; background:var(--bg-secondary); color:var(--text-primary);">
                         </div>
                         <div class="form-group-custom" style="margin-bottom:0;">
-                            <label style="font-size:0.75rem; font-weight:700;">3 Últimos Dígitos Patente</label>
-                            <input type="text" class="form-control-custom" value="${m.patente_ultimos3}" onchange="updateMovilProp('${m.id}', 'patente_ultimos3', this.value)" maxlength="3" placeholder="Ej. 789" required style="width:100%; height:40px; border-radius:8px; border:1px solid var(--border); padding:6px 10px; font-size:0.88rem; text-transform:uppercase; font-weight:800; background:var(--bg-secondary); color:var(--text-primary);">
+                            <label style="font-size:0.75rem; font-weight:700;">🏷️ Nombre / Código Interno</label>
+                            <input type="text" class="form-control-custom" value="${m.codigo || ''}" onchange="updateMovilProp('${m.id}', 'codigo', this.value)" placeholder="Ej. Combi 01" required style="width:100%; height:40px; border-radius:8px; border:1px solid var(--border); padding:6px 10px; font-size:0.88rem; background:var(--bg-secondary); color:var(--text-primary);">
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:10px; margin-bottom:12px;">
+                        <div class="form-group-custom" style="margin-bottom:0;">
+                            <label style="font-size:0.75rem; font-weight:700;">🚐 Marca / Modelo</label>
+                            <input type="text" class="form-control-custom" value="${m.marca || ''}" onchange="updateMovilProp('${m.id}', 'marca', this.value)" placeholder="Ej. Mercedes Sprinter" required style="width:100%; height:40px; border-radius:8px; border:1px solid var(--border); padding:6px 10px; font-size:0.88rem; background:var(--bg-secondary); color:var(--text-primary);">
+                        </div>
+                        <div class="form-group-custom" style="margin-bottom:0;">
+                            <label style="font-size:0.75rem; font-weight:700;">🎨 Color</label>
+                            <input type="text" class="form-control-custom" value="${m.color || ''}" onchange="updateMovilProp('${m.id}', 'color', this.value)" placeholder="Ej. Blanco" required style="width:100%; height:40px; border-radius:8px; border:1px solid var(--border); padding:6px 10px; font-size:0.88rem; background:var(--bg-secondary); color:var(--text-primary);">
+                        </div>
+                        <div class="form-group-custom" style="margin-bottom:0;">
+                            <label style="font-size:0.75rem; font-weight:700;">🔢 Últ. 3 Patente</label>
+                            <input type="text" class="form-control-custom" value="${m.patente_ultimos3 || ''}" onchange="updateMovilProp('${m.id}', 'patente_ultimos3', this.value)" maxlength="3" placeholder="Ej. 789" required style="width:100%; height:40px; border-radius:8px; border:1px solid var(--border); padding:6px 10px; font-size:0.88rem; text-transform:uppercase; font-weight:800; background:var(--bg-secondary); color:var(--text-primary);">
+                        </div>
+                    </div>
+
+                    <!-- CREDENCIALES PARA LA APP ANDROID -->
+                    <div style="background:rgba(0,184,148,0.08); border:1px solid rgba(0,184,148,0.3); border-radius:12px; padding:12px;">
+                        <b style="font-size:0.8rem; color:#00b894; display:block; margin-bottom:8px;"><i class="fas fa-key"></i> Credenciales de Acceso para la App Chofer:</b>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr auto; gap:10px; align-items:flex-end;">
+                            <div class="form-group-custom" style="margin-bottom:0;">
+                                <label style="font-size:0.72rem; font-weight:700;">Usuario App</label>
+                                <input type="text" class="form-control-custom" value="${m.usuario || ''}" onchange="updateMovilProp('${m.id}', 'usuario', this.value)" placeholder="Ej. chofer1" required style="width:100%; height:36px; border-radius:6px; border:1px solid var(--border); padding:4px 8px; font-size:0.85rem; background:var(--bg-secondary); color:var(--text-primary);">
+                            </div>
+                            <div class="form-group-custom" style="margin-bottom:0;">
+                                <label style="font-size:0.72rem; font-weight:700;">Contraseña App</label>
+                                <input type="text" class="form-control-custom" value="${m.password || ''}" onchange="updateMovilProp('${m.id}', 'password', this.value)" placeholder="Ej. 1234" required style="width:100%; height:36px; border-radius:6px; border:1px solid var(--border); padding:4px 8px; font-size:0.85rem; font-weight:700; background:var(--bg-secondary); color:var(--text-primary);">
+                            </div>
+                            <button type="button" onclick="shareDriverCredentials('${m.id}')" title="Copiar datos para enviar al chofer por WhatsApp" style="background:#25d366; color:white; border:none; border-radius:8px; padding:8px 12px; font-weight:700; font-size:0.78rem; cursor:pointer; height:36px; display:inline-flex; align-items:center; gap:6px;">
+                                <i class="fab fa-whatsapp"></i> Enviar
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -966,6 +1000,26 @@
             if (m) {
                 m[prop] = val;
             }
+        }
+
+        function shareDriverCredentials(id) {
+            const m = myFleetMoviles.find(item => item.id === id);
+            if (!m) return;
+            const companyName = document.getElementById('fleetCompanyName')?.value || 'Nuestra Empresa';
+            const text = `🚐 *BariRuta Chofer - Acceso a la App*\n` +
+                         `🏢 Empresa: *${companyName}*\n` +
+                         `👤 Chofer: *${m.chofer_nombre || 'Chofer'}*\n` +
+                         `🚐 Vehículo: *${m.marca || 'Combi'}* (Patente: ***${m.patente_ultimos3 || '---'})\n\n` +
+                         `📲 Descargá la app BariRuta Chofer e ingresá con:\n` +
+                         `🔑 *Usuario:* ${m.usuario || '---'}\n` +
+                         `🔒 *Contraseña:* ${m.password || '---'}\n\n` +
+                         `¡Al ingresar ya podés transmitir tu ubicación en tiempo real en el mapa de Bariloche.Online!`;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ ¡Datos de acceso copiados al portapapeles! Pegalos en WhatsApp para tu chofer.');
+            }).catch(() => {
+                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+            });
         }
 
         async function saveSelectedServicesConfig() {

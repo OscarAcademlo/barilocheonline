@@ -40,14 +40,18 @@ function initTouristMap() {
 function setupRealtimeTracking() {
     const statusText = document.getElementById('realtimeStatusText');
 
+    // Cargar empresas habilitadas desde el backend PHP (pagaron o tienen código gratis)
+    // Esto garantiza que aparezcan en el select aunque no haya vehículos transmitiendo aún
+    loadExcursionCompaniesFromBackend();
+
     // Escuchar estado de conexión
     window.bariRuta.onStatusChange(msg => {
         if (statusText) statusText.textContent = msg;
     });
 
-    // Escuchar cambios de empresas en Supabase
+    // Escuchar cambios de empresas en Supabase (vehículos activos)
     window.bariRuta.onCompaniesChange(companies => {
-        renderCompanySelect(companies);
+        mergeAndRenderCompanies(companies);
     });
 
     // Escuchar vehículos en tiempo real (transmitidos desde la app Android)
@@ -55,6 +59,31 @@ function setupRealtimeTracking() {
         renderLiveVehicles(vehicles);
     });
 }
+
+// Empresas registradas (del backend), se combinan con las de Supabase
+let _backendCompanies = [];
+
+async function loadExcursionCompaniesFromBackend() {
+    try {
+        const res = await fetch('save_alojamiento.php?action=get_excursion_companies&t=' + Date.now());
+        const companies = await res.json();
+        _backendCompanies = companies || [];
+        mergeAndRenderCompanies(window.bariRuta.companies || []);
+    } catch (e) {
+        console.warn('No se pudieron cargar empresas del backend:', e);
+    }
+}
+
+function mergeAndRenderCompanies(supabaseCompanies) {
+    // Unir: backend + Supabase, sin duplicados (por nombre)
+    const merged = [..._backendCompanies];
+    (supabaseCompanies || []).forEach(sc => {
+        const exists = merged.some(b => b.name.toLowerCase().trim() === (sc.name || '').toLowerCase().trim());
+        if (!exists) merged.push(sc);
+    });
+    renderCompanySelect(merged);
+}
+
 
 function renderCompanySelect(companies) {
     const select = document.getElementById('companySelect');

@@ -714,6 +714,131 @@ if ($action === 'get_gastronomia') {
     exit;
 }
 
+// 15b. OBTENER EMPRESAS DE EXCURSIONES HABILITADAS (para select del mapa y app Android)
+if ($action === 'get_excursion_companies') {
+    $file = __DIR__ . '/proveedores_servicios.json';
+    if (!file_exists($file)) {
+        echo json_encode([]);
+        exit;
+    }
+    $providers = json_decode(file_get_contents($file), true) ?: [];
+    $excursionCompanies = array_values(array_filter($providers, function($p) {
+        if (!($p['is_active'] ?? false)) return false;
+        $services = $p['services'] ?? [];
+        return in_array('excursiones', $services);
+    }));
+    // Exponemos nombre, teléfono y lista de móviles/choferes públicos (sin passwords)
+    $result = array_map(function($p) {
+        $cleanList = [];
+        foreach ($p['moviles'] ?? [] as $m) {
+            if (($m['is_active'] ?? true) !== false) {
+                $cleanList[] = [
+                    'id' => $m['id'] ?? '',
+                    'codigo' => $m['codigo'] ?? '',
+                    'marca' => $m['marca'] ?? '',
+                    'patente_ultimos3' => $m['patente_ultimos3'] ?? '',
+                    'chofer_nombre' => $m['chofer_nombre'] ?? '',
+                    'usuario' => $m['usuario'] ?? ''
+                ];
+            }
+        }
+        return [
+            'name'  => $p['business_name'] ?? '',
+            'phone' => $p['phone'] ?? '',
+            'moviles' => $cleanList
+        ];
+    }, $excursionCompanies);
+    echo json_encode(array_values($result));
+    exit;
+}
+
+// 15c. LOGIN DE CHOFER DESDE LA APP ANDROID
+if ($action === 'driver_login') {
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true) ?: $_POST ?: $_GET;
+    $username = strtolower(trim($data['usuario'] ?? $data['username'] ?? ''));
+    $password = trim($data['password'] ?? $data['clave'] ?? '');
+
+    if (empty($username) || empty($password)) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'Ingresá tu usuario y contraseña asignados por la empresa.']);
+        exit;
+    }
+
+    $provFile = __DIR__ . '/proveedores_servicios.json';
+    $providers = file_exists($provFile) ? json_decode(file_get_contents($provFile), true) : [];
+    if (!is_array($providers)) $providers = [];
+
+    $subsFile = __DIR__ . '/suscripciones.json';
+    $subs = file_exists($subsFile) ? json_decode(file_get_contents($subsFile), true) : [];
+    if (!is_array($subs)) $subs = [];
+
+    $matchedMobile = null;
+    $matchedCompany = null;
+
+    foreach ($providers as $p) {
+        if (($p['is_active'] ?? true) === false) continue;
+        $services = $p['services'] ?? [];
+        if (!in_array('excursiones', $services)) continue;
+
+        // Validar si la empresa está al día
+        $email = strtolower(trim($p['email'] ?? ''));
+        $isSubActive = ($email === ADMIN_EMAIL);
+        if (!$isSubActive) {
+            foreach ($subs as $s) {
+                if (strtolower(trim($s['email'] ?? '')) === $email && !empty($s['active'])) {
+                    if (empty($s['expires_at']) || strtotime($s['expires_at']) >= strtotime('today')) {
+                        $isSubActive = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if (!$isSubActive) continue;
+
+        $moviles = $p['moviles'] ?? [];
+        foreach ($moviles as $m) {
+            if (($m['is_active'] ?? true) === false) continue;
+            $mUser = strtolower(trim($m['usuario'] ?? ''));
+            $mPass = trim($m['password'] ?? '');
+
+            if (!empty($mUser) && $mUser === $username && $mPass === $password) {
+                $matchedMobile = $m;
+                $matchedCompany = $p;
+                break 2;
+            }
+        }
+    }
+
+    if ($matchedMobile && $matchedCompany) {
+        $cName = $matchedCompany['business_name'] ?: 'Empresa Excursión';
+        $vBrand = $matchedMobile['marca'] ?: 'Combi';
+        $vPlate = $matchedMobile['patente_ultimos3'] ?: '';
+        $dName = $matchedMobile['chofer_nombre'] ?: 'Chofer';
+        $vCode = trim($matchedMobile['codigo'] ?? '') ?: ($vBrand . ($vPlate ? " - $vPlate" : ""));
+
+        echo json_encode([
+            'status' => 'success',
+            'message' => '¡Bienvenido ' . $dName . '!',
+            'company_name' => $cName,
+            'driver_name' => $dName,
+            'vehicle_brand' => $vBrand,
+            'vehicle_plate' => $vPlate,
+            'vehicle_code' => $vCode,
+            'color' => $matchedMobile['color'] ?? 'Blanco',
+            'mobile_id' => $matchedMobile['id'] ?? ''
+        ]);
+        exit;
+    }
+
+    http_response_code(401);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Usuario o contraseña incorrectos, o la empresa no tiene la suscripción activa.'
+    ]);
+    exit;
+}
+
 // 16. GUARDAR / EDITAR PROVEEDOR MULTISERVICIO Y FLOTA DE COMBO/MÓVILES
 if ($action === 'save_multiservice_provider') {
     $raw = file_get_contents('php://input');
@@ -735,7 +860,7 @@ if ($action === 'save_multiservice_provider') {
     $selectedServices = is_array($data['services'] ?? null) ? $data['services'] : [];
     $moviles = is_array($data['moviles'] ?? null) ? $data['moviles'] : [];
 
-    // Limpiar y formatear móviles (Marca, Color, 3 últimos dígitos de patente)
+    // Limpiar y formatear móviles (Marca, Color, 3 últimos dígitos de patente, Chofer, Usuario, Password)
     $cleanMoviles = [];
     foreach ($moviles as $m) {
         $cleanMoviles[] = [
@@ -744,6 +869,9 @@ if ($action === 'save_multiservice_provider') {
             'marca' => trim($m['marca'] ?? ''),
             'color' => trim($m['color'] ?? 'Blanco'),
             'patente_ultimos3' => strtoupper(trim(substr($m['patente_ultimos3'] ?? '', -3))),
+            'chofer_nombre' => trim($m['chofer_nombre'] ?? $m['driver_name'] ?? ''),
+            'usuario' => strtolower(trim($m['usuario'] ?? $m['username'] ?? '')),
+            'password' => trim($m['password'] ?? ''),
             'is_active' => isset($m['is_active']) ? (bool)$m['is_active'] : true
         ];
     }
@@ -973,6 +1101,25 @@ if ($action === 'admin_update_provider') {
     $expiresAt = trim($data['expires_at'] ?? '');
     $isActive = isset($data['is_active']) ? (bool)$data['is_active'] : true;
 
+    $moviles = is_array($data['moviles'] ?? null) ? $data['moviles'] : null;
+    $cleanMoviles = null;
+    if ($moviles !== null) {
+        $cleanMoviles = [];
+        foreach ($moviles as $m) {
+            $cleanMoviles[] = [
+                'id' => $m['id'] ?? ('movil_' . uniqid()),
+                'codigo' => trim($m['codigo'] ?? 'Combi'),
+                'marca' => trim($m['marca'] ?? ''),
+                'color' => trim($m['color'] ?? 'Blanco'),
+                'patente_ultimos3' => strtoupper(trim(substr($m['patente_ultimos3'] ?? '', -3))),
+                'chofer_nombre' => trim($m['chofer_nombre'] ?? $m['driver_name'] ?? ''),
+                'usuario' => strtolower(trim($m['usuario'] ?? $m['username'] ?? '')),
+                'password' => trim($m['password'] ?? ''),
+                'is_active' => isset($m['is_active']) ? (bool)$m['is_active'] : true
+            ];
+        }
+    }
+
     // Actualizar en proveedores_servicios.json
     $provFile = __DIR__ . '/proveedores_servicios.json';
     $providers = file_exists($provFile) ? json_decode(file_get_contents($provFile), true) : [];
@@ -985,6 +1132,10 @@ if ($action === 'admin_update_provider') {
             $p['phone'] = $phone;
             $p['services'] = $services;
             $p['is_active'] = $isActive;
+            if ($cleanMoviles !== null) {
+                $p['moviles'] = $cleanMoviles;
+                $p['cantidad_moviles'] = count($cleanMoviles);
+            }
             $p['updated_at'] = date('c');
             $found = true;
             break;
@@ -996,6 +1147,8 @@ if ($action === 'admin_update_provider') {
             'business_name' => $businessName ?: 'Cliente ' . $targetEmail,
             'phone' => $phone,
             'services' => $services,
+            'moviles' => $cleanMoviles ?: [],
+            'cantidad_moviles' => count($cleanMoviles ?: []),
             'is_active' => $isActive,
             'created_at' => date('c')
         ];

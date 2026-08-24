@@ -1164,13 +1164,16 @@
                             ${moviles.length === 0 ? `
                                 <small style="color:var(--text-secondary);">No tiene combis o móviles registrados aún.</small>
                             ` : `
-                                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px;">
+                                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:10px;">
                                     ${moviles.map(m => `
-                                        <div style="background:var(--bg-main); border:1px solid ${m.is_active === false ? '#e74c3c' : 'var(--border)'}; border-radius:10px; padding:10px; display:flex; justify-content:space-between; align-items:center;">
+                                        <div style="background:var(--bg-main); border:1px solid ${m.is_active === false ? '#e74c3c' : 'var(--border)'}; border-radius:10px; padding:10px; display:flex; justify-content:space-between; align-items:flex-start;">
                                             <div>
-                                                <b style="font-size:0.9rem; display:block;">🚐 ${m.codigo || 'Combi'}</b>
-                                                <small style="color:var(--text-secondary); display:block;">
-                                                    ${m.marca || 'Marca n/d'} • ${m.color || 'Blanco'} • Pat: <b>...${m.patente_ultimos3 || '---'}</b>
+                                                <b style="font-size:0.9rem; display:block; color:var(--primary);">🚐 ${m.codigo || 'Combi'}: ${m.marca || 'Vehículo'} (${m.color || 'Blanco'})</b>
+                                                <small style="color:var(--text-secondary); display:block; margin:2px 0;">
+                                                    👤 Chofer: <b>${m.chofer_nombre || 'Sin asignar'}</b> • Patente: <b>...${m.patente_ultimos3 || '---'}</b>
+                                                </small>
+                                                <small style="color:#00b894; display:block; font-weight:700;">
+                                                    🔑 Usuario: <code>${m.usuario || '-'}</code> | Clave: <code>${m.password || '-'}</code>
                                                 </small>
                                             </div>
                                             <div>
