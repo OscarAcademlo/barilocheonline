@@ -137,7 +137,7 @@ function initMap() {
     const mapEl = document.getElementById('map');
     if (!mapEl) return;
 
-    map = L.map('map', { zoomControl: false }).setView([-41.1335, -71.3103], 12);
+    map = L.map('map', { zoomControl: false }).setView([-41.1335, -71.3103], 13);
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
@@ -150,6 +150,8 @@ function renderMapMarkers(list) {
     if (!map) return;
     markers.forEach(m => map.removeLayer(m));
     markers = [];
+
+    const bounds = [];
 
     list.forEach(acc => {
         if (!acc.lat || !acc.lng) return;
@@ -175,7 +177,13 @@ function renderMapMarkers(list) {
             .addTo(map);
 
         markers.push(marker);
+        bounds.push([acc.lat, acc.lng]);
     });
+
+    // Auto-ajustar el zoom para mostrar todos los pines
+    if (bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [40, 40], maxZoom: 13 });
+    }
 }
 
 // 3. RENDERIZAR LISTA AIRBNB

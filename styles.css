@@ -3037,3 +3037,67 @@ body {
         font-size: 1rem !important;
     }
 }
+
+/* ============================================
+   MAPA DE ALOJAMIENTOS: MARCADORES DE PRECIO
+   ============================================ */
+.custom-price-marker {
+    background: transparent !important;
+    border: none !important;
+}
+
+.price-marker-content {
+    background: #1e272e;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 0.78rem;
+    padding: 5px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.35);
+    border: 2px solid rgba(255,255,255,0.15);
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease;
+    display: inline-block;
+    line-height: 1;
+}
+
+.price-marker-content:hover {
+    background: #0084ff;
+    transform: scale(1.08);
+}
+
+/* Popup mini del mapa de alojamientos */
+.map-popup-mini {
+    font-family: 'Inter', sans-serif;
+    min-width: 200px;
+}
+
+.map-popup-mini img {
+    width: 100%;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.map-popup-mini b {
+    font-size: 0.9rem;
+    display: block;
+    margin-bottom: 3px;
+}
+
+.map-popup-mini button {
+    margin-top: 8px;
+    background: #0084ff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    font-size: 0.82rem;
+}
