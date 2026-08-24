@@ -208,11 +208,19 @@ function renderAccommodations(list) {
     container.innerHTML = list.map(acc => {
         const coverImg = (acc.images && acc.images[0]) ? acc.images[0] : 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800';
         const isOwnerOrAdmin = currentUser && (currentUser.email === acc.owner_email || currentUser.email === ADMIN_EMAIL);
+        const isTestService = acc.is_test || 
+                              (acc.owner_email && (acc.owner_email.toLowerCase().includes('test') || acc.owner_email.toLowerCase().includes('oscar') || acc.owner_email.toLowerCase().includes('demo'))) || 
+                              (acc.name && (acc.name.toLowerCase().includes('prueba') || acc.name.toLowerCase().includes('demo') || acc.name.toLowerCase().includes('test')));
 
         return `
             <div class="accommodation-card-airbnb" onclick="showAccommodationDetails('${acc.id}')">
-                <div class="accommodation-img-wrapper">
+                <div class="accommodation-img-wrapper" style="position:relative;">
                     <img src="${coverImg}" alt="${acc.name}" onerror="this.src='https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800'">
+                    ${isTestService ? `
+                        <div class="test-service-badge" style="position:absolute; top:10px; left:10px; z-index:4; background:#f59e0b; color:#ffffff; font-size:0.68rem; font-weight:800; padding:3px 8px; border-radius:6px; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(0,0,0,0.3); text-transform:uppercase; letter-spacing:0.3px;">
+                            <i class="fas fa-flask"></i> Prueba Técnica
+                        </div>
+                    ` : ''}
                     <div class="accommodation-price-badge">$${Number(acc.price).toLocaleString('es-AR')}/noche</div>
                     <div class="accommodation-type-tag">${acc.type || 'Cabaña'}</div>
                 </div>
@@ -247,6 +255,9 @@ function showAccommodationDetails(id) {
     if (!acc) return;
 
     const isOwnerOrAdmin = currentUser && (currentUser.email === acc.owner_email || currentUser.email === ADMIN_EMAIL);
+    const isTestService = acc.is_test || 
+                          (acc.owner_email && (acc.owner_email.toLowerCase().includes('test') || acc.owner_email.toLowerCase().includes('oscar') || acc.owner_email.toLowerCase().includes('demo'))) || 
+                          (acc.name && (acc.name.toLowerCase().includes('prueba') || acc.name.toLowerCase().includes('demo') || acc.name.toLowerCase().includes('test')));
 
     const modal = document.getElementById('accommodationModal');
     const content = document.getElementById('modalContent');
@@ -272,6 +283,15 @@ function showAccommodationDetails(id) {
             ` : ''}
         </div>
         <div class="modal-accommodation-body">
+            ${isTestService ? `
+                <div style="background:#fffbeb; border:1.5px dashed #f59e0b; border-radius:12px; padding:10px 14px; margin-bottom:14px; display:flex; align-items:center; gap:10px; color:#b45309;">
+                    <i class="fas fa-flask" style="font-size:1.4rem;"></i>
+                    <div>
+                        <div style="font-weight:800; font-size:0.85rem; text-transform:uppercase;">🧪 Servicio de Prueba Técnica (Demo)</div>
+                        <div style="font-size:0.75rem; color:#92400e;">Esta publicación forma parte de las pruebas de verificación técnica y demostración del sistema.</div>
+                    </div>
+                </div>
+            ` : ''}
             <div class="modal-accommodation-title">
                 <div>
                     <span class="type-pill-header">${acc.type || 'Alojamiento'}</span>

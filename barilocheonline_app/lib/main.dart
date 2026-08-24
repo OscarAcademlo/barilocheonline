@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,6 +15,8 @@ const String kSupabaseAnonKey =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB3cmxid3BscGd6aXJsY3J3ZXBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzMzc0NzAsImV4cCI6MjA4NjkxMzQ3MH0.HxEfbABTObu4khKxVhtBaBuCt2RDBm34urnSEJCfJUU';
 
 const String kApiBaseUrl = 'https://bariloche.online/save_alojamiento.php';
+
+final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -72,8 +75,9 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
   bool _loggingIn = false;
   String? _loginError;
 
-  // Controllers de Transmisión Activa
+  // Controllers de Transmisión Activa y Butacas
   final _excursionNameCtrl = TextEditingController();
+  int _availableSeats = 15; // Butacas libres dinámicas
 
   bool _isStreaming = false;
   StreamSubscription<Position>? _positionStreamSub;
@@ -87,11 +91,64 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
   List<Map<String, dynamic>> _touristsWaiting = [];
   RealtimeChannel? _touristChannel;
   RealtimeChannel? _trackingBroadcastChannel;
+  Timer? _pickupPollTimer;
 
   @override
   void initState() {
     super.initState();
+    _initNotifications();
     _checkSavedSession();
+  }
+
+  Future<void> _initNotifications() async {
+    try {
+      const AndroidInitializationSettings initializationSettingsAndroid =
+          AndroidInitializationSettings('@mipmap/ic_launcher');
+      const InitializationSettings initializationSettings =
+          InitializationSettings(android: initializationSettingsAndroid);
+      await _localNotifications.initialize(settings: initializationSettings);
+
+      const AndroidNotificationChannel channel = AndroidNotificationChannel(
+        'bariruta_pickups_channel',
+        'Alertas de Pasajeros BariRuta',
+        description: 'Notificaciones de nuevos pasajeros en la combi en tiempo real',
+        importance: Importance.max,
+        playSound: true,
+        enableVibration: true,
+      );
+
+      final androidPlugin = _localNotifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+      await androidPlugin?.createNotificationChannel(channel);
+      await androidPlugin?.requestNotificationsPermission();
+    } catch (e) {
+      debugPrint('Error init notifications: $e');
+    }
+  }
+
+  Future<void> _showSystemNotification(String name, String address, int passengers) async {
+    try {
+      const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+        'bariruta_pickups_channel',
+        'Alertas de Pasajeros BariRuta',
+        channelDescription: 'Notificaciones de nuevos pasajeros en tiempo real',
+        importance: Importance.max,
+        priority: Priority.high,
+        showWhen: true,
+        enableVibration: true,
+        playSound: true,
+      );
+
+      const NotificationDetails platformDetails = NotificationDetails(android: androidDetails);
+
+      await _localNotifications.show(
+        id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+        title: '🔔 ¡NUEVO PASAJERO: $name!',
+        body: '📍 $address ($passengers persona${passengers > 1 ? "s" : ""})',
+        notificationDetails: platformDetails,
+      );
+    } catch (e) {
+      debugPrint('Error showing push notification: $e');
+    }
   }
 
   @override
@@ -377,6 +434,7 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
       'lng': pos.longitude,
       'speed': speedKmH.roundToDouble(),
       'heading': pos.heading.roundToDouble(),
+      'available_seats': _availableSeats,
       'status': 'en_camino',
       'updated_at': now.toUtc().toIso8601String(),
     };
@@ -416,8 +474,6 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
       });
     }
   }
-
-  Timer? _pickupPollTimer;
 
   Future<void> _listenTouristPickups() async {
     final company = _driverProfile?['company_name'] ?? '';
@@ -471,7 +527,20 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
   void _notifyNewPassenger(Map<String, dynamic> p) {
     final name = p['tourist_name'] ?? 'Nuevo Pasajero';
     final address = p['address'] ?? p['pickup_address'] ?? 'Punto de recogida';
-    final count = p['passengers'] ?? 1;
+    final count = p['passengers'] is int ? p['passengers'] as int : int.tryParse('${p['passengers']}') ?? 1;
+
+    // Disparar Notificación Push / Tray del Sistema Android
+    _showSystemNotification(name, address, count);
+
+    // Ajustar butacas disponibles dinámicamente
+    if (_availableSeats >= count) {
+      setState(() {
+        _availableSeats -= count;
+      });
+      if (_currentPosition != null && _isStreaming) {
+        _sendTelemetryToSupabase(_currentPosition!);
+      }
+    }
 
     showDialog(
       context: context,
@@ -519,7 +588,7 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
           ),
           ElevatedButton.icon(
             icon: const Icon(Icons.navigation_rounded, size: 18),
-            label: const Text('IR A BUSCAR'),
+            label: const Text('IR A BUSCAR (MAPA)'),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF0084FF),
               foregroundColor: Colors.white,
@@ -540,9 +609,29 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
   }
 
   Future<void> _launchNavigation(double lat, double lng) async {
-    final uri = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lng');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    // 1. Intent nativo de navegación de Google Maps
+    final googleMapsNavUri = Uri.parse('google.navigation:q=$lat,$lng&mode=d');
+    final geoUri = Uri.parse('geo:$lat,$lng?q=$lat,$lng(Pasajero)');
+    final webMapsUri = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lng');
+
+    try {
+      if (await canLaunchUrl(googleMapsNavUri)) {
+        await launchUrl(googleMapsNavUri, mode: LaunchMode.externalNonBrowserApplication);
+        return;
+      }
+    } catch (_) {}
+
+    try {
+      if (await canLaunchUrl(geoUri)) {
+        await launchUrl(geoUri, mode: LaunchMode.externalApplication);
+        return;
+      }
+    } catch (_) {}
+
+    try {
+      await launchUrl(webMapsUri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      _showSnackBar('No se pudo abrir el mapa: $e', isError: true);
     }
   }
 
@@ -985,6 +1074,81 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
 
               const SizedBox(height: 18),
 
+              // SELECTOR DINÁMICO DE BUTACAS / ASIENTOS LIBRES
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E293B),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: const Color(0xFF0084FF).withValues(alpha: 0.35)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0084FF).withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.event_seat_rounded, color: Color(0xFF0084FF), size: 26),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Butacas Disponibles', style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600)),
+                          Text(
+                            _availableSeats > 0 ? '$_availableSeats libres en la combi' : '🔴 Combi Completa',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 15,
+                              color: _availableSeats > 0 ? const Color(0xFF00B894) : const Color(0xFFE74C3C),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.remove_circle_rounded, color: Colors.white70, size: 30),
+                      tooltip: 'Restar butaca libre',
+                      onPressed: () {
+                        if (_availableSeats > 0) {
+                          setState(() => _availableSeats--);
+                          if (_currentPosition != null && _isStreaming) {
+                            _sendTelemetryToSupabase(_currentPosition!);
+                          }
+                        }
+                      },
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0F172A),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: const Color(0xFF0084FF)),
+                      ),
+                      child: Text(
+                        '$_availableSeats',
+                        style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Color(0xFF0084FF)),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.add_circle_rounded, color: Color(0xFF0084FF), size: 30),
+                      tooltip: 'Sumar butaca libre',
+                      onPressed: () {
+                        setState(() => _availableSeats++);
+                        if (_currentPosition != null && _isStreaming) {
+                          _sendTelemetryToSupabase(_currentPosition!);
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 14),
+
               TextFormField(
                 controller: _excursionNameCtrl,
                 enabled: !_isStreaming,
@@ -1100,10 +1264,10 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
                     final tId = t['id'];
                     final tName = t['tourist_name'] ?? 'Pasajero';
                     final tPhone = t['tourist_phone'] ?? '';
-                    final tAddress = t['address'] ?? t['hotel_notes'] ?? 'Punto de recogida';
+                    final tAddress = t['address'] ?? t['pickup_address'] ?? t['hotel_notes'] ?? 'Punto de recogida';
                     final tPassengers = t['passengers'] ?? 1;
-                    final tLat = (t['lat'] as num?)?.toDouble();
-                    final tLng = (t['lng'] as num?)?.toDouble();
+                    final tLat = (t['lat'] ?? t['pickup_lat'] as num?)?.toDouble();
+                    final tLng = (t['lng'] ?? t['pickup_lng'] as num?)?.toDouble();
 
                     String distanceText = '';
                     if (_currentPosition != null && tLat != null && tLng != null) {
@@ -1121,12 +1285,19 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
                     }
 
                     return Container(
-                      margin: const EdgeInsets.only(bottom: 14),
+                      margin: const EdgeInsets.only(bottom: 16),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: const Color(0xFF1E293B),
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: const Color(0xFF00B894).withValues(alpha: 0.4), width: 1.5),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: const Color(0xFF0084FF).withValues(alpha: 0.5), width: 1.5),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1140,7 +1311,7 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
                                   shape: BoxShape.circle,
                                   color: const Color(0xFF00B894).withValues(alpha: 0.2),
                                 ),
-                                child: const Icon(Icons.person_pin_circle_rounded, color: Color(0xFF00B894), size: 24),
+                                child: const Icon(Icons.person_pin_circle_rounded, color: Color(0xFF00B894), size: 26),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
@@ -1159,10 +1330,11 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
                                 ),
                               ),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                                 decoration: BoxDecoration(
                                   color: const Color(0xFF00B894).withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: const Color(0xFF00B894)),
                                 ),
                                 child: const Text(
                                   'PAGADO',
@@ -1173,14 +1345,15 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
                           ),
                           const SizedBox(height: 12),
                           Container(
-                            padding: const EdgeInsets.all(10),
+                            padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
                               color: const Color(0xFF0F172A),
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.white10),
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.hotel_rounded, color: Colors.white60, size: 18),
+                                const Icon(Icons.location_on_rounded, color: Color(0xFFFF7675), size: 20),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
@@ -1192,49 +1365,72 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
                             ),
                           ),
                           const SizedBox(height: 14),
+
+                          // BOTÓN 1: ABRIR GOOGLE MAPS Y CÓMO LLEGAR
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.navigation_rounded, size: 20),
+                              label: const Text(
+                                '📍 CÓMO LLEGAR (ABRIR GOOGLE MAPS)',
+                                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF0084FF),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                elevation: 3,
+                              ),
+                              onPressed: () {
+                                if (tLat != null && tLng != null) {
+                                  _launchNavigation(tLat, tLng);
+                                } else {
+                                  _showSnackBar('Coordenadas GPS no disponibles para este pasajero.', isError: true);
+                                }
+                              },
+                            ),
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          // BOTONES 2 Y 3: WHATSAPP Y CONFIRMACIÓN DE ABORDAJE
                           Row(
                             children: [
-                              if (tLat != null && tLng != null)
-                                Expanded(
-                                  child: ElevatedButton.icon(
-                                    icon: const Icon(Icons.navigation_rounded, size: 18),
-                                    label: const Text('NAVEGAR GPS'),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF0084FF),
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(vertical: 12),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                    ),
-                                    onPressed: () => _launchNavigation(tLat, tLng),
-                                  ),
-                                ),
-                              if (tPhone.isNotEmpty) ...[
-                                const SizedBox(width: 8),
-                                IconButton.filled(
-                                  icon: const Icon(Icons.chat_bubble_rounded, size: 20),
-                                  style: IconButton.styleFrom(
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  icon: const Icon(Icons.chat_bubble_rounded, size: 18),
+                                  label: const Text('WhatsApp', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                  style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF25D366),
                                     foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.all(12),
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                   ),
-                                  tooltip: 'WhatsApp al Pasajero',
-                                  onPressed: () => _launchWhatsApp(tPhone, tName),
+                                  onPressed: () {
+                                    if (tPhone.isNotEmpty) {
+                                      _launchWhatsApp(tPhone, tName);
+                                    } else {
+                                      _showSnackBar('Teléfono no registrado para este pasajero.', isError: true);
+                                    }
+                                  },
                                 ),
-                              ],
-                              const SizedBox(width: 8),
-                              IconButton.filled(
-                                icon: const Icon(Icons.check_rounded, size: 22),
-                                style: IconButton.styleFrom(
-                                  backgroundColor: const Color(0xFF00B894),
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.all(12),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  icon: const Icon(Icons.check_circle_rounded, size: 18),
+                                  label: const Text('Subió a bordo', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF00B894),
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  ),
+                                  onPressed: () {
+                                    _markPassengerBoarded(t);
+                                  },
                                 ),
-                                tooltip: 'Marcar como Recogido / A bordo',
-                                onPressed: () {
-                                  _markPassengerBoarded(t);
-                                },
                               ),
                             ],
                           ),

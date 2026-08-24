@@ -230,6 +230,9 @@ function renderLiveVehicles(vehicles) {
         const vehicleBrand = matchedMovil?.marca || veh.vehicle_brand || 'Mercedes-Benz Sprinter';
         const vehiclePlate = matchedMovil?.patente_ultimos3 || veh.vehicle_plate || '789';
 
+        const availableSeats = veh.available_seats !== undefined ? veh.available_seats : (matchedMovil?.asientos_disponibles ?? 12);
+        const isCombiFull = availableSeats <= 0;
+
         // Marcador combi con COLOR PERSONALIZADO DE EMPRESA, CHOFER Y NOMBRE
         const iconHtml = `
             <div class="combi-live-marker ${isMoving ? 'is-moving' : ''}" style="--comp-color: ${compColor};">
@@ -257,12 +260,15 @@ function renderLiveVehicles(vehicles) {
                         </svg>
                     </div>
                 </div>
-                <!-- ETIQUETA DIRECTA EN EL MAPA: EMPRESA, CHOFER Y UNIDAD -->
+                <!-- ETIQUETA DIRECTA EN EL MAPA: EMPRESA, CHOFER, UNIDAD Y BUTACAS -->
                 <div class="combi-badge-pill" style="border-color: ${compColor};">
                     <div class="combi-company-tag" style="background: ${compColor};">${companyName}</div>
                     <div class="combi-driver-tag"><i class="fas fa-user-tie"></i> ${driverName}</div>
                     <div class="combi-info-subrow">
                         <b>${veh.vehicle_code || 'Combi'}</b>
+                        <span class="combi-seats-pill" style="background:${isCombiFull ? '#e74c3c' : '#00b894'}; color:#fff; font-weight:800; font-size:0.68rem; padding:1px 5px; border-radius:4px;">
+                            ${isCombiFull ? '🔴 Completa' : `💺 ${availableSeats} libres`}
+                        </span>
                         <span class="combi-speed-pill">${speedText}</span>
                     </div>
                 </div>
@@ -298,6 +304,12 @@ function renderLiveVehicles(vehicles) {
                     </div>
                     <h3 class="uber-excursion-title" style="margin:2px 0 10px 0;">${excursionName}</h3>
                     
+                    <!-- DISPONIBILIDAD DE BUTACAS EN VIVO -->
+                    <div style="background: ${isCombiFull ? '#fee2e2' : '#ecfdf5'}; border: 1px solid ${isCombiFull ? '#ef4444' : '#10b981'}; border-radius: 10px; padding: 7px 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; font-weight: 700; color: ${isCombiFull ? '#b91c1c' : '#047857'};">
+                        <span><i class="fas fa-chair" style="margin-right:5px;"></i> ${isCombiFull ? '🔴 Combi Completa (0 butacas disponibles)' : `💺 Disponibilidad: <b>${availableSeats} butacas libres</b>`}</span>
+                        <span style="font-size:0.7rem; text-transform:uppercase; background:${isCombiFull ? '#ef4444' : '#10b981'}; color:#fff; padding:2px 6px; border-radius:6px;">EN VIVO</span>
+                    </div>
+
                     <!-- DATOS DEL VEHÍCULO Y PATENTE -->
                     <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:7px 10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; font-size:0.78rem;">
                         <span><i class="fas fa-truck-pickup" style="color:#64748b; margin-right:4px;"></i> <b>${vehicleBrand}</b></span>
