@@ -1597,8 +1597,17 @@
             const m = currentAdminEditProvMoviles.find(item => item.id === id);
             if (!m) return;
             const companyName = document.getElementById('adminEditProvBusinessName')?.value || 'Nuestra Empresa';
-            const rawPhone = (m.chofer_telefono || m.phone || '').trim();
-            const cleanPhone = rawPhone.replace(/\D/g, '');
+            let rawPhone = (m.chofer_telefono || m.phone || '').trim().replace(/\D/g, '');
+            
+            if (rawPhone) {
+                if (rawPhone.length === 10 && rawPhone.startsWith('294')) {
+                    rawPhone = '549' + rawPhone;
+                } else if (rawPhone.length === 11 && rawPhone.startsWith('0294')) {
+                    rawPhone = '549' + rawPhone.substring(1);
+                } else if (!rawPhone.startsWith('54') && rawPhone.length >= 8) {
+                    rawPhone = '549' + rawPhone;
+                }
+            }
             
             const text = `¡Hola *${m.chofer_nombre || 'Chofer'}*! 👋\n` +
                          `Te compartimos tus credenciales de acceso para la aplicación *BariRuta Chofer* de *${companyName}*:\n\n` +
@@ -1611,8 +1620,8 @@
                          `Abrí la app, ingresá con tu usuario y contraseña, y tocá *"MOSTRAR EN EL MAPA"* para transmitir tu ubicación en vivo.`;
 
             let waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
-            if (cleanPhone) {
-                waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
+            if (rawPhone) {
+                waUrl = `https://wa.me/${rawPhone}?text=${encodeURIComponent(text)}`;
             }
             window.open(waUrl, '_blank');
         }

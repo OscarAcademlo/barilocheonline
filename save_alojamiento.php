@@ -36,13 +36,30 @@ if ($action === 'check_subscription') {
     }
 
     if ($email === ADMIN_EMAIL) {
-        echo json_encode(['active' => true, 'is_admin' => true, 'expires_at' => '2099-12-31', 'plan' => 'admin']);
+        echo json_encode(['active' => true, 'is_admin' => true, 'expires_at' => '2099-12-31', 'plan' => 'admin', 'max_moviles' => 5]);
         exit;
     }
 
     $subsFile = __DIR__ . '/suscripciones.json';
     $subs = file_exists($subsFile) ? json_decode(file_get_contents($subsFile), true) : [];
+    $provFile = __DIR__ . '/proveedores_servicios.json';
+    $providers = file_exists($provFile) ? json_decode(file_get_contents($provFile), true) : [];
     $now = time();
+
+    // Determinar límite de móviles del prestador
+    $maxMoviles = 1; // Por defecto para código gratuito / promo es 1 móvil
+    if (is_array($providers)) {
+        foreach ($providers as $p) {
+            if (strtolower(trim($p['email'] ?? '')) === $email) {
+                if (isset($p['cantidad_moviles']) && intval($p['cantidad_moviles']) > 0) {
+                    $maxMoviles = min(5, max(1, intval($p['cantidad_moviles'])));
+                } elseif (isset($p['max_moviles']) && intval($p['max_moviles']) > 0) {
+                    $maxMoviles = min(5, max(1, intval($p['max_moviles'])));
+                }
+                break;
+            }
+        }
+    }
 
     if (is_array($subs)) {
         foreach ($subs as $sub) {
@@ -51,11 +68,18 @@ if ($action === 'check_subscription') {
                 $expStr = $sub['expires_at'] ?? '';
                 $exp = strtotime($expStr);
                 if ($exp >= $now) {
+                    $plan = strtolower($sub['plan'] ?? '');
+                    if (strpos($plan, '5_movil') !== false || strpos($plan, '120k') !== false) {
+                        $maxMoviles = 5;
+                    } elseif (strpos($plan, '3_movil') !== false || strpos($plan, '70k') !== false) {
+                        $maxMoviles = 3;
+                    }
                     echo json_encode([
                         'active' => true,
                         'is_admin' => false,
                         'expires_at' => $expStr,
-                        'plan' => $sub['plan'] ?? 'standard'
+                        'plan' => $sub['plan'] ?? 'standard',
+                        'max_moviles' => $maxMoviles
                     ]);
                     exit;
                 }
@@ -63,7 +87,7 @@ if ($action === 'check_subscription') {
         }
     }
 
-    echo json_encode(['active' => false, 'is_admin' => false]);
+    echo json_encode(['active' => false, 'is_admin' => false, 'max_moviles' => $maxMoviles]);
     exit;
 }
 
