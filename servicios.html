@@ -364,9 +364,14 @@
 
                     const waText = encodeURIComponent(`¡Hola ${s.name}! Vi tu servicio en Bariloche.Online y me gustaría consultar disponibilidad y tarifas.`);
                     const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${waText}` : '#';
+                    
+                    const isTestService = s.is_test || 
+                                          (s.owner_email && (s.owner_email.toLowerCase().includes('test') || s.owner_email.toLowerCase().includes('oscar') || s.owner_email.toLowerCase().includes('demo'))) || 
+                                          (s.name && (s.name.toLowerCase().includes('prueba') || s.name.toLowerCase().includes('demo') || s.name.toLowerCase().includes('test')));
 
                     return `
-                        <div class="service-card-item">
+                        <div class="service-card-item" style="position:relative;">
+                            ${isTestService ? `<div style="position:absolute; top:10px; right:10px; z-index:10; background:#f59e0b; color:white; font-size:0.7rem; font-weight:800; padding:4px 8px; border-radius:6px; box-shadow:0 2px 5px rgba(0,0,0,0.3);"><i class="fas fa-flask"></i> Prueba Técnica</div>` : ''}
                             <div class="service-card-image" style="background-image: url('${img}');">
                                 <span class="service-card-cat-badge">
                                     <i class="fas ${cat?.icon || 'fa-briefcase'}"></i> ${cat?.name || s.category_id}
@@ -415,9 +420,14 @@
             }
             const waText = encodeURIComponent(`¡Hola ${s.name}! Vi tu publicación en Bariloche.Online y quisiera más información.`);
             const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${waText}` : '#';
+            
+            const isTestService = s.is_test || 
+                                  (s.owner_email && (s.owner_email.toLowerCase().includes('test') || s.owner_email.toLowerCase().includes('oscar') || s.owner_email.toLowerCase().includes('demo'))) || 
+                                  (s.name && (s.name.toLowerCase().includes('prueba') || s.name.toLowerCase().includes('demo') || s.name.toLowerCase().includes('test')));
 
             document.getElementById('modalSrvTitle').textContent = s.name;
             document.getElementById('modalSrvContent').innerHTML = `
+                ${isTestService ? `<div style="background:#f59e0b; color:white; font-size:0.85rem; font-weight:800; padding:8px 12px; border-radius:10px; margin-bottom:15px; display:inline-flex; align-items:center; gap:6px;"><i class="fas fa-flask"></i> Este es un Servicio de Prueba Técnica</div>` : ''}
                 <div style="height:220px; border-radius:16px; background:url('${img}') center/cover no-repeat; margin-bottom:16px;"></div>
                 <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(0,206,201,0.15); color:#00cec9; padding:4px 10px; border-radius:8px; font-weight:800; font-size:0.8rem; margin-bottom:10px;">
                     <i class="fas ${cat?.icon || 'fa-briefcase'}"></i> ${cat?.name || s.category_id}

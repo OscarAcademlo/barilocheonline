@@ -609,27 +609,9 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
   }
 
   Future<void> _launchNavigation(double lat, double lng) async {
-    // 1. Intent nativo de navegación de Google Maps
-    final googleMapsNavUri = Uri.parse('google.navigation:q=$lat,$lng&mode=d');
-    final geoUri = Uri.parse('geo:$lat,$lng?q=$lat,$lng(Pasajero)');
-    final webMapsUri = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lng');
-
+    final uri = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lng');
     try {
-      if (await canLaunchUrl(googleMapsNavUri)) {
-        await launchUrl(googleMapsNavUri, mode: LaunchMode.externalNonBrowserApplication);
-        return;
-      }
-    } catch (_) {}
-
-    try {
-      if (await canLaunchUrl(geoUri)) {
-        await launchUrl(geoUri, mode: LaunchMode.externalApplication);
-        return;
-      }
-    } catch (_) {}
-
-    try {
-      await launchUrl(webMapsUri, mode: LaunchMode.externalApplication);
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     } catch (e) {
       _showSnackBar('No se pudo abrir el mapa: $e', isError: true);
     }
@@ -1400,11 +1382,11 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
                               Expanded(
                                 child: ElevatedButton.icon(
                                   icon: const Icon(Icons.chat_bubble_rounded, size: 18),
-                                  label: const Text('WhatsApp', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                  label: const Text('💬 Avisar por WhatsApp', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12), textAlign: TextAlign.center),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF25D366),
                                     foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                   ),
                                   onPressed: () {
@@ -1416,15 +1398,15 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
                                   },
                                 ),
                               ),
-                              const SizedBox(width: 10),
+                              const SizedBox(width: 8),
                               Expanded(
                                 child: ElevatedButton.icon(
                                   icon: const Icon(Icons.check_circle_rounded, size: 18),
-                                  label: const Text('Subió a bordo', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                  label: const Text('✅ ¡Ya subió a la combi!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12), textAlign: TextAlign.center),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF00B894),
                                     foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                   ),
                                   onPressed: () {
