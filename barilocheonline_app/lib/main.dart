@@ -417,62 +417,60 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
     }
   }
 
+  Timer? _pickupPollTimer;
+
   Future<void> _listenTouristPickups() async {
     final company = _driverProfile?['company_name'] ?? '';
     if (company.isEmpty) return;
 
-    try {
-      final supabase = Supabase.instance.client;
-      final data = await supabase
-          .from('tourist_locations')
-          .select()
-          .eq('company_name', company)
-          .order('updated_at', ascending: false);
+    await _fetchDriverPickups();
 
-      if (mounted) {
-        setState(() {
-          _touristsWaiting = List<Map<String, dynamic>>.from(data);
-        });
+    _pickupPollTimer?.cancel();
+    _pickupPollTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      if (!mounted || !_isStreaming) {
+        return;
       }
+      _fetchDriverPickups();
+    });
+  }
 
-      _touristChannel?.unsubscribe();
-      _touristChannel = supabase.channel('realtime_driver_tourists').onPostgresChanges(
-            event: PostgresChangeEvent.all,
-            schema: 'public',
-            table: 'tourist_locations',
-            callback: (payload) async {
-              final refresh = await supabase
-                  .from('tourist_locations')
-                  .select()
-                  .eq('company_name', company)
-                  .order('updated_at', ascending: false);
+  Future<void> _fetchDriverPickups() async {
+    final company = _driverProfile?['company_name'] ?? '';
+    if (company.isEmpty) return;
 
-              if (mounted) {
-                final oldIds = _touristsWaiting.map((e) => e['id']).toSet();
-                final newPassengers = List<Map<String, dynamic>>.from(refresh);
+    try {
+      final uri = Uri.parse(
+        'https://bariloche.online/save_alojamiento.php?action=get_driver_pickups&company=${Uri.encodeComponent(company)}&t=${DateTime.now().millisecondsSinceEpoch}',
+      );
+      final res = await http.get(uri);
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body);
+        if (data['status'] == 'success' && data['pickups'] != null) {
+          final List<Map<String, dynamic>> newPickups = List<Map<String, dynamic>>.from(data['pickups']);
+          if (!mounted) return;
 
-                // Detectar si entró un nuevo pasajero abonado
-                for (final p in newPassengers) {
-                  if (!oldIds.contains(p['id']) && (p['status'] == 'pagado' || p['status'] == null)) {
-                    _notifyNewPassenger(p);
-                    break;
-                  }
-                }
+          final oldIds = _touristsWaiting.map((e) => (e['ticket_id'] ?? e['id'] ?? '').toString()).toSet();
+          for (final p in newPickups) {
+            final pid = (p['ticket_id'] ?? p['id'] ?? '').toString();
+            if (!oldIds.contains(pid) && (p['status'] == 'pagado' || p['status'] == null)) {
+              _notifyNewPassenger(p);
+              break;
+            }
+          }
 
-                setState(() {
-                  _touristsWaiting = newPassengers;
-                });
-              }
-            },
-          )..subscribe();
+          setState(() {
+            _touristsWaiting = newPickups;
+          });
+        }
+      }
     } catch (e) {
-      debugPrint('Error conectando turistas: $e');
+      debugPrint('Error obteniendo pickups: $e');
     }
   }
 
   void _notifyNewPassenger(Map<String, dynamic> p) {
     final name = p['tourist_name'] ?? 'Nuevo Pasajero';
-    final address = p['address'] ?? 'Punto de recogida';
+    final address = p['address'] ?? p['pickup_address'] ?? 'Punto de recogida';
     final count = p['passengers'] ?? 1;
 
     showDialog(
@@ -487,7 +485,7 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
             SizedBox(width: 10),
             Expanded(
               child: Text(
-                '¡NUEVO PASAJERO ABONADO!',
+                '¡NUEVO PASAJERO ASIGNADO!',
                 style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Color(0xFF00B894)),
               ),
             ),
@@ -510,7 +508,7 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: const Color(0xFF00B894)),
               ),
-              child: const Text('💳 TICKET PAGADO 100%', style: TextStyle(color: Color(0xFF00B894), fontWeight: FontWeight.w900, fontSize: 12)),
+              child: const Text('💳 TICKET PAGADO / CONFIRMADO', style: TextStyle(color: Color(0xFF00B894), fontWeight: FontWeight.w900, fontSize: 12)),
             ),
           ],
         ),
@@ -529,8 +527,8 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
             ),
             onPressed: () {
               Navigator.pop(ctx);
-              final lat = (p['lat'] as num?)?.toDouble();
-              final lng = (p['lng'] as num?)?.toDouble();
+              final lat = (p['lat'] ?? p['pickup_lat'] as num?)?.toDouble();
+              final lng = (p['lng'] ?? p['pickup_lng'] as num?)?.toDouble();
               if (lat != null && lng != null) {
                 _launchNavigation(lat, lng);
               }
@@ -562,13 +560,21 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
     }
   }
 
-  Future<void> _markPassengerBoarded(dynamic id) async {
+  Future<void> _markPassengerBoarded(dynamic item) async {
+    final ticketId = (item is Map) ? (item['ticket_id'] ?? item['id'] ?? '') : item.toString();
     try {
-      final supabase = Supabase.instance.client;
-      await supabase.from('tourist_locations').delete().eq('id', id);
-      _listenTouristPickups();
-      _showSnackBar('✅ Pasajero marcado como a bordo');
+      await http.post(
+        Uri.parse('https://bariloche.online/save_alojamiento.php?action=complete_ticket_pickup'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'ticket_id': ticketId}),
+      );
     } catch (_) {}
+
+    setState(() {
+      _touristsWaiting.removeWhere((t) => (t['ticket_id'] ?? t['id'] ?? '') == ticketId);
+    });
+
+    _showSnackBar('✅ Pasajero marcado como a bordo');
   }
 
   void _showSnackBar(String msg, {bool isError = false}) {
@@ -1227,9 +1233,7 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
                                 ),
                                 tooltip: 'Marcar como Recogido / A bordo',
                                 onPressed: () {
-                                  if (tId != null) {
-                                    _markPassengerBoarded(tId);
-                                  }
+                                  _markPassengerBoarded(t);
                                 },
                               ),
                             ],
