@@ -1241,6 +1241,7 @@ body {
 .custom-leaflet-marker {
     background: transparent !important;
     border: none !important;
+    overflow: visible !important;
 }
 
 .combi-live-marker {
@@ -1252,6 +1253,7 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    overflow: visible;
 }
 
 .combi-pulse-wave {
@@ -1290,7 +1292,7 @@ body {
 
 .combi-badge-pill {
     position: absolute;
-    bottom: -26px;
+    top: 50px;
     left: 50%;
     transform: translateX(-50%);
     background: rgba(15, 23, 42, 0.96);
@@ -1303,32 +1305,45 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-    z-index: 3;
+    gap: 2px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.65);
+    z-index: 100;
     pointer-events: none;
 }
 
 .combi-company-tag {
-    font-size: 0.68rem;
+    font-size: 0.7rem;
     font-weight: 900;
     color: #ffffff;
-    padding: 1px 6px;
+    padding: 2px 8px;
     border-radius: 5px;
     letter-spacing: 0.2px;
-    max-width: 130px;
+    max-width: 150px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    text-transform: uppercase;
+}
+
+.combi-driver-tag {
+    font-size: 0.66rem;
+    font-weight: 700;
+    color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    gap: 3px;
 }
 
 .combi-info-subrow {
     display: flex;
     align-items: center;
     gap: 4px;
-    font-size: 0.65rem;
-    font-weight: 700;
-    margin-top: 1px;
+    font-size: 0.64rem;
+    font-weight: 800;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    padding-top: 2px;
+    width: 100%;
+    justify-content: center;
 }
 
 .combi-speed-pill {

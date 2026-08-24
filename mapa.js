@@ -220,11 +220,17 @@ function renderLiveVehicles(vehicles) {
         const isMoving = speed > 0;
 
         const currentCompany = window.bariRuta?.companies?.find(
-            c => (c.name || '').toLowerCase() === (veh.company_name || '').toLowerCase()
+            c => (c.name || '').toLowerCase().trim() === (veh.company_name || '').toLowerCase().trim()
         );
-        const companyPhone = currentCompany?.phone || '+5492944123456';
+        const companyPhone = currentCompany?.phone || '+5492944674774';
+        const matchedMovil = currentCompany?.moviles?.find(
+            m => (m.codigo || '').toLowerCase().trim() === (veh.vehicle_code || '').toLowerCase().trim() ||
+                 (m.chofer_nombre || '').toLowerCase().trim() === (veh.driver_name || '').toLowerCase().trim()
+        );
+        const vehicleBrand = matchedMovil?.marca || veh.vehicle_brand || 'Mercedes-Benz Sprinter';
+        const vehiclePlate = matchedMovil?.patente_ultimos3 || veh.vehicle_plate || '789';
 
-        // Marcador combi con COLOR PERSONALIZADO DE EMPRESA Y NOMBRE
+        // Marcador combi con COLOR PERSONALIZADO DE EMPRESA, CHOFER Y NOMBRE
         const iconHtml = `
             <div class="combi-live-marker ${isMoving ? 'is-moving' : ''}" style="--comp-color: ${compColor};">
                 <div class="combi-pulse-wave" style="border-color: ${compColor};"></div>
@@ -239,10 +245,10 @@ function renderLiveVehicles(vehicles) {
                             <!-- Parabrisas frontal y ventanillas oscuras -->
                             <rect x="12" y="13" width="18" height="9" rx="2.5" fill="#1e293b"/>
                             <rect x="34" y="13" width="18" height="9" rx="2.5" fill="#1e293b"/>
-                            <!-- Luces delanteras potentes amarillas -->
+                            <!-- Luces delanteras amarillas -->
                             <circle cx="14" cy="41" r="4" fill="#facc15" stroke="#eab308" stroke-width="1"/>
                             <circle cx="50" cy="41" r="4" fill="#facc15" stroke="#eab308" stroke-width="1"/>
-                            <!-- Parrilla y paragolpes delantero -->
+                            <!-- Parrilla -->
                             <rect x="22" y="39" width="20" height="4.5" rx="2" fill="#334155"/>
                             <rect x="24" y="40.5" width="16" height="1.5" rx="0.5" fill="#94a3b8"/>
                             <!-- Ruedas -->
@@ -253,6 +259,7 @@ function renderLiveVehicles(vehicles) {
                 </div>
                 <div class="combi-badge-pill" style="border-color: ${compColor};">
                     <div class="combi-company-tag" style="background: ${compColor};">${companyName}</div>
+                    <div class="combi-driver-tag"><i class="fas fa-user-tie"></i> ${driverName}</div>
                     <div class="combi-info-subrow">
                         <b>${veh.vehicle_code || 'Combi'}</b>
                         <span class="combi-speed-pill">${speedText}</span>
@@ -273,8 +280,8 @@ function renderLiveVehicles(vehicles) {
         const popupContent = `
             <div class="uber-mini-card">
                 <!-- CABECERA: TIPO DE UNIDAD + ESTADO EN VIVO -->
-                <div class="uber-card-header">
-                    <div class="uber-vehicle-badge">
+                <div class="uber-card-header" style="border-bottom: 2px solid ${compColor}; padding-bottom: 8px;">
+                    <div class="uber-vehicle-badge" style="background: ${compColor}18; color: ${compColor}; font-weight:800;">
                         <i class="fas fa-van-shuttle"></i>
                         <span>${veh.vehicle_code || 'Combi Oficial'}</span>
                     </div>
@@ -283,21 +290,30 @@ function renderLiveVehicles(vehicles) {
                     </div>
                 </div>
 
-                <!-- TÍTULO DE LA EXCURSIÓN -->
+                <!-- CUERPO DE LA TARJETA -->
                 <div class="uber-card-body">
-                    <h3 class="uber-excursion-title">${excursionName}</h3>
+                    <div style="font-size:0.75rem; font-weight:900; color:${compColor}; text-transform:uppercase; margin-top:8px; margin-bottom:2px; letter-spacing:0.3px;">
+                        <i class="fas fa-building"></i> ${companyName}
+                    </div>
+                    <h3 class="uber-excursion-title" style="margin:2px 0 10px 0;">${excursionName}</h3>
                     
-                    <!-- INFO DE EMPRESA Y CHOFER -->
+                    <!-- DATOS DEL VEHÍCULO Y PATENTE -->
+                    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:7px 10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; font-size:0.78rem;">
+                        <span><i class="fas fa-truck-pickup" style="color:#64748b; margin-right:4px;"></i> <b>${vehicleBrand}</b></span>
+                        ${vehiclePlate ? `<span style="background:#0f172a; color:#fff; font-weight:800; font-size:0.72rem; padding:2px 6px; border-radius:5px; letter-spacing:0.5px;">PATENTE ***${vehiclePlate}</span>` : ''}
+                    </div>
+
+                    <!-- INFO DE CHOFER -->
                     <div class="uber-driver-row">
-                        <div class="uber-driver-avatar">
+                        <div class="uber-driver-avatar" style="background: ${compColor};">
                             <i class="fas fa-user-tie"></i>
                         </div>
                         <div class="uber-driver-info">
                             <div class="uber-driver-name">${driverName}</div>
-                            <div class="uber-company-name"><i class="fas fa-building"></i> ${companyName}</div>
+                            <div class="uber-company-name">Chofer Oficial • ${companyName}</div>
                         </div>
                         <div class="uber-rating-badge">
-                            <i class="fas fa-star"></i> 4.9
+                            <i class="fas fa-star"></i> 5.0
                         </div>
                     </div>
 
@@ -310,7 +326,7 @@ function renderLiveVehicles(vehicles) {
                         <div class="uber-telemetry-item">
                             <span class="uber-tel-label">Estado</span>
                             <span class="uber-tel-val ${isMoving ? 'en-viaje' : 'en-espera'}">
-                                ${isMoving ? 'En viaje' : 'Disponible'}
+                                ${isMoving ? 'En recorrido' : 'En parada'}
                             </span>
                         </div>
                     </div>
@@ -318,10 +334,10 @@ function renderLiveVehicles(vehicles) {
 
                 <!-- BOTONES DE ACCIÓN: COMPRAR TICKET + WHATSAPP -->
                 <div class="uber-card-actions">
-                    <a href="ticket.html?empresa=${encodeURIComponent(companyName)}&excursion=${encodeURIComponent(excursionName)}&combi=${encodeURIComponent(veh.vehicle_code || '')}&chofer=${encodeURIComponent(driverName)}" class="uber-btn-primary">
+                    <a href="ticket.html?empresa=${encodeURIComponent(companyName)}&excursion=${encodeURIComponent(excursionName)}&combi=${encodeURIComponent(veh.vehicle_code || '')}&chofer=${encodeURIComponent(driverName)}" class="uber-btn-primary" style="background:${compColor};">
                         <i class="fas fa-ticket-alt"></i> Comprar Ticket
                     </a>
-                    <a href="https://wa.me/${companyPhone.replace(/\D/g, '')}?text=${encodeURIComponent(`¡Hola! Estoy viendo en vivo la combi ${veh.vehicle_code || ''} de ${companyName} (${excursionName}) en Bariloche.Online y quiero consultar por tickets.`)}" target="_blank" class="uber-btn-whatsapp" title="Consultar por WhatsApp">
+                    <a href="https://wa.me/${companyPhone.replace(/\D/g, '')}?text=${encodeURIComponent(`¡Hola! Estoy viendo en vivo la combi ${veh.vehicle_code || ''} (${vehicleBrand} ***${vehiclePlate}) de ${companyName} con chofer ${driverName} en Bariloche.Online y quiero consultar por la excursión ${excursionName}.`)}" target="_blank" class="uber-btn-whatsapp" title="Consultar por WhatsApp">
                         <i class="fab fa-whatsapp"></i>
                     </a>
                 </div>
