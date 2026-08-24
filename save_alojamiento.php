@@ -891,6 +891,9 @@ if ($action === 'save_multiservice_provider') {
     $phone = trim($data['phone'] ?? '');
     $selectedServices = is_array($data['services'] ?? null) ? $data['services'] : [];
     $moviles = is_array($data['moviles'] ?? null) ? $data['moviles'] : [];
+    $mpAccessToken = trim($data['mp_access_token'] ?? '');
+    $mpPublicKey = trim($data['mp_public_key'] ?? '');
+    $mpLink = trim($data['mp_link'] ?? '');
 
     // Calcular cupo máximo estricto según suscripción contratada o código promo
     $isAdmin = ($email === ADMIN_EMAIL);
@@ -949,6 +952,9 @@ if ($action === 'save_multiservice_provider') {
             $p['services'] = $selectedServices;
             $p['moviles'] = $cleanMoviles;
             $p['cantidad_moviles'] = count($cleanMoviles);
+            if (!empty($mpAccessToken)) $p['mp_access_token'] = $mpAccessToken;
+            if (!empty($mpPublicKey)) $p['mp_public_key'] = $mpPublicKey;
+            if (!empty($mpLink)) $p['mp_link'] = $mpLink;
             $p['updated_at'] = date('c');
             $updated = true;
             break;
@@ -965,6 +971,9 @@ if ($action === 'save_multiservice_provider') {
             'services' => $selectedServices,
             'moviles' => $cleanMoviles,
             'cantidad_moviles' => count($cleanMoviles),
+            'mp_access_token' => $mpAccessToken,
+            'mp_public_key' => $mpPublicKey,
+            'mp_link' => $mpLink,
             'is_active' => true,
             'created_at' => date('c'),
             'updated_at' => date('c')
@@ -1879,6 +1888,242 @@ if ($action === 'delete_servicio') {
 
     http_response_code(404);
     echo json_encode(['status' => 'error', 'message' => 'Servicio no encontrado']);
+    exit;
+}
+
+// 31. PROBAR TOKEN DE MERCADO PAGO DE UNA EMPRESA
+if ($action === 'test_mp_token') {
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true) ?: $_POST;
+    $token = trim($data['token'] ?? '');
+
+    if (empty($token)) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'Token requerido']);
+        exit;
+    }
+
+    $ch = curl_init('https://api.mercadopago.com/users/me');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Bearer ' . $token
+    ]);
+    $res = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpCode === 200) {
+        $info = json_decode($res, true);
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'Credencial válida',
+            'user' => [
+                'nickname' => $info['nickname'] ?? 'Empresa MP',
+                'email' => $info['email'] ?? '',
+                'site_id' => $info['site_id'] ?? 'MLA'
+            ]
+        ]);
+    } else {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'Token de Mercado Pago inválido o expirado. Verificá tu Access Token de Producción.']);
+    }
+    exit;
+}
+
+// 32. CREAR PREFERENCIA DE PAGO DE TICKET DE EXCURSIÓN (Cobro Directo a la Empresa o Plataforma)
+if ($action === 'create_ticket_preference') {
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true) ?: $_POST;
+
+    $companyName = trim($data['empresa'] ?? '');
+    $excursionName = trim($data['excursion'] ?? 'Excursión Bariloche');
+    $combi = trim($data['combi'] ?? '');
+    $driver = trim($data['chofer'] ?? '');
+    $touristName = trim($data['tourist_name'] ?? '');
+    $touristPhone = trim($data['tourist_phone'] ?? '');
+    $pickupAddress = trim($data['pickup_address'] ?? 'Punto de encuentro');
+    $pickupLat = isset($data['pickup_lat']) && is_numeric($data['pickup_lat']) ? floatval($data['pickup_lat']) : null;
+    $pickupLng = isset($data['pickup_lng']) && is_numeric($data['pickup_lng']) ? floatval($data['pickup_lng']) : null;
+    $passengers = max(1, intval($data['passengers'] ?? 1));
+    $totalAmount = max(100, intval($data['total_amount'] ?? (25000 * $passengers)));
+
+    // Buscar si la empresa tiene su propio MP_ACCESS_TOKEN
+    $tokenToUse = MP_ACCESS_TOKEN;
+    $provFile = __DIR__ . '/proveedores_servicios.json';
+    if (file_exists($provFile)) {
+        $providers = json_decode(file_get_contents($provFile), true) ?: [];
+        foreach ($providers as $p) {
+            if (strtolower(trim($p['business_name'] ?? '')) === strtolower(trim($companyName)) || strtolower(trim($p['email'] ?? '')) === strtolower(trim($companyName))) {
+                if (!empty($p['mp_access_token'])) {
+                    $tokenToUse = trim($p['mp_access_token']);
+                    break;
+                }
+            }
+        }
+    }
+
+    $ticketId = 'tkt_' . uniqid();
+    $preferenceData = [
+        'items' => [
+            [
+                'title'       => "{$passengers}x Ticket: {$excursionName} ({$companyName} - {$combi})",
+                'description' => "Recogida en: {$pickupAddress} - Pasajero: {$touristName}",
+                'quantity'    => 1,
+                'currency_id' => 'ARS',
+                'unit_price'  => $totalAmount
+            ]
+        ],
+        'payer' => [
+            'name'  => $touristName,
+            'phone' => ['number' => $touristPhone]
+        ],
+        'back_urls' => [
+            'success' => "https://bariloche.online/ticket.html?payment=success&ticket_id={$ticketId}&tourist_name=" . urlencode($touristName) . "&excursion=" . urlencode($excursionName) . "&combi=" . urlencode($combi) . "&chofer=" . urlencode($driver) . "&passengers={$passengers}",
+            'failure' => "https://bariloche.online/ticket.html?payment=failure",
+            'pending' => "https://bariloche.online/ticket.html?payment=pending&ticket_id={$ticketId}"
+        ],
+        'notification_url' => "https://bariloche.online/save_alojamiento.php?action=webhook_ticket",
+        'auto_return' => 'approved',
+        'external_reference' => "ticket_{$ticketId}"
+    ];
+
+    $ch = curl_init('https://api.mercadopago.com/checkout/preferences');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($preferenceData));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Bearer ' . $tokenToUse,
+        'Content-Type: application/json'
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpCode >= 200 && $httpCode < 300) {
+        $resData = json_decode($response, true);
+
+        // Guardar ticket borrador
+        $ticketDraft = [
+            'ticket_id' => $ticketId,
+            'company_name' => $companyName,
+            'combi' => $combi,
+            'driver' => $driver,
+            'excursion_name' => $excursionName,
+            'tourist_name' => $touristName,
+            'tourist_phone' => $touristPhone,
+            'pickup_address' => $pickupAddress,
+            'pickup_lat' => $pickupLat,
+            'pickup_lng' => $pickupLng,
+            'passengers' => $passengers,
+            'total_amount' => $totalAmount,
+            'status' => 'pendiente',
+            'created_at' => date('c')
+        ];
+
+        $tktFile = __DIR__ . '/tickets_excursiones.json';
+        $tickets = file_exists($tktFile) ? json_decode(file_get_contents($tktFile), true) : [];
+        if (!is_array($tickets)) $tickets = [];
+        $tickets[] = $ticketDraft;
+        file_put_contents($tktFile, json_encode($tickets, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        echo json_encode([
+            'status' => 'success',
+            'init_point' => $resData['init_point'] ?? '',
+            'preference_id' => $resData['id'] ?? '',
+            'ticket_id' => $ticketId
+        ]);
+    } else {
+        http_response_code(500);
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'No se pudo conectar con Mercado Pago para generar el ticket.',
+            'details' => $response
+        ]);
+    }
+    exit;
+}
+
+// 33. CONFIRMAR PAGO DE TICKET Y NOTIFICAR AL CHOFER EN TIEMPO REAL
+if ($action === 'confirm_ticket_payment' || $action === 'webhook_ticket') {
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true) ?: $_POST;
+    $ticketId = trim($_GET['ticket_id'] ?? $data['ticket_id'] ?? '');
+
+    $tktFile = __DIR__ . '/tickets_excursiones.json';
+    $tickets = file_exists($tktFile) ? json_decode(file_get_contents($tktFile), true) : [];
+    if (!is_array($tickets)) $tickets = [];
+
+    $confirmedTicket = null;
+    foreach ($tickets as &$t) {
+        if ($t['ticket_id'] === $ticketId || (!empty($ticketId) && strpos($ticketId, $t['ticket_id']) !== false)) {
+            $t['status'] = 'pagado';
+            $t['paid_at'] = date('c');
+            $confirmedTicket = $t;
+            break;
+        }
+    }
+    unset($t);
+
+    if ($confirmedTicket) {
+        file_put_contents($tktFile, json_encode($tickets, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        // Enviar a Supabase tourist_locations para alerta inmediata en la App del Chofer
+        $supaPayload = [
+            'company_name' => $confirmedTicket['company_name'],
+            'vehicle_code' => $confirmedTicket['combi'],
+            'tourist_name' => $confirmedTicket['tourist_name'],
+            'tourist_phone' => $confirmedTicket['tourist_phone'],
+            'address'      => $confirmedTicket['pickup_address'],
+            'lat'          => $confirmedTicket['pickup_lat'] ?? -41.1335,
+            'lng'          => $confirmedTicket['pickup_lng'] ?? -71.3103,
+            'passengers'   => $confirmedTicket['passengers'],
+            'status'       => 'pagado',
+            'created_at'   => date('c'),
+            'updated_at'   => date('c')
+        ];
+
+        // Insertar en Supabase REST
+        try {
+            $supaUrl = 'https://pwrlbwplpgzirlcrwepi.supabase.co/rest/v1/tourist_locations';
+            $supaKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB3cmxid3BscGd6aXJsY3J3ZXBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzMzc0NzAsImV4cCI6MjA4NjkxMzQ3MH0.HxEfbABTObu4khKxVhtBaBuCt2RDBm34urnSEJCfJUU';
+            $sc = curl_init($supaUrl);
+            curl_setopt($sc, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($sc, CURLOPT_POST, true);
+            curl_setopt($sc, CURLOPT_POSTFIELDS, json_encode($supaPayload));
+            curl_setopt($sc, CURLOPT_HTTPHEADER, [
+                'apikey: ' . $supaKey,
+                'Authorization: Bearer ' . $supaKey,
+                'Content-Type: application/json',
+                'Prefer: return=minimal'
+            ]);
+            curl_exec($sc);
+            curl_close($sc);
+        } catch (Exception $e) {}
+
+        echo json_encode(['status' => 'success', 'message' => 'Ticket confirmado y chofer notificado en tiempo real', 'ticket' => $confirmedTicket]);
+    } else {
+        echo json_encode(['status' => 'success', 'message' => 'Webhook recibido']);
+    }
+    exit;
+}
+
+// 34. OBTENER TICKETS / PICKUPS DEL CHOFER
+if ($action === 'get_driver_pickups') {
+    $company = trim($_GET['company'] ?? '');
+    $combi = trim($_GET['combi'] ?? '');
+
+    $tktFile = __DIR__ . '/tickets_excursiones.json';
+    $tickets = file_exists($tktFile) ? json_decode(file_get_contents($tktFile), true) : [];
+    if (!is_array($tickets)) $tickets = [];
+
+    $list = array_values(array_filter($tickets, function($t) use ($company, $combi) {
+        $matchComp = empty($company) || (strtolower(trim($t['company_name'] ?? '')) === strtolower(trim($company)));
+        $matchCombi = empty($combi) || (strtolower(trim($t['combi'] ?? '')) === strtolower(trim($combi)));
+        return $matchComp && $matchCombi && ($t['status'] ?? '') === 'pagado';
+    }));
+
+    echo json_encode(['status' => 'success', 'pickups' => $list]);
     exit;
 }
 

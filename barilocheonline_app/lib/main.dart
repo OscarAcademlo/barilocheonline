@@ -444,9 +444,21 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
                   .select()
                   .eq('company_name', company)
                   .order('updated_at', ascending: false);
+
               if (mounted) {
+                final oldIds = _touristsWaiting.map((e) => e['id']).toSet();
+                final newPassengers = List<Map<String, dynamic>>.from(refresh);
+
+                // Detectar si entró un nuevo pasajero abonado
+                for (final p in newPassengers) {
+                  if (!oldIds.contains(p['id']) && (p['status'] == 'pagado' || p['status'] == null)) {
+                    _notifyNewPassenger(p);
+                    break;
+                  }
+                }
+
                 setState(() {
-                  _touristsWaiting = List<Map<String, dynamic>>.from(refresh);
+                  _touristsWaiting = newPassengers;
                 });
               }
             },
@@ -454,6 +466,107 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
     } catch (e) {
       debugPrint('Error conectando turistas: $e');
     }
+  }
+
+  void _notifyNewPassenger(Map<String, dynamic> p) {
+    final name = p['tourist_name'] ?? 'Nuevo Pasajero';
+    final address = p['address'] ?? 'Punto de recogida';
+    final count = p['passengers'] ?? 1;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1E293B),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.notifications_active_rounded, color: Color(0xFF00B894), size: 28),
+            SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                '¡NUEVO PASAJERO ABONADO!',
+                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Color(0xFF00B894)),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('👤 Pasajero: $name', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+            const SizedBox(height: 6),
+            Text('📍 Recogida: $address', style: const TextStyle(color: Colors.white70, fontSize: 14)),
+            const SizedBox(height: 6),
+            Text('👥 Personas: $count ticket(s)', style: const TextStyle(color: Color(0xFF0084FF), fontWeight: FontWeight.w700)),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFF00B894).withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFF00B894)),
+              ),
+              child: const Text('💳 TICKET PAGADO 100%', style: TextStyle(color: Color(0xFF00B894), fontWeight: FontWeight.w900, fontSize: 12)),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Entendido', style: TextStyle(color: Colors.white70)),
+          ),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.navigation_rounded, size: 18),
+            label: const Text('IR A BUSCAR'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF0084FF),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            onPressed: () {
+              Navigator.pop(ctx);
+              final lat = (p['lat'] as num?)?.toDouble();
+              final lng = (p['lng'] as num?)?.toDouble();
+              if (lat != null && lng != null) {
+                _launchNavigation(lat, lng);
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _launchNavigation(double lat, double lng) async {
+    final uri = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lng');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  Future<void> _launchWhatsApp(String phone, String passengerName) async {
+    String clean = phone.replaceAll(RegExp(r'\D'), '');
+    if (clean.length == 10 && clean.startsWith('294')) {
+      clean = '549$clean';
+    } else if (!clean.startsWith('54') && clean.length >= 8) {
+      clean = '549$clean';
+    }
+    final text = '¡Hola $passengerName! 👋 Te contactamos de la combi de Bariloche.Online. Ya estamos en camino a tu punto de recogida.';
+    final uri = Uri.parse('https://wa.me/$clean?text=${Uri.encodeComponent(text)}');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  Future<void> _markPassengerBoarded(dynamic id) async {
+    try {
+      final supabase = Supabase.instance.client;
+      await supabase.from('tourist_locations').delete().eq('id', id);
+      _listenTouristPickups();
+      _showSnackBar('✅ Pasajero marcado como a bordo');
+    } catch (_) {}
   }
 
   void _showSnackBar(String msg, {bool isError = false}) {
@@ -928,20 +1041,20 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.person_pin_circle_rounded, color: Color(0xFFFF7675), size: 22),
-                      SizedBox(width: 8),
+                      const Icon(Icons.person_pin_circle_rounded, color: Color(0xFFFF7675), size: 22),
+                      const SizedBox(width: 8),
                       Text(
-                        'Turistas Esperando Parada',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                        'Pasajeros & Hoja de Ruta (${_touristsWaiting.length})',
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
                       ),
                     ],
                   ),
                   IconButton(
                     icon: const Icon(Icons.refresh_rounded, color: Colors.white70),
                     onPressed: _listenTouristPickups,
-                    tooltip: 'Actualizar',
+                    tooltip: 'Actualizar lista',
                   ),
                 ],
               ),
@@ -956,9 +1069,16 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
                     border: Border.all(color: Colors.white12),
                   ),
                   child: const Center(
-                    child: Text(
-                      'No hay turistas esperando parada en este momento.',
-                      style: TextStyle(color: Colors.white54, fontSize: 13, fontWeight: FontWeight.w600),
+                    child: Column(
+                      children: [
+                        Icon(Icons.check_circle_outline_rounded, color: Color(0xFF00B894), size: 36),
+                        SizedBox(height: 8),
+                        Text(
+                          'No hay pasajeros pendientes de recogida en este momento.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600),
+                        ),
+                      ],
                     ),
                   ),
                 )
@@ -969,54 +1089,149 @@ class _DriverRootScreenState extends State<DriverRootScreen> {
                   itemCount: _touristsWaiting.length,
                   itemBuilder: (ctx, index) {
                     final t = _touristsWaiting[index];
-                    final tName = t['tourist_name'] ?? 'Turista';
-                    final tNotes = t['hotel_notes'] ?? 'Esperando combi';
+                    final tId = t['id'];
+                    final tName = t['tourist_name'] ?? 'Pasajero';
+                    final tPhone = t['tourist_phone'] ?? '';
+                    final tAddress = t['address'] ?? t['hotel_notes'] ?? 'Punto de recogida';
+                    final tPassengers = t['passengers'] ?? 1;
                     final tLat = (t['lat'] as num?)?.toDouble();
                     final tLng = (t['lng'] as num?)?.toDouble();
 
+                    String distanceText = '';
+                    if (_currentPosition != null && tLat != null && tLng != null) {
+                      final meters = Geolocator.distanceBetween(
+                        _currentPosition!.latitude,
+                        _currentPosition!.longitude,
+                        tLat,
+                        tLng,
+                      );
+                      if (meters >= 1000) {
+                        distanceText = ' • A ${(meters / 1000).toStringAsFixed(1)} km';
+                      } else {
+                        distanceText = ' • A ${meters.round()} m';
+                      }
+                    }
+
                     return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.all(14),
+                      margin: const EdgeInsets.only(bottom: 14),
+                      padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: const Color(0xFF1E293B),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.white12),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: const Color(0xFF00B894).withValues(alpha: 0.4), width: 1.5),
                       ),
-                      child: Row(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            width: 44,
-                            height: 44,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: const Color(0xFFFF7675).withValues(alpha: 0.2),
-                            ),
-                            child: const Icon(Icons.person_pin_circle, color: Color(0xFFFF7675)),
+                          Row(
+                            children: [
+                              Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: const Color(0xFF00B894).withValues(alpha: 0.2),
+                                ),
+                                child: const Icon(Icons.person_pin_circle_rounded, color: Color(0xFF00B894), size: 24),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      tName,
+                                      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Colors.white),
+                                    ),
+                                    Text(
+                                      '$tPassengers pasajero(s)$distanceText',
+                                      style: const TextStyle(color: Color(0xFF0084FF), fontSize: 12, fontWeight: FontWeight.w700),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF00B894).withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Text(
+                                  'PAGADO',
+                                  style: TextStyle(color: Color(0xFF00B894), fontWeight: FontWeight.w900, fontSize: 11),
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                          const SizedBox(height: 12),
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF0F172A),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
                               children: [
-                                Text(tName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                                const SizedBox(height: 2),
-                                Text(tNotes, style: const TextStyle(color: Colors.white70, fontSize: 13)),
+                                const Icon(Icons.hotel_rounded, color: Colors.white60, size: 18),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    tAddress,
+                                    style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                                  ),
+                                ),
                               ],
                             ),
                           ),
-                          if (tLat != null && tLng != null)
-                            IconButton(
-                              icon: const Icon(Icons.directions_rounded, color: Color(0xFF0084FF), size: 28),
-                              tooltip: 'Abrir en Google Maps',
-                              onPressed: () async {
-                                final uri = Uri.parse(
-                                  'https://www.google.com/maps/dir/?api=1&destination=$tLat,$tLng',
-                                );
-                                if (await canLaunchUrl(uri)) {
-                                  await launchUrl(uri, mode: LaunchMode.externalApplication);
-                                }
-                              },
-                            ),
+                          const SizedBox(height: 14),
+                          Row(
+                            children: [
+                              if (tLat != null && tLng != null)
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    icon: const Icon(Icons.navigation_rounded, size: 18),
+                                    label: const Text('NAVEGAR GPS'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF0084FF),
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    ),
+                                    onPressed: () => _launchNavigation(tLat, tLng),
+                                  ),
+                                ),
+                              if (tPhone.isNotEmpty) ...[
+                                const SizedBox(width: 8),
+                                IconButton.filled(
+                                  icon: const Icon(Icons.chat_bubble_rounded, size: 20),
+                                  style: IconButton.styleFrom(
+                                    backgroundColor: const Color(0xFF25D366),
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.all(12),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  ),
+                                  tooltip: 'WhatsApp al Pasajero',
+                                  onPressed: () => _launchWhatsApp(tPhone, tName),
+                                ),
+                              ],
+                              const SizedBox(width: 8),
+                              IconButton.filled(
+                                icon: const Icon(Icons.check_rounded, size: 22),
+                                style: IconButton.styleFrom(
+                                  backgroundColor: const Color(0xFF00B894),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.all(12),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                ),
+                                tooltip: 'Marcar como Recogido / A bordo',
+                                onPressed: () {
+                                  if (tId != null) {
+                                    _markPassengerBoarded(tId);
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     );

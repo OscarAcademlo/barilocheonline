@@ -486,18 +486,42 @@
                         </div>
                     </div>
 
-                    <!-- AUTOMATIZACIÓN DE MERCADO PAGO DEL PRESTADOR DE EXCURSIONES -->
-                    <div style="background:rgba(0, 132, 255, 0.05); border:1px solid var(--primary); border-radius:16px; padding:16px; margin-bottom:20px;">
-                        <b style="font-size:0.95rem; display:block; margin-bottom:4px; color:var(--primary);"><i class="fas fa-wallet"></i> Automatización de Cobros por Mercado Pago (Opcional)</b>
-                        <small style="color:var(--text-secondary); display:block; margin-bottom:12px;">Ingresá tu Link de Pago o tus credenciales para que cuando el turista reserve su excursión, el dinero ingrese directo a tu cuenta.</small>
-                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+                    <!-- AUTOMATIZACIÓN DE MERCADO PAGO DEL PRESTADOR DE EXCURSIONES (COBRO DIRECTO) -->
+                    <div style="background:rgba(0, 132, 255, 0.05); border:1.5px solid var(--primary); border-radius:18px; padding:20px; margin-bottom:24px;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px; margin-bottom:8px;">
+                            <div>
+                                <b style="font-size:1.05rem; display:block; color:var(--primary);"><i class="fas fa-credit-card"></i> Cobro Directo en tu Mercado Pago (Tickets & Reservas)</b>
+                                <small style="color:var(--text-secondary); display:block;">El dinero de los tickets abonados por los turistas entra <b>100% directo a tu cuenta de Mercado Pago</b> sin intermediarios.</small>
+                            </div>
+                            <button type="button" onclick="toggleMpInstructions()" style="background:rgba(0,132,255,0.15); color:#0084ff; border:1px solid #0084ff; padding:6px 14px; border-radius:10px; font-weight:700; font-size:0.8rem; cursor:pointer;">
+                                <i class="fas fa-circle-question"></i> Instructivo en 3 Pasos
+                            </button>
+                        </div>
+
+                        <!-- INSTRUCTIVO DESPLEGABLE -->
+                        <div id="mpInstructionsBox" style="display:none; background:var(--bg-main); border:1px dashed #0084ff; border-radius:14px; padding:14px; margin:12px 0; font-size:0.85rem; line-height:1.5;">
+                            <b style="color:#0084ff; display:block; margin-bottom:6px;"><i class="fas fa-book-open"></i> ¿Cómo obtener tu Access Token en 2 minutos?</b>
+                            <ol style="margin:0; padding-left:20px; color:var(--text-primary);">
+                                <li>Ingresá a <a href="https://www.mercadopago.com.ar/developers/panel/app" target="_blank" style="color:#0084ff; font-weight:700; text-decoration:underline;">Mercado Pago Developers (Panel de Apps)</a> con tu cuenta de Mercado Pago.</li>
+                                <li>Hacé clic en <b>"Crear aplicación"</b> (Nombre sugerido: <i>Mi Empresa - Bariloche Online</i> / Tipo: <i>Pagos en el sitio web</i>).</li>
+                                <li>En el menú izquierdo entrá a <b>"Credenciales de producción"</b>, copiá el <b>"Access Token"</b> (empieza con <code>APP_USR-...</code>) y pegalo en el casillero de abajo.</li>
+                            </ol>
+                        </div>
+
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:14px; margin-top:12px;">
                             <div class="form-group-custom" style="margin-bottom:0;">
-                                <label style="font-size:0.78rem; font-weight:700;">Link de Pago / Alias / CVU de Mercado Pago</label>
-                                <input type="text" id="fleetMpLink" placeholder="Ej: https://mpago.la/xxxx o miempresa.mp" style="width:100%; height:40px; border-radius:8px; border:1px solid var(--border); padding:6px 10px; font-size:0.85rem; background:var(--bg-main); color:var(--text-primary);">
+                                <label style="font-size:0.82rem; font-weight:700;">Access Token de Producción (Recomendado para cobro automático)</label>
+                                <div style="display:flex; gap:8px;">
+                                    <input type="password" id="fleetMpAccessToken" placeholder="APP_USR-xxxxxxxxxxxxxxxxxxxx" style="flex:1; height:42px; border-radius:10px; border:1px solid var(--border); padding:6px 12px; font-size:0.88rem; background:var(--bg-main); color:var(--text-primary); font-family:monospace;">
+                                    <button type="button" onclick="testMyMpToken()" style="background:#00b894; color:white; border:none; padding:0 14px; border-radius:10px; font-weight:700; font-size:0.8rem; cursor:pointer; white-space:nowrap;">
+                                        <i class="fas fa-vial"></i> Probar
+                                    </button>
+                                </div>
+                                <div id="mpTokenTestResult" style="font-size:0.8rem; font-weight:700; margin-top:4px;"></div>
                             </div>
                             <div class="form-group-custom" style="margin-bottom:0;">
-                                <label style="font-size:0.78rem; font-weight:700;">Public Key de Mercado Pago (Opcional)</label>
-                                <input type="text" id="fleetMpPublicKey" placeholder="APP_USR-xxxx..." style="width:100%; height:40px; border-radius:8px; border:1px solid var(--border); padding:6px 10px; font-size:0.85rem; background:var(--bg-main); color:var(--text-primary);">
+                                <label style="font-size:0.82rem; font-weight:700;">Link de Pago / Alias de Mercado Pago (Alternativo)</label>
+                                <input type="text" id="fleetMpLink" placeholder="Ej: https://mpago.la/xxxx o miempresa.mp" style="width:100%; height:42px; border-radius:10px; border:1px solid var(--border); padding:6px 12px; font-size:0.88rem; background:var(--bg-main); color:var(--text-primary);">
                             </div>
                         </div>
                     </div>
@@ -964,6 +988,7 @@
                     if (currentProviderData) {
                         document.getElementById('fleetCompanyName').value = currentProviderData.business_name || '';
                         document.getElementById('fleetCompanyPhone').value = currentProviderData.phone || '';
+                        if (document.getElementById('fleetMpAccessToken')) document.getElementById('fleetMpAccessToken').value = currentProviderData.mp_access_token || '';
                         if (document.getElementById('fleetMpLink')) document.getElementById('fleetMpLink').value = currentProviderData.mp_link || '';
                         if (document.getElementById('fleetMpPublicKey')) document.getElementById('fleetMpPublicKey').value = currentProviderData.mp_public_key || '';
                         myFleetMoviles = currentProviderData.moviles || [];
@@ -1246,6 +1271,7 @@
                         services: selectedServices,
                         business_name: document.getElementById('fleetCompanyName')?.value || '',
                         phone: document.getElementById('fleetCompanyPhone')?.value || '',
+                        mp_access_token: document.getElementById('fleetMpAccessToken')?.value || '',
                         mp_link: document.getElementById('fleetMpLink')?.value || '',
                         mp_public_key: document.getElementById('fleetMpPublicKey')?.value || '',
                         moviles: myFleetMoviles
@@ -1253,7 +1279,7 @@
                 });
                 const data = await res.json();
                 if (data.status === 'success') {
-                    alert('✅ Configuración de servicios guardada. Los módulos activos ya están disponibles en las pestañas.');
+                    alert('✅ Configuración de servicios y cobros guardada. Los módulos activos ya están disponibles en las pestañas.');
                     handleServiceSelectionChange();
                     if (selectedServices.length > 0) {
                         switchDashboardTab(selectedServices[0]);
@@ -1263,6 +1289,47 @@
                 }
             } catch (e) {
                 alert('Error al guardar servicios.');
+            }
+        }
+
+        function toggleMpInstructions() {
+            const box = document.getElementById('mpInstructionsBox');
+            if (box) {
+                box.style.display = (box.style.display === 'none' || !box.style.display) ? 'block' : 'none';
+            }
+        }
+
+        async function testMyMpToken() {
+            const input = document.getElementById('fleetMpAccessToken');
+            const resultMsg = document.getElementById('mpTokenTestResult');
+            const token = input ? input.value.trim() : '';
+
+            if (!token) {
+                resultMsg.textContent = '⚠️ Ingresá tu Access Token primero.';
+                resultMsg.style.color = '#ef4444';
+                return;
+            }
+
+            resultMsg.textContent = 'Verificando con Mercado Pago...';
+            resultMsg.style.color = '#0084ff';
+
+            try {
+                const res = await fetch('save_alojamiento.php?action=test_mp_token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    resultMsg.textContent = `🟢 ¡Conexión exitosa! Cuenta: ${data.user?.nickname || 'Mercado Pago'} (${data.user?.email || 'Verificada'})`;
+                    resultMsg.style.color = '#00b894';
+                } else {
+                    resultMsg.textContent = `❌ ${data.message || 'Token inválido'}`;
+                    resultMsg.style.color = '#ef4444';
+                }
+            } catch (e) {
+                resultMsg.textContent = 'Error al probar conexión con Mercado Pago';
+                resultMsg.style.color = '#ef4444';
             }
         }
 

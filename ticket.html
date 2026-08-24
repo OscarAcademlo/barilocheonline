@@ -4,11 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Comprar Ticket | Bariloche.Online & BariRuta</title>
-    <link rel="icon" type="image/png" href="favicon.png">
+    <title>Comprar Ticket Excursión | Bariloche.Online & BariRuta</title>
+    <link rel="icon" type="image/png" href="favicon.png?v=2026">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#ffffff">
-    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="theme-color" content="#0084ff">
+    <link rel="apple-touch-icon" href="icon-192.png?v=2026">
+    
+    <!-- OpenGraph & WhatsApp Previews -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Comprar Ticket Excursión | Bariloche.Online">
+    <meta property="og:description" content="Reservá y aboná tu ticket de excursión con geolocalización de recogida en vivo.">
+    <meta property="og:image" content="https://bariloche.online/icon-512.png?v=2026">
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css?v=2213">
@@ -124,6 +131,37 @@
             border-color: var(--primary);
         }
 
+        .btn-gps-pickup {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 132, 255, 0.12);
+            color: #0084ff;
+            border: 1.5px solid #0084ff;
+            padding: 9px 16px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-gps-pickup:hover {
+            background: #0084ff;
+            color: #fff;
+        }
+
+        .gps-status-badge {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #10b981;
+            margin-top: 6px;
+        }
+
         .passenger-counter {
             display: flex;
             align-items: center;
@@ -236,6 +274,7 @@
         <a href="index.html" class="logo" style="text-decoration:none; color:inherit;"><b>B</b> BARILOCHE.ONLINE</a>
         <nav class="nav-desktop">
             <a href="mapa.html" class="nav-link"><i class="fas fa-satellite-dish"></i> EN VIVO</a>
+            <a href="servicios.html" class="nav-link">SERVICIOS</a>
             <a href="comer.html" class="nav-link">COMER</a>
             <a href="alojamiento.html" class="nav-link">DORMIR</a>
             <a href="radios.html" class="nav-link">MEDIOS</a>
@@ -252,8 +291,21 @@
             <i class="fas fa-arrow-left"></i> Volver al Mapa en Vivo
         </a>
 
+        <!-- CONFIRMACIÓN DE PAGO EXITOSO -->
+        <div id="paymentSuccessNotice" style="display:none; background:#e8f8f5; border:2px solid #00b894; border-radius:20px; padding:24px; text-align:center; margin-bottom:20px;">
+            <div style="font-size:3rem; margin-bottom:8px;">🎉</div>
+            <h2 style="font-family:'Outfit'; color:#00b894; margin:0 0 8px;">¡Ticket Confirmado y Abonado!</h2>
+            <p style="color:#2d3436; font-size:0.95rem; margin:0 0 16px;">
+                La combi y el chofer ya recibieron tu geolocalización y punto de recogida en su pantalla.
+            </p>
+            <div id="ticketConfirmationDetails" style="background:#fff; border-radius:14px; padding:14px; text-align:left; font-size:0.88rem; margin-bottom:16px; border:1px solid #c8e6c9;"></div>
+            <a href="mapa.html" style="display:inline-block; background:#0084ff; color:white; padding:12px 24px; border-radius:12px; font-weight:800; text-decoration:none;">
+                <i class="fas fa-location-crosshairs"></i> Ver Combi Acercándose en Vivo
+            </a>
+        </div>
+
         <!-- HERO DE LA EXCURSIÓN SELECCIONADA -->
-        <div class="ticket-hero-card">
+        <div class="ticket-hero-card" id="ticketHeroBox">
             <div class="ticket-badge-pill">
                 <i class="fas fa-satellite-dish"></i> Combi en Vivo &bull; BariRuta
             </div>
@@ -261,7 +313,7 @@
             <div class="ticket-meta-grid">
                 <div class="ticket-meta-item">
                     <span>Empresa</span>
-                    <b id="dispCompany">Empresa Oscar</b>
+                    <b id="dispCompany">Empresa</b>
                 </div>
                 <div class="ticket-meta-item">
                     <span>Chofer / Guía</span>
@@ -269,7 +321,7 @@
                 </div>
                 <div class="ticket-meta-item">
                     <span>Unidad</span>
-                    <b id="dispCombi">Combi 01</b>
+                    <b id="dispCombi">Combi Oficial</b>
                 </div>
                 <div class="ticket-meta-item">
                     <span>Estado</span>
@@ -279,9 +331,9 @@
         </div>
 
         <!-- FORMULARIO DE RESERVA / COMPRA -->
-        <div class="ticket-form-card">
+        <div class="ticket-form-card" id="ticketFormBox">
             <h2 style="font-size:1.2rem; font-weight:800; margin:0 0 16px; color:var(--text-primary);">
-                <i class="fas fa-ticket-alt" style="color:var(--primary); margin-right:6px;"></i> Datos del Pasajero
+                <i class="fas fa-ticket-alt" style="color:var(--primary); margin-right:6px;"></i> Datos del Pasajero & Punto de Encuentro
             </h2>
 
             <div class="form-group">
@@ -291,12 +343,19 @@
 
             <div class="form-group">
                 <label>Teléfono / WhatsApp *</label>
-                <input type="tel" id="custPhone" class="form-control" placeholder="Ej. +54 9 11 1234-5678" required>
+                <input type="tel" id="custPhone" class="form-control" placeholder="Ej. +54 9 11 1234-5678 (con 549)" required>
             </div>
 
             <div class="form-group">
-                <label>Hotel o Punto de Encuentro</label>
-                <input type="text" id="custHotel" class="form-control" placeholder="Ej. Hotel Edelweiss / Centro Cívico">
+                <label>Hotel o Dirección de Recogida (Pickup)</label>
+                <input type="text" id="custHotel" class="form-control" placeholder="Ej. Hotel Edelweiss / Av. Bustillo Km 4">
+                
+                <button type="button" class="btn-gps-pickup" onclick="captureTouristGPS()">
+                    <i class="fas fa-location-crosshairs"></i> 📍 Usar mi Ubicación GPS actual
+                </button>
+                <div id="gpsStatusBadge" class="gps-status-badge">
+                    <i class="fas fa-check-circle"></i> Coordenadas GPS fijadas con precisión satelital
+                </div>
             </div>
 
             <div class="form-group">
@@ -315,44 +374,85 @@
             <div class="price-summary-box">
                 <div>
                     <div class="price-label">Total a Abonar</div>
-                    <small style="color:var(--text-secondary); font-size:0.78rem;">Tarifa oficial en pesos (ARS)</small>
+                    <small style="color:var(--text-secondary); font-size:0.78rem;">Tarifa oficial acreditada directo a la empresa</small>
                 </div>
                 <div class="price-total" id="totalPrice">$25.000</div>
             </div>
 
-            <!-- BOTÓN DE PAGO DIRECTO -->
-            <button type="button" class="btn-pay-mp" onclick="handlePayTicket()">
-                <i class="fas fa-lock"></i> Reservar y Pagar Ticket
+            <!-- BOTÓN DE PAGO DIRECTO CON MERCADO PAGO -->
+            <button type="button" id="btnPayMP" class="btn-pay-mp" onclick="handlePayTicketWithMP()">
+                <i class="fas fa-credit-card"></i> Pagar con Mercado Pago (Directo a la Empresa)
             </button>
 
             <!-- BOTÓN DE CONSULTA POR WHATSAPP -->
             <a href="#" id="waBookingLink" target="_blank" class="btn-pay-wa">
-                <i class="fab fa-whatsapp"></i> Confirmar con la Empresa por WhatsApp
+                <i class="fab fa-whatsapp"></i> Reservar y Coordinar por WhatsApp
             </a>
         </div>
     </div>
 
     <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js?v=2077"></script>
     <script>
         let basePrice = 25000;
         let passengers = 1;
+        let touristLat = null;
+        let touristLng = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             const params = new URLSearchParams(window.location.search);
             const excursion = params.get('excursion') || 'Circuito Turístico Bariloche';
-            const empresa = params.get('empresa') || 'Empresa Oscar';
-            const combi = params.get('combi') || 'Combi Oficial';
+            const empresa = params.get('empresa') || 'Empresa Oficial';
+            const combi = params.get('combi') || 'Combi 01';
             const chofer = params.get('chofer') || 'Chofer Asignado';
+            const paymentStatus = params.get('payment');
 
             document.getElementById('dispExcursion').textContent = excursion;
             document.getElementById('dispCompany').textContent = empresa;
             document.getElementById('dispCombi').textContent = combi;
             document.getElementById('dispDriver').textContent = chofer;
 
+            if (paymentStatus === 'success') {
+                showSuccessScreen(params);
+            }
+
             updatePriceDisplay();
             updateWhatsAppLink();
         });
+
+        function captureTouristGPS() {
+            if (!navigator.geolocation) {
+                alert('La geolocalización no es compatible con este navegador.');
+                return;
+            }
+            const btn = document.querySelector('.btn-gps-pickup');
+            const badge = document.getElementById('gpsStatusBadge');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Obteniendo ubicación GPS...';
+
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    touristLat = pos.coords.latitude;
+                    touristLng = pos.coords.longitude;
+                    btn.innerHTML = '<i class="fas fa-check"></i> Ubicación GPS fijada';
+                    btn.style.background = '#00b894';
+                    btn.style.color = '#fff';
+                    btn.style.borderColor = '#00b894';
+                    badge.style.display = 'inline-flex';
+
+                    const hotelInput = document.getElementById('custHotel');
+                    if (hotelInput && !hotelInput.value) {
+                        hotelInput.value = `GPS: ${touristLat.toFixed(5)}, ${touristLng.toFixed(5)}`;
+                    }
+                    updateWhatsAppLink();
+                },
+                (err) => {
+                    btn.innerHTML = '<i class="fas fa-location-crosshairs"></i> Reintentar GPS';
+                    alert('No se pudo obtener la ubicación GPS. Por favor escribí tu Hotel o dirección.');
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        }
 
         function updatePassengers(delta) {
             passengers = Math.max(1, Math.min(15, passengers + delta));
@@ -369,38 +469,107 @@
         function updateWhatsAppLink() {
             const params = new URLSearchParams(window.location.search);
             const excursion = params.get('excursion') || 'Circuito Chico';
-            const empresa = params.get('empresa') || 'Empresa Oscar';
+            const empresa = params.get('empresa') || 'Empresa Oficial';
             const combi = params.get('combi') || 'Combi';
             const total = (basePrice * passengers).toLocaleString('es-AR');
 
             const name = document.getElementById('custName')?.value || 'Pasajero';
-            const hotel = document.getElementById('custHotel')?.value || 'A confirmar';
+            const hotel = document.getElementById('custHotel')?.value || (touristLat ? `GPS: ${touristLat.toFixed(5)}, ${touristLng.toFixed(5)}` : 'A confirmar');
 
-            const msg = `¡Hola ${empresa}! Quiero reservar ${passengers} ticket(s) para ${excursion} (Combi ${combi}). Total estimado: $${total}. Nombre: ${name}. Hotel/Parada: ${hotel}.`;
+            const msg = `¡Hola ${empresa}! Quiero reservar ${passengers} ticket(s) para ${excursion} (Combi ${combi}). Total: $${total}. Nombre: ${name}. Pickup: ${hotel}.`;
 
             const link = document.getElementById('waBookingLink');
             if (link) {
-                link.href = `https://wa.me/5492944123456?text=${encodeURIComponent(msg)}`;
+                link.href = `https://wa.me/5492944674774?text=${encodeURIComponent(msg)}`;
             }
         }
 
-        function handlePayTicket() {
+        async function handlePayTicketWithMP() {
             const name = document.getElementById('custName').value.trim();
-            const phone = document.getElementById('custPhone').value.trim();
+            let phone = document.getElementById('custPhone').value.trim();
+            const hotel = document.getElementById('custHotel').value.trim();
 
             if (!name || !phone) {
-                alert('Por favor completá tu Nombre y WhatsApp para continuar con la reserva.');
+                alert('Por favor completá tu Nombre y Teléfono/WhatsApp para generar tu ticket.');
                 return;
             }
 
-            // Redirigir a WhatsApp con los datos completos
-            updateWhatsAppLink();
-            const waLink = document.getElementById('waBookingLink').href;
-            window.location.href = waLink;
+            // Auto-formatear 549
+            const digits = phone.replace(/\D/g, '');
+            if (digits.length === 10 && !digits.startsWith('54')) {
+                phone = '549' + digits;
+            }
+
+            const params = new URLSearchParams(window.location.search);
+            const empresa = params.get('empresa') || 'Empresa Oficial';
+            const excursion = params.get('excursion') || 'Circuito Turístico';
+            const combi = params.get('combi') || 'Combi 01';
+            const chofer = params.get('chofer') || 'Chofer Asignado';
+            const totalAmount = basePrice * passengers;
+
+            const btn = document.getElementById('btnPayMP');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Conectando con Mercado Pago...';
+
+            try {
+                const res = await fetch('save_alojamiento.php?action=create_ticket_preference', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        empresa,
+                        excursion,
+                        combi,
+                        chofer,
+                        tourist_name: name,
+                        tourist_phone: phone,
+                        pickup_address: hotel || 'Ubicación GPS',
+                        pickup_lat: touristLat,
+                        pickup_lng: touristLng,
+                        passengers,
+                        total_amount: totalAmount
+                    })
+                });
+
+                const data = await res.json();
+                if (data.status === 'success' && data.init_point) {
+                    window.location.href = data.init_point;
+                } else {
+                    alert('No se pudo iniciar el pago: ' + (data.message || 'Error'));
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-credit-card"></i> Pagar con Mercado Pago';
+                }
+            } catch (e) {
+                alert('Error de conexión al procesar el ticket.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-credit-card"></i> Pagar con Mercado Pago';
+            }
+        }
+
+        function showSuccessScreen(params) {
+            document.getElementById('ticketFormBox').style.display = 'none';
+            document.getElementById('ticketHeroBox').style.display = 'none';
+            const successBox = document.getElementById('paymentSuccessNotice');
+            const details = document.getElementById('ticketConfirmationDetails');
+
+            const name = params.get('tourist_name') || 'Pasajero';
+            const excursion = params.get('excursion') || 'Excursión Bariloche';
+            const combi = params.get('combi') || 'Combi';
+            const chofer = params.get('chofer') || 'Chofer';
+            const passengers = params.get('passengers') || '1';
+
+            details.innerHTML = `
+                <div><b>Pasajero:</b> ${name}</div>
+                <div><b>Excursión:</b> ${excursion}</div>
+                <div><b>Combi Asignada:</b> ${combi} (Chofer: ${chofer})</div>
+                <div><b>Tickets:</b> ${passengers} persona(s)</div>
+                <div style="color:#00b894; font-weight:800; margin-top:6px;">ESTADO: PAGADO & NOTIFICADO EN VIVO</div>
+            `;
+            successBox.style.display = 'block';
         }
 
         document.getElementById('custName').addEventListener('input', updateWhatsAppLink);
         document.getElementById('custHotel').addEventListener('input', updateWhatsAppLink);
+        document.getElementById('custPhone').addEventListener('input', updateWhatsAppLink);
     </script>
 </body>
 
