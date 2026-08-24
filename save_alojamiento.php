@@ -871,6 +871,7 @@ if ($action === 'save_multiservice_provider') {
             'color' => trim($m['color'] ?? 'Blanco'),
             'patente_ultimos3' => strtoupper(trim(substr($m['patente_ultimos3'] ?? '', -3))),
             'chofer_nombre' => trim($m['chofer_nombre'] ?? $m['driver_name'] ?? ''),
+            'chofer_telefono' => trim($m['chofer_telefono'] ?? $m['phone'] ?? ''),
             'usuario' => strtolower(trim($m['usuario'] ?? $m['username'] ?? '')),
             'password' => trim($m['password'] ?? ''),
             'is_active' => isset($m['is_active']) ? (bool)$m['is_active'] : true
@@ -1114,6 +1115,7 @@ if ($action === 'admin_update_provider') {
                 'color' => trim($m['color'] ?? 'Blanco'),
                 'patente_ultimos3' => strtoupper(trim(substr($m['patente_ultimos3'] ?? '', -3))),
                 'chofer_nombre' => trim($m['chofer_nombre'] ?? $m['driver_name'] ?? ''),
+                'chofer_telefono' => trim($m['chofer_telefono'] ?? $m['phone'] ?? ''),
                 'usuario' => strtolower(trim($m['usuario'] ?? $m['username'] ?? '')),
                 'password' => trim($m['password'] ?? ''),
                 'is_active' => isset($m['is_active']) ? (bool)$m['is_active'] : true
