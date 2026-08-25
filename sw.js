@@ -1,23 +1,19 @@
-const CACHE_NAME = 'bariloche-online-v3';
+const CACHE_NAME = 'bariloche-online-v999';
 const urlsToCache = [
     '/',
     '/index.html',
-    '/styles.css',
+    '/styles.css?v=9999',
     '/app.js',
-    '/manifest.json',
-    'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap'
+    '/accommodations.js?v=9999'
 ];
 
 // Install
 self.addEventListener('install', event => {
-    // Forzar al Service Worker a instalarse de inmediato y no esperar
     self.skipWaiting();
     event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => {
-                console.log('Opened cache');
-                return cache.addAll(urlsToCache);
-            })
+        caches.keys().then(keys => Promise.all(keys.map(key => caches.delete(key))))
+            .then(() => caches.open(CACHE_NAME))
+            .then(cache => cache.addAll(urlsToCache))
     );
 });
 
