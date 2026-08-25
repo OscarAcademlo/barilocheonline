@@ -99,7 +99,9 @@ class AuthManager {
                     </div>
                 `;
 
-                if (!isAdmin && !subBadge) {
+                let hasSubData = null;
+                try { hasSubData = localStorage.getItem('bari_sub_' + emailClean); } catch (e) {}
+                if (!isAdmin && !hasSubData) {
                     fetch(`save_alojamiento.php?action=check_subscription&email=${encodeURIComponent(emailClean)}&_t=${Date.now()}`)
                         .then(r => r.json())
                         .then(d => {

@@ -52,6 +52,8 @@
       "Pet friendly"
     ],
     "phone": "5492944123456",
+    "open_days": "Lunes a Domingos",
+    "open_hours": "12:00 a 00:00 hs",
     "is_active": true,
     "created_at": "2026-08-20T12:00:00Z",
     "is_demo": true
@@ -79,6 +81,8 @@
       "Opciones sin TACC"
     ],
     "phone": "5492944234567",
+    "open_days": "Lunes a Domingos",
+    "open_hours": "12:00 a 16:00 hs / 20:00 a 00:00 hs",
     "is_active": true,
     "created_at": "2026-08-20T12:00:00Z",
     "is_demo": true
@@ -106,6 +110,8 @@
       "Pet friendly"
     ],
     "phone": "5492944345678",
+    "open_days": "Todos los días",
+    "open_hours": "09:00 a 01:00 hs",
     "is_active": true,
     "created_at": "2026-08-20T12:00:00Z",
     "is_demo": true
@@ -132,6 +138,8 @@
       "Vegetariano"
     ],
     "phone": "5492944456789",
+    "open_days": "Lunes a Domingos",
+    "open_hours": "12:00 a 00:00 hs",
     "is_active": true,
     "created_at": "2026-08-20T12:00:00Z",
     "is_demo": true
@@ -158,6 +166,8 @@
       "Precios Populares"
     ],
     "phone": "5492944567890",
+    "open_days": "Martes a Domingos",
+    "open_hours": "12:00 a 15:30 hs / 20:00 a 23:30 hs",
     "is_active": true,
     "created_at": "2026-08-20T12:00:00Z",
     "is_demo": true
