@@ -477,13 +477,9 @@
                     const transText = document.getElementById('transferDetailsText');
                     const cashBox = document.getElementById('cashNoticeBox');
 
-                    if (cfg.accepts_mp) {
-                        if (btnMP) {
-                            btnMP.style.display = 'flex';
-                            btnMP.innerHTML = '<i class="fas fa-credit-card"></i> Pagar con Tarjeta / Mercado Pago (Online)';
-                        }
-                    } else if (!isUserAdmin && btnMP) {
-                        btnMP.style.display = 'none';
+                    if (btnMP) {
+                        btnMP.style.display = 'flex';
+                        btnMP.innerHTML = '<i class="fas fa-credit-card"></i> Pagar con Tarjeta / Mercado Pago';
                     }
 
                     if (cfg.accepts_transfer && cfg.transfer_details) {
@@ -594,67 +590,10 @@
                             || (user && (user.email === 'oscarns@gmail.com' || (window.authManager.isAdmin && window.authManager.isAdmin()))) 
                             || localStorage.getItem('bariloche_user_email') === 'oscarns@gmail.com';
             if (isAdmin) {
+            if (isUserAdmin) {
                 return handleAdminTestTicket();
             }
-
-            const name = document.getElementById('custName').value.trim();
-            let phone = document.getElementById('custPhone').value.trim();
-            const hotel = document.getElementById('custHotel').value.trim();
-
-            if (!name || !phone) {
-                alert('Por favor completá tu Nombre y Teléfono/WhatsApp para generar tu ticket.');
-                return;
-            }
-
-            // Auto-formatear 549
-            const digits = phone.replace(/\D/g, '');
-            if (digits.length === 10 && !digits.startsWith('54')) {
-                phone = '549' + digits;
-            }
-
-            const params = new URLSearchParams(window.location.search);
-            const empresa = params.get('empresa') || 'Empresa Oficial';
-            const excursion = params.get('excursion') || 'Circuito Turístico';
-            const combi = params.get('combi') || 'Combi 01';
-            const chofer = params.get('chofer') || 'Chofer Asignado';
-            const totalAmount = basePrice * passengers;
-
-            const btn = document.getElementById('btnPayMP');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Conectando con Mercado Pago...';
-
-            try {
-                const res = await fetch('save_alojamiento.php?action=create_ticket_preference', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        empresa,
-                        excursion,
-                        combi,
-                        chofer,
-                        tourist_name: name,
-                        tourist_phone: phone,
-                        pickup_address: hotel || 'Ubicación GPS',
-                        pickup_lat: touristLat,
-                        pickup_lng: touristLng,
-                        passengers,
-                        total_amount: totalAmount
-                    })
-                });
-
-                const data = await res.json();
-                if (data.status === 'success' && data.init_point) {
-                    window.location.href = data.init_point;
-                } else {
-                    alert('⚠️ ' + (data.message || 'Error al iniciar el pago con Mercado Pago.'));
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-credit-card"></i> Pagar con Tarjeta / Mercado Pago';
-                }
-            } catch (e) {
-                alert('Error de conexión al procesar el ticket.');
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-credit-card"></i> Pagar con Tarjeta / Mercado Pago';
-            }
+            alert("Por el momento no esta habilitada esta opcion cualquier duda contactar a nuestro whatsapp");
         }
 
         async function handleAdminTestTicket() {

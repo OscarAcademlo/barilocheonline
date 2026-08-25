@@ -14,7 +14,8 @@
       "https://images.unsplash.com/photo-1551632811-561732d1e306?w=800"
     ],
     "is_active": true,
-    "created_at": "2026-08-24T12:00:00Z"
+    "created_at": "2026-08-24T12:00:00Z",
+    "is_demo": true
   },
   {
     "id": "srv_mascotas_pata_01",
@@ -31,6 +32,7 @@
       "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=800"
     ],
     "is_active": true,
-    "created_at": "2026-08-24T12:00:00Z"
+    "created_at": "2026-08-24T12:00:00Z",
+    "is_demo": true
   }
 ]

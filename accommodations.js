@@ -208,7 +208,7 @@ function renderAccommodations(list) {
     container.innerHTML = list.map(acc => {
         const coverImg = (acc.images && acc.images[0]) ? acc.images[0] : 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800';
         const isOwnerOrAdmin = currentUser && (currentUser.email === acc.owner_email || currentUser.email === ADMIN_EMAIL);
-        const isTestService = acc.is_test || 
+        const isTestService = acc.is_demo || acc.is_test || 
                               (acc.owner_email && (acc.owner_email.toLowerCase().includes('test') || acc.owner_email.toLowerCase().includes('oscar') || acc.owner_email.toLowerCase().includes('demo'))) || 
                               (acc.name && (acc.name.toLowerCase().includes('prueba') || acc.name.toLowerCase().includes('demo') || acc.name.toLowerCase().includes('test')));
 
@@ -217,8 +217,8 @@ function renderAccommodations(list) {
                 <div class="accommodation-img-wrapper" style="position:relative;">
                     <img src="${coverImg}" alt="${acc.name}" onerror="this.src='https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800'">
                     ${isTestService ? `
-                        <div class="test-service-badge" style="position:absolute; top:10px; left:10px; z-index:4; background:#f59e0b; color:#ffffff; font-size:0.68rem; font-weight:800; padding:3px 8px; border-radius:6px; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(0,0,0,0.3); text-transform:uppercase; letter-spacing:0.3px;">
-                            <i class="fas fa-flask"></i> Prueba Técnica
+                        <div class="demo-ribbon-wrapper">
+                            <div class="demo-ribbon">Servicio Solo de Ejemplo</div>
                         </div>
                     ` : ''}
                     <div class="accommodation-price-badge">$${Number(acc.price).toLocaleString('es-AR')}/noche</div>
@@ -284,11 +284,11 @@ function showAccommodationDetails(id) {
         </div>
         <div class="modal-accommodation-body">
             ${isTestService ? `
-                <div style="background:#fffbeb; border:1.5px dashed #f59e0b; border-radius:12px; padding:10px 14px; margin-bottom:14px; display:flex; align-items:center; gap:10px; color:#b45309;">
-                    <i class="fas fa-flask" style="font-size:1.4rem;"></i>
+                <div class="demo-banner-box">
+                    <i class="fas fa-flag"></i>
                     <div>
-                        <div style="font-weight:800; font-size:0.85rem; text-transform:uppercase;">🧪 Servicio de Prueba Técnica (Demo)</div>
-                        <div style="font-size:0.75rem; color:#92400e;">Esta publicación forma parte de las pruebas de verificación técnica y demostración del sistema.</div>
+                        <div class="demo-banner-title">🚩 SERVICIO SOLO DE EJEMPLO</div>
+                        <div class="demo-banner-desc">Esta publicación es una demostración de ejemplo para el sistema.</div>
                     </div>
                 </div>
             ` : ''}
@@ -318,8 +318,7 @@ function showAccommodationDetails(id) {
                 <h3 style="font-size:0.95rem; margin-bottom:8px; color:var(--primary);"><i class="fas fa-wallet"></i> Medios de Pago Aceptados</h3>
                 <div style="display:flex; flex-wrap:wrap; gap:8px; font-size:0.85rem; font-weight:700;">
                     ${(acc.payment_methods && acc.payment_methods.cash === false) ? '' : '<span style="background:rgba(16,185,129,0.15); color:#10b981; padding:5px 10px; border-radius:8px;">💵 Efectivo</span>'}
-                    ${(acc.payment_methods && (acc.payment_methods.transfer === true || !!acc.transfer_details)) ? '<span style="background:rgba(0,132,255,0.15); color:#0084ff; padding:5px 10px; border-radius:8px;">🏦 Transferencia (Alias/CBU)</span>' : ''}
-                    ${(acc.payment_methods && (acc.payment_methods.mercadopago === true || !!acc.mp_access_token || !!acc.mp_link)) ? '<span style="background:rgba(0,132,255,0.15); color:#0084ff; padding:5px 10px; border-radius:8px;">💳 Tarjetas / Mercado Pago</span>' : ''}
+                    <span style="background:rgba(0,158,227,0.15); color:#009ee3; padding:5px 10px; border-radius:8px;">💳 Mercado Pago</span>
                     <span style="background:rgba(37,211,102,0.15); color:#25d366; padding:5px 10px; border-radius:8px;">📱 WhatsApp directo</span>
                 </div>
                 ${acc.transfer_details ? `
@@ -329,12 +328,15 @@ function showAccommodationDetails(id) {
                 ` : ''}
             </div>
             
-            <div class="modal-price-section">
-                <div class="modal-price">
+            <div class="modal-price-section" style="flex-direction:column; gap:12px; align-items:stretch;">
+                <div class="modal-price" style="justify-content:space-between; display:flex;">
                     <span class="price-label">Tarifa por noche</span>
                     <span class="price-amount">$${Number(acc.price).toLocaleString('es-AR')}</span>
                 </div>
-                <a href="${waUrl}" target="_blank" class="btn-whatsapp-direct">
+                <button type="button" onclick="payWithMercadoPago()" style="background:#009ee3; color:white; border:none; padding:14px 20px; border-radius:14px; font-weight:800; font-size:1rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; box-shadow:0 4px 15px rgba(0,158,227,0.35);">
+                    <i class="fas fa-credit-card"></i> Pagar con Mercado Pago
+                </button>
+                <a href="${waUrl}" target="_blank" class="btn-whatsapp-direct" style="text-align:center; justify-content:center;">
                     <i class="fab fa-whatsapp"></i> Contactar al Dueño por WhatsApp
                 </a>
             </div>
@@ -655,29 +657,7 @@ function closeSubscriptionModal() {
 }
 
 async function payWithMercadoPago() {
-    if (!currentUser) return;
-    const btn = document.getElementById('btnPayMP');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Conectando con Mercado Pago...';
-
-    try {
-        const res = await fetch('save_alojamiento.php?action=create_mp_preference', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: currentUser.email })
-        });
-        const data = await res.json();
-        if (data.status === 'success' && data.init_point) {
-            window.location.href = data.init_point;
-        } else {
-            alert('Error al generar link de pago: ' + (data.message || 'Intente nuevamente'));
-        }
-    } catch (e) {
-        alert('Error de conexión con Mercado Pago');
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-credit-card"></i> Pagar $10.000 con Mercado Pago';
-    }
+    alert("Por el momento no esta habilitada esta opcion cualqjuier duda contactar a nuestro whatsapp");
 }
 
 async function redeemPromoCode() {

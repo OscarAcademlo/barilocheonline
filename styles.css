@@ -3139,3 +3139,60 @@ body {
     width: 100%;
     font-size: 0.82rem;
 }
+
+/* DEMO RIBBON & MP MODAL */
+.demo-ribbon-wrapper {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 140px;
+    height: 140px;
+    overflow: hidden;
+    z-index: 15;
+    pointer-events: none;
+    border-top-right-radius: inherit;
+}
+.demo-ribbon {
+    position: absolute;
+    top: 24px;
+    right: -36px;
+    width: 170px;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #ffffff;
+    text-align: center;
+    padding: 5px 0;
+    font-size: 0.68rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    transform: rotate(45deg);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.35);
+    letter-spacing: 0.5px;
+    border: 1px dashed rgba(255,255,255,0.6);
+}
+
+.demo-banner-box {
+    background: rgba(239, 68, 68, 0.12);
+    border: 1.5px solid #ef4444;
+    border-radius: 14px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #dc2626;
+}
+.demo-banner-box i {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+.demo-banner-title {
+    font-weight: 900;
+    font-size: 0.88rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+.demo-banner-desc {
+    font-size: 0.78rem;
+    color: #b91c1c;
+    margin-top: 2px;
+}

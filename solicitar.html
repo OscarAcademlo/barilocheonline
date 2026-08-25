@@ -253,25 +253,7 @@
         });
 
         async function paySelectedPlanMP() {
-            const emailInput = document.getElementById('email');
-            const email = (emailInput ? emailInput.value.trim() : '') || prompt('Ingresá tu email para asociar el pago de Mercado Pago:');
-            if (!email) return;
-
-            try {
-                const res = await fetch('save_alojamiento.php?action=create_preference', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, plan: currentPlanKey || 'alojamiento' })
-                });
-                const data = await res.json();
-                if (data.status === 'success' && data.init_point) {
-                    window.location.href = data.init_point;
-                } else {
-                    alert('Error al generar enlace de pago: ' + (data.message || 'Error'));
-                }
-            } catch (e) {
-                alert('Error al conectar con Mercado Pago');
-            }
+            alert("Por el momento no esta habilitada esta opcion cualqjuier duda contactar a nuestro whatsapp");
         }
     </script>
 

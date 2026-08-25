@@ -8,7 +8,7 @@
     "price": 135000,
     "rating": 4.99,
     "lat": -41.1275,
-    "lng": -71.3650,
+    "lng": -71.365,
     "images": [
       "img/alojamientos/cabana_bustillo_frente.jpg",
       "img/alojamientos/cabana_bustillo_interior.jpg",
@@ -30,7 +30,8 @@
     ],
     "phone": "5492944123456",
     "is_active": true,
-    "created_at": "2026-08-23T15:45:00Z"
+    "created_at": "2026-08-23T15:45:00Z",
+    "is_demo": true
   },
   {
     "id": "acc_1",
@@ -48,9 +49,18 @@
       "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&q=80&w=800"
     ],
     "description": "Hermosa cabaña con vista panorámica al Lago Nahuel Huapi. 3 dormitorios, cocina equipada, parrilla y deck con vista al lago.",
-    "amenities": ["Wi-Fi", "Parrilla", "Deck", "Vista al lago", "Calefacción", "Estacionamiento", "Pet friendly"],
+    "amenities": [
+      "Wi-Fi",
+      "Parrilla",
+      "Deck",
+      "Vista al lago",
+      "Calefacción",
+      "Estacionamiento",
+      "Pet friendly"
+    ],
     "phone": "5492944123456",
-    "created_at": "2026-08-20T12:00:00Z"
+    "created_at": "2026-08-20T12:00:00Z",
+    "is_demo": true
   },
   {
     "id": "acc_2",
@@ -61,16 +71,23 @@
     "price": 82000,
     "rating": 4.78,
     "lat": -41.134,
-    "lng": -71.310,
+    "lng": -71.31,
     "images": [
       "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=800",
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=800",
       "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&q=80&w=800"
     ],
     "description": "Moderno loft en pleno centro de Bariloche. A pasos de restaurantes, tiendas y transporte público. Ideal para parejas.",
-    "amenities": ["Wi-Fi", "Smart TV", "Cocina", "Calefacción", "Ubicación central"],
+    "amenities": [
+      "Wi-Fi",
+      "Smart TV",
+      "Cocina",
+      "Calefacción",
+      "Ubicación central"
+    ],
     "phone": "5492944234567",
-    "created_at": "2026-08-20T12:00:00Z"
+    "created_at": "2026-08-20T12:00:00Z",
+    "is_demo": true
   },
   {
     "id": "acc_3",
@@ -88,9 +105,18 @@
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=800"
     ],
     "description": "A minutos del centro de ski Cerro Catedral. Casa completa con 4 dormitorios, chimenea y jacuzzi. Perfecta para familias.",
-    "amenities": ["Wi-Fi", "Jacuzzi", "Chimenea", "Parrilla", "4 dormitorios", "Calefacción", "Pet friendly"],
+    "amenities": [
+      "Wi-Fi",
+      "Jacuzzi",
+      "Chimenea",
+      "Parrilla",
+      "4 dormitorios",
+      "Calefacción",
+      "Pet friendly"
+    ],
     "phone": "5492944345678",
-    "created_at": "2026-08-20T12:00:00Z"
+    "created_at": "2026-08-20T12:00:00Z",
+    "is_demo": true
   },
   {
     "id": "acc_4",
@@ -108,9 +134,16 @@
       "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=800"
     ],
     "description": "Departamento luminoso sobre Av. Bustillo con vista directa al lago. 2 dormitorios, balcón amplio y todas las comodidades.",
-    "amenities": ["Wi-Fi", "Balcón", "Vista al lago", "Cocina completa", "Estacionamiento"],
+    "amenities": [
+      "Wi-Fi",
+      "Balcón",
+      "Vista al lago",
+      "Cocina completa",
+      "Estacionamiento"
+    ],
     "phone": "5492944456789",
-    "created_at": "2026-08-20T12:00:00Z"
+    "created_at": "2026-08-20T12:00:00Z",
+    "is_demo": true
   },
   {
     "id": "acc_5",
@@ -128,8 +161,16 @@
       "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=800"
     ],
     "description": "Inmersa en el bosque del Circuito Chico. Tranquilidad absoluta, contacto con la naturaleza. 2 dormitorios y hogar a leña.",
-    "amenities": ["Hogar a leña", "Bosque", "Tranquilidad", "Parrilla", "Wi-Fi", "Pet friendly"],
+    "amenities": [
+      "Hogar a leña",
+      "Bosque",
+      "Tranquilidad",
+      "Parrilla",
+      "Wi-Fi",
+      "Pet friendly"
+    ],
     "phone": "5492944567890",
-    "created_at": "2026-08-20T12:00:00Z"
+    "created_at": "2026-08-20T12:00:00Z",
+    "is_demo": true
   }
 ]

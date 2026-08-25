@@ -6,8 +6,8 @@
     "type": "Cervecería Artesanal",
     "location": "Juramento 190, Bariloche",
     "rating": 4.9,
-    "lat": -41.1370,
-    "lng": -71.3130,
+    "lat": -41.137,
+    "lng": -71.313,
     "images": [
       "img/gastronomia/cerveza_cabeza.jpg",
       "img/gastronomia/patagonia.jpg"
@@ -15,10 +15,17 @@
     "description": "Cerveza artesanal de autor elaborada con agua pura de deshielo y lúpulos patagónicos. Tapeos, hamburguesas caseras y el mejor ambiente cervecero de Bariloche.",
     "specialty": "IPA Patagónica, Hamburguesas Caseras, Tapeo Cervecero",
     "promo": "Happy Hour 18:00 a 20:00 hs - 2x1 en Pintas Artesanales",
-    "features": ["Cerveza Tirada", "Música en Vivo", "Patio Cervecero", "Pet friendly", "Opciones Veganas"],
+    "features": [
+      "Cerveza Tirada",
+      "Música en Vivo",
+      "Patio Cervecero",
+      "Pet friendly",
+      "Opciones Veganas"
+    ],
     "phone": "5492944998877",
     "is_active": true,
-    "created_at": "2026-08-23T10:00:00Z"
+    "created_at": "2026-08-23T10:00:00Z",
+    "is_demo": true
   },
   {
     "id": "gasto_1",
@@ -35,10 +42,17 @@
     "description": "El refugio icónico de Cerveza Patagonia. Imperdible vista panorámica al lago Nahuel Huapi, cervezas tiradas exclusivas y un menú que combina carnes ahumadas, pizzas y tablas de montaña.",
     "specialty": "Cerveza Patagonia, Carnes Ahumadas, Entradas",
     "promo": "Happy Hour 17hs a 19hs - 2x1 en Pintas",
-    "features": ["Vista increíble", "Cerveza Artesanal", "Estacionamiento", "Opciones Veganas", "Pet friendly"],
+    "features": [
+      "Vista increíble",
+      "Cerveza Artesanal",
+      "Estacionamiento",
+      "Opciones Veganas",
+      "Pet friendly"
+    ],
     "phone": "5492944123456",
     "is_active": true,
-    "created_at": "2026-08-20T12:00:00Z"
+    "created_at": "2026-08-20T12:00:00Z",
+    "is_demo": true
   },
   {
     "id": "gasto_2",
@@ -48,17 +62,24 @@
     "location": "Villegas 347, Centro",
     "rating": 4.9,
     "lat": -41.1362,
-    "lng": -71.3090,
+    "lng": -71.309,
     "images": [
       "img/gastronomia/alberto.jpg"
     ],
     "description": "La parrilla más clásica y recomendada de Bariloche. Cortes de carne de primera calidad, porciones súper abundantes y las mejores papas fritas provenzal de la Patagonia.",
     "specialty": "Ojo de bife, Bife de Chorizo, Papas fritas",
     "promo": "Sugerencia: ¡Pedí el Bife de Chorizo mariposa para compartir!",
-    "features": ["Parrilla a la vista", "Porciones Abundantes", "Ubicación céntrica", "Vinos Premium", "Opciones sin TACC"],
+    "features": [
+      "Parrilla a la vista",
+      "Porciones Abundantes",
+      "Ubicación céntrica",
+      "Vinos Premium",
+      "Opciones sin TACC"
+    ],
     "phone": "5492944234567",
     "is_active": true,
-    "created_at": "2026-08-20T12:00:00Z"
+    "created_at": "2026-08-20T12:00:00Z",
+    "is_demo": true
   },
   {
     "id": "gasto_3",
@@ -75,10 +96,17 @@
     "description": "El paraíso dulce en pleno centro. Degustá chocolates artesanales, sus famosos 'Franui' y helados únicos en el local tradicional con pista de patinaje sobre hielo.",
     "specialty": "Chocolates Artesanales, Franui, Pista de Hielo",
     "promo": "Promoción: Llevá 1kg de chocolate y elegí un Franui de regalo",
-    "features": ["Heladería Artesanal", "Pista de Hielo", "Cafetería", "Ideal Familias", "Pet friendly"],
+    "features": [
+      "Heladería Artesanal",
+      "Pista de Hielo",
+      "Cafetería",
+      "Ideal Familias",
+      "Pet friendly"
+    ],
     "phone": "5492944345678",
     "is_active": true,
-    "created_at": "2026-08-20T12:00:00Z"
+    "created_at": "2026-08-20T12:00:00Z",
+    "is_demo": true
   },
   {
     "id": "gasto_4",
@@ -95,10 +123,16 @@
     "description": "Un clásico con opciones para todos los gustos: pizzas a la piedra, pastas caseras, trucha patagónica, platos vegetarianos y los helados más originales de la región.",
     "specialty": "Trucha patagónica, Pastas caseras, Helados",
     "promo": "Menú Turístico: Principal + Bebida + Helado artesanal",
-    "features": ["Menú infantil", "Pastas Caseras", "Opciones sin TACC", "Vegetariano"],
+    "features": [
+      "Menú infantil",
+      "Pastas Caseras",
+      "Opciones sin TACC",
+      "Vegetariano"
+    ],
     "phone": "5492944456789",
     "is_active": true,
-    "created_at": "2026-08-20T12:00:00Z"
+    "created_at": "2026-08-20T12:00:00Z",
+    "is_demo": true
   },
   {
     "id": "gasto_5",
@@ -108,16 +142,22 @@
     "location": "Mitre 1130, Bariloche",
     "rating": 4.8,
     "lat": -41.1342,
-    "lng": -71.2940,
+    "lng": -71.294,
     "images": [
       "img/gastronomia/fonda.jpg"
     ],
     "description": "El bodegón más famoso de Bariloche por sus milanesas gigantes a la napolitana. Platos tradicionales, caseros y súper abundantes que alimentan a toda la familia.",
     "specialty": "Milanesa Napolitana Gigante, Pastas, Papas",
     "promo": "¡La milanesa para 3 personas rinde para 4!",
-    "features": ["Bodegón clásico", "Porciones Gigantes", "Familiar", "Precios Populares"],
+    "features": [
+      "Bodegón clásico",
+      "Porciones Gigantes",
+      "Familiar",
+      "Precios Populares"
+    ],
     "phone": "5492944567890",
     "is_active": true,
-    "created_at": "2026-08-20T12:00:00Z"
+    "created_at": "2026-08-20T12:00:00Z",
+    "is_demo": true
   }
 ]
