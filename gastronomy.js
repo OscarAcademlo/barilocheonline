@@ -225,18 +225,20 @@ function renderFilteredGastronomy(listToRender) {
         const coverImg = (rest.images && rest.images.length > 0 && rest.images[0]) ? rest.images[0] : (rest.image || 'img/gastronomia/patagonia.jpg');
 
         return `
-            <div class="accommodation-card-airbnb" onclick="showGastronomyDetails('${rest.id}')" onmouseenter="highlightMapMarker('${rest.id}')" style="margin-bottom:20px;">
-                <div class="accommodation-img-wrapper" style="height:210px; background:#0f172a;">
+            <div class="accommodation-card-airbnb" onclick="showGastronomyDetails('${rest.id}')" onmouseenter="highlightMapMarker('${rest.id}')" style="margin-bottom:14px; border-radius:16px; overflow:hidden;">
+                <div class="accommodation-img-wrapper" style="height:165px; min-height:165px; background:#0f172a; position:relative;">
                     <img src="${coverImg}" alt="${rest.name}" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='img/gastronomia/patagonia.jpg';" style="width:100%; height:100%; object-fit:cover; display:block;">
-                    <div class="accommodation-price-badge" style="background:#e67e22; border-radius:10px; font-size:0.75rem; font-weight:800;">${rest.type || 'Gastronomía'}</div>
+                    <div class="accommodation-price-badge" style="background:#e67e22; border-radius:8px; font-size:0.75rem; font-weight:800; padding:4px 10px; bottom:10px; right:10px;">${rest.type || 'Gastronomía'}</div>
                 </div>
-                <div class="accommodation-info-airbnb">
-                    <div class="accommodation-header-row">
-                        <h3 class="accommodation-name" style="font-size:1.05rem;">${rest.name}</h3>
-                        <span class="accommodation-rating-star"><i class="fas fa-star" style="color:#f59e0b;"></i> ${rest.rating || 4.8}</span>
+                <div class="accommodation-info-airbnb" style="padding:12px 14px;">
+                    <div class="accommodation-header-row" style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:4px;">
+                        <h3 class="accommodation-name" style="font-size:1.02rem; font-weight:800; line-height:1.3; color:var(--text-primary); margin:0; word-break:break-word; overflow:visible; text-overflow:clip; white-space:normal;">${rest.name}</h3>
+                        <span class="accommodation-rating-star" style="font-size:0.82rem; font-weight:700; background:rgba(245,158,11,0.12); color:#d97706; padding:3px 7px; border-radius:6px; flex-shrink:0; display:inline-flex; align-items:center; gap:4px;">
+                            <i class="fas fa-star" style="color:#f59e0b;"></i> ${rest.rating || 4.8}
+                        </span>
                     </div>
-                    <p class="accommodation-location-text" style="color:#e67e22; font-weight:700; font-size:0.84rem; margin-top:2px; margin-bottom:4px;">${rest.specialty || 'Especialidades de montaña'}</p>
-                    <p class="accommodation-location-text"><i class="fas fa-map-marker-alt"></i> ${rest.location}</p>
+                    ${rest.specialty ? `<p style="color:#e67e22; font-weight:700; font-size:0.82rem; margin:2px 0 4px 0; line-height:1.2; white-space:normal;">${rest.specialty}</p>` : ''}
+                    <p class="accommodation-location-text" style="font-size:0.82rem; color:var(--text-secondary); margin:0; display:flex; align-items:center; gap:5px;"><i class="fas fa-map-marker-alt" style="color:var(--text-secondary);"></i> ${rest.location}</p>
                 </div>
             </div>
         `;
