@@ -1560,6 +1560,8 @@ if ($action === 'save_gastronomia') {
         'description' => trim($_POST['description'] ?? ''),
         'specialty' => trim($_POST['specialty'] ?? ''),
         'promo' => trim($_POST['promo'] ?? ''),
+        'open_days' => trim($_POST['open_days'] ?? 'Lunes a Domingos'),
+        'open_hours' => trim($_POST['open_hours'] ?? '12:00 a 00:00 hs'),
         'features' => $features,
         'phone' => preg_replace('/[^\d]/', '', $_POST['phone'] ?? '5492944123456'),
         'is_active' => true,

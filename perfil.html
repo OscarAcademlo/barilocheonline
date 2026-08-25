@@ -754,6 +754,17 @@
                     </div>
                 </div>
 
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:12px;">
+                    <div class="form-group-custom">
+                        <label style="font-size:0.82rem; font-weight:700;">Días de Atención</label>
+                        <input type="text" id="gastoOpenDays" placeholder="Ej: Lunes a Domingos / Martes a Domingos" style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
+                    </div>
+                    <div class="form-group-custom">
+                        <label style="font-size:0.82rem; font-weight:700;">Horario de Atención</label>
+                        <input type="text" id="gastoOpenHours" placeholder="Ej: 18:00 a 02:00 hs / 12:00 a 00:00 hs" style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
+                    </div>
+                </div>
+
                 <div class="form-group-custom" style="margin-bottom:12px;">
                     <label style="font-size:0.82rem; font-weight:700;">Promoción / Beneficio para Clientes</label>
                     <input type="text" id="gastoPromo" placeholder="Ej: Happy Hour 17 a 19hs - 20% OFF en efectivo" style="width:100%; height:44px; border-radius:10px; padding:8px 12px; background:#0f172a; border:1px solid #334155; color:white;">
@@ -1516,6 +1527,8 @@
             document.getElementById('gastoPhone').value = '';
             document.getElementById('gastoSpecialty').value = '';
             document.getElementById('gastoPromo').value = '';
+            document.getElementById('gastoOpenDays').value = 'Lunes a Domingos';
+            document.getElementById('gastoOpenHours').value = '12:00 a 00:00 hs';
             document.getElementById('gastoDesc').value = '';
             document.getElementById('gastoType').value = 'Cervecería Artesanal';
             document.getElementById('gastoCustomTypeInput').value = '';
@@ -1557,6 +1570,8 @@
             document.getElementById('gastoPhone').value = item.phone || '';
             document.getElementById('gastoSpecialty').value = item.specialty || '';
             document.getElementById('gastoPromo').value = item.promo || '';
+            document.getElementById('gastoOpenDays').value = item.open_days || 'Lunes a Domingos';
+            document.getElementById('gastoOpenHours').value = item.open_hours || '12:00 a 00:00 hs';
             document.getElementById('gastoDesc').value = item.description || '';
 
             gastoSelectedFiles = [];
@@ -1777,6 +1792,8 @@
             formData.append('phone', document.getElementById('gastoPhone').value.trim());
             formData.append('specialty', document.getElementById('gastoSpecialty').value.trim());
             formData.append('promo', document.getElementById('gastoPromo').value.trim());
+            formData.append('open_days', document.getElementById('gastoOpenDays').value.trim());
+            formData.append('open_hours', document.getElementById('gastoOpenHours').value.trim());
             formData.append('description', document.getElementById('gastoDesc').value.trim());
             formData.append('lat', document.getElementById('gastoLat').value);
             formData.append('lng', document.getElementById('gastoLng').value);
