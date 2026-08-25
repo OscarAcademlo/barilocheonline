@@ -121,19 +121,21 @@ function initMapGasto() {
     markersGasto = [];
 
     const bounds = [];
-    const validLocales = GASTRONOMY.filter(r => r.lat && r.lng);
-    const downtownLocales = validLocales.filter(r => Math.abs(r.lat - (-41.134)) < 0.04 && Math.abs(r.lng - (-71.31)) < 0.04);
-    const outerLocales = validLocales.filter(r => !downtownLocales.includes(r));
+    const validLocales = GASTRONOMY.filter(r => r.lat && r.lng).map(r => ({
+        ...r,
+        latNum: parseFloat(r.lat),
+        lngNum: parseFloat(r.lng)
+    }));
 
-    // Posiciones en abanico libre alrededor del centro para que los carteles NUNCA se encimen
+    // Distribuir carteles en abanico amplio alrededor del centro para que NUNCA se encimen
     const downtownOffsets = [
-        { latOffset: 0.007, lngOffset: -0.011 },  // Arriba-Izquierda
-        { latOffset: 0.009, lngOffset: 0.000 },   // Arriba-Centro
-        { latOffset: 0.007, lngOffset: 0.012 },   // Arriba-Derecha
-        { latOffset: -0.006, lngOffset: -0.010 }, // Abajo-Izquierda
-        { latOffset: -0.007, lngOffset: 0.011 },  // Abajo-Derecha
-        { latOffset: 0.001, lngOffset: -0.014 },  // Centro-Izquierda
-        { latOffset: 0.001, lngOffset: 0.015 }    // Centro-Derecha
+        { latOffset: 0.0075, lngOffset: -0.012 }, // 1. Arriba Izquierda (sobre la costa)
+        { latOffset: 0.0090, lngOffset: 0.001 },  // 2. Arriba Centro (sobre el agua)
+        { latOffset: 0.0075, lngOffset: 0.013 },  // 3. Arriba Derecha
+        { latOffset: -0.0065, lngOffset: -0.011 },// 4. Abajo Izquierda
+        { latOffset: -0.0075, lngOffset: 0.012 }, // 5. Abajo Derecha
+        { latOffset: 0.0015, lngOffset: -0.015 }, // 6. Centro Izquierda
+        { latOffset: 0.0015, lngOffset: 0.015 }   // 7. Centro Derecha
     ];
 
     let dtIndex = 0;
@@ -145,49 +147,51 @@ function initMapGasto() {
         if ((rest.type || '').includes('Chocolatería') || (rest.type || '').includes('Helad')) emoji = '🍫';
         if ((rest.type || '').includes('Pizza') || (rest.type || '').includes('Pastas')) emoji = '🍕';
 
-        let cardLat = rest.lat;
-        let cardLng = rest.lng;
+        let cardLat = rest.latNum;
+        let cardLng = rest.lngNum;
 
-        if (downtownLocales.includes(rest)) {
+        // Si es zona céntrica (cercana a -41.134, -71.309), asignar posición en abanico despejado
+        const isDowntown = Math.abs(rest.latNum - (-41.1345)) < 0.04 && Math.abs(rest.lngNum - (-71.3092)) < 0.04;
+        if (isDowntown) {
             const offset = downtownOffsets[dtIndex % downtownOffsets.length];
-            cardLat = rest.lat + offset.latOffset;
-            cardLng = rest.lng + offset.lngOffset;
+            cardLat = rest.latNum + offset.latOffset;
+            cardLng = rest.lngNum + offset.lngOffset;
             dtIndex++;
         } else {
             // Fuera del centro (ej. Cervecería Patagonia Km 24)
-            cardLat = rest.lat + 0.004;
+            cardLat = rest.latNum + 0.005;
         }
 
         // 1. Puntito naranja en la ubicación GPS real del local
         const dotIcon = L.divIcon({
             className: 'gasto-mockup-card-wrap',
-            html: `<div class="gasto-dot-marker-anchor" id="dot_gasto_${rest.id}"></div>`,
+            html: `<div id="dot_gasto_${rest.id}" style="width:12px; height:12px; background:#e67e22; border:2px solid #ffffff; border-radius:50%; box-shadow:0 0 8px rgba(230,126,34,0.8), 0 2px 6px rgba(0,0,0,0.6); transform:translate(-50%, -50%);"></div>`,
             iconSize: [0, 0],
             iconAnchor: [0, 0]
         });
-        const dotMarker = L.marker([rest.lat, rest.lng], { icon: dotIcon }).addTo(mapGasto);
+        const dotMarker = L.marker([rest.latNum, rest.lngNum], { icon: dotIcon }).addTo(mapGasto);
         markersGasto.push(dotMarker);
 
         // 2. Línea fina estética uniendo el punto GPS con el cartel flotante
-        const line = L.polyline([[rest.lat, rest.lng], [cardLat, cardLng]], {
-            color: '#64748b',
-            weight: 1.5,
-            opacity: 0.85,
+        const line = L.polyline([[rest.latNum, rest.lngNum], [cardLat, cardLng]], {
+            color: '#475569',
+            weight: 1.8,
+            opacity: 0.9,
             dashArray: '3, 3'
         }).addTo(mapGasto);
         line.gastoId = rest.id;
         markersGasto.push(line);
 
-        // 3. Cartel flotante (Mockup Card) desplazado en zona libre sin encimarse
+        // 3. Cartel flotante (Mockup Card estilo Imagen 1) con estilos inline 100% garantizados
         const cardIcon = L.divIcon({
             className: 'gasto-mockup-card-wrap',
             html: `
-                <div class="gasto-mockup-card" id="pin_gasto_${rest.id}" onclick="showGastronomyDetails('${rest.id}')">
-                    <div class="gasto-card-icon-box">${emoji}</div>
-                    <div class="gasto-card-text-box">
-                        <div class="gasto-card-title-text">${rest.name}</div>
-                        <div class="gasto-card-sub-text">- ${rest.type || 'Gastronomía'}</div>
-                        <div class="gasto-card-stars-row">★★★★★</div>
+                <div class="gasto-mockup-card" id="pin_gasto_${rest.id}" onclick="showGastronomyDetails('${rest.id}')" style="background:rgba(15,23,42,0.94); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border:1.5px solid #334155; border-radius:16px; padding:8px 12px; box-shadow:0 12px 28px rgba(0,0,0,0.6), 0 0 15px rgba(230,126,34,0.2); display:flex; align-items:center; gap:10px; color:#ffffff; cursor:pointer; user-select:none; white-space:nowrap; max-width:220px; font-family:'Outfit', sans-serif;">
+                    <div style="width:38px; height:38px; background:rgba(230,126,34,0.18); border:1px solid rgba(230,126,34,0.35); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0;">${emoji}</div>
+                    <div style="display:flex; flex-direction:column; overflow:hidden;">
+                        <div style="font-weight:800; font-size:0.82rem; color:#ffffff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:140px;">${rest.name}</div>
+                        <div style="font-size:0.72rem; color:#94a3b8; font-weight:600; margin-top:1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:140px;">- ${rest.type || 'Gastronomía'}</div>
+                        <div style="color:#f59e0b; font-size:0.7rem; margin-top:2px; letter-spacing:1px;">★★★★★</div>
                     </div>
                 </div>
             `,
@@ -203,7 +207,7 @@ function initMapGasto() {
         cardMarker.lineRef = line;
         markersGasto.push(cardMarker);
 
-        bounds.push([rest.lat, rest.lng]);
+        bounds.push([rest.latNum, rest.lngNum]);
         bounds.push([cardLat, cardLng]);
     });
 
