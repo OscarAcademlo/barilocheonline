@@ -1,10 +1,10 @@
-const CACHE_NAME = 'bariloche-online-v999';
+const CACHE_NAME = 'bariloche-online-v10005';
 const urlsToCache = [
     '/',
     '/index.html',
-    '/styles.css?v=9999',
+    '/styles.css?v=10005',
     '/app.js',
-    '/accommodations.js?v=9999'
+    '/accommodations.js?v=10005'
 ];
 
 // Install

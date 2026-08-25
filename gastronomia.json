@@ -23,6 +23,8 @@
       "Opciones Veganas"
     ],
     "phone": "5492944998877",
+    "open_days": "Martes a Domingos",
+    "open_hours": "18:00 a 02:00 hs",
     "is_active": true,
     "created_at": "2026-08-23T10:00:00Z",
     "is_demo": true

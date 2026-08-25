@@ -346,9 +346,10 @@
                 <input type="tel" id="custPhone" class="form-control" placeholder="Ej. +54 9 11 1234-5678 (con 549)" required>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" style="position:relative;">
                 <label>Hotel o Dirección de Recogida (Pickup)</label>
-                <input type="text" id="custHotel" class="form-control" placeholder="Ej. Hotel Edelweiss / Av. Bustillo Km 4">
+                <input type="text" id="custHotel" class="form-control" placeholder="Ej. Hotel Edelweiss / Av. Bustillo Km 4" autocomplete="off" oninput="handleAddressAutocomplete(this)">
+                <div id="addressAutocompleteDropdown" class="autocomplete-dropdown-box" style="display:none; position:absolute; top:100%; left:0; right:0; background:#0f172a; border:1px solid #334155; border-radius:12px; z-index:99999; max-height:220px; overflow-y:auto; box-shadow:0 10px 25px rgba(0,0,0,0.7); margin-top:4px;"></div>
                 
                 <button type="button" class="btn-gps-pickup" onclick="captureTouristGPS()">
                     <i class="fas fa-location-crosshairs"></i> 📍 Usar mi Ubicación GPS actual
@@ -774,6 +775,102 @@
         document.getElementById('custName').addEventListener('input', updateWhatsAppLink);
         document.getElementById('custHotel').addEventListener('input', updateWhatsAppLink);
         document.getElementById('custPhone').addEventListener('input', updateWhatsAppLink);
+
+        // ==============================================================================
+        // AUTOCOMPLETAR DE CALLE Y NÚMERO / HOTELES EN BARILOCHE
+        // ==============================================================================
+        const BARILOCHE_PLACES_AUTOCOMPLETE = [
+            "Hotel Edelweiss - San Martín 202, Centro",
+            "Hotel Llao Llao - Av. Bustillo Km 25",
+            "Hotel Panamericano - San Martín 536",
+            "Design Suites - Av. Bustillo Km 2.5",
+            "Huinid Hotel - Av. Bustillo Km 2.6",
+            "Hotel Nevada - Rolando 250",
+            "Hotel Cacique Inacayal - Juan Manuel de Rosas 625",
+            "Hotel Kenton Palace - Morales 338",
+            "Hotel Crans Montana - Palacios 180",
+            "Hotel Nahuel Huapi - Moreno 252",
+            "Av. Exequiel Bustillo Km 1",
+            "Av. Exequiel Bustillo Km 2",
+            "Av. Exequiel Bustillo Km 4",
+            "Av. Exequiel Bustillo Km 8",
+            "Av. Exequiel Bustillo Km 10",
+            "Av. Exequiel Bustillo Km 15",
+            "Av. Exequiel Bustillo Km 20",
+            "Mitre 100", "Mitre 200", "Mitre 500", "Mitre 1000",
+            "Moreno 200", "Moreno 400", "Moreno 700",
+            "San Martín 100", "San Martín 300", "San Martín 500",
+            "Quaglia 150", "Quaglia 300",
+            "Villegas 200", "Villegas 350",
+            "Rolando 150", "Rolando 300",
+            "Beschtedt 200", "Palacios 150", "Frey 200", "John O'Connor 150"
+        ];
+
+        let autocompleteTimer = null;
+
+        function handleAddressAutocomplete(inputEl) {
+            const dropdown = document.getElementById('addressAutocompleteDropdown');
+            if (!dropdown) return;
+            const query = (inputEl.value || '').trim().toLowerCase();
+            if (query.length < 2) {
+                dropdown.style.display = 'none';
+                return;
+            }
+
+            const matches = BARILOCHE_PLACES_AUTOCOMPLETE.filter(p => p.toLowerCase().includes(query));
+
+            let html = matches.map(m => `
+                <div style="padding:10px 14px; cursor:pointer; color:#ffffff; font-size:0.88rem; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:8px;" onclick="selectAddressOption('${m.replace(/'/g, "\\'")}', '${inputEl.id}')" onmouseenter="this.style.background='rgba(230,126,34,0.2)'" onmouseleave="this.style.background='transparent'">
+                    <i class="fas fa-map-pin" style="color:#e67e22;"></i> ${m}
+                </div>
+            `).join('');
+
+            if (query.length >= 3) {
+                clearTimeout(autocompleteTimer);
+                autocompleteTimer = setTimeout(async () => {
+                    try {
+                        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}+Bariloche&addressdetails=1&limit=4`);
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (data && data.length > 0) {
+                                const apiMatches = data.map(item => item.display_name.split(',')[0] + ', Bariloche');
+                                const combined = Array.from(new Set([...matches, ...apiMatches]));
+                                dropdown.innerHTML = combined.map(m => `
+                                    <div style="padding:10px 14px; cursor:pointer; color:#ffffff; font-size:0.88rem; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:8px;" onclick="selectAddressOption('${m.replace(/'/g, "\\'")}', '${inputEl.id}')" onmouseenter="this.style.background='rgba(230,126,34,0.2)'" onmouseleave="this.style.background='transparent'">
+                                        <i class="fas fa-location-dot" style="color:#e67e22;"></i> ${m}
+                                    </div>
+                                `).join('');
+                                dropdown.style.display = 'block';
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('Nominatim autocomplete offline:', e);
+                    }
+                }, 300);
+            }
+
+            if (matches.length > 0) {
+                dropdown.innerHTML = html;
+                dropdown.style.display = 'block';
+            } else if (query.length < 3) {
+                dropdown.style.display = 'none';
+            }
+        }
+
+        function selectAddressOption(val, inputId) {
+            const inputEl = document.getElementById(inputId);
+            if (inputEl) inputEl.value = val;
+            const dropdown = document.getElementById('addressAutocompleteDropdown');
+            if (dropdown) dropdown.style.display = 'none';
+            updateWhatsAppLink();
+        }
+
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('addressAutocompleteDropdown');
+            if (dropdown && !e.target.closest('.form-group')) {
+                dropdown.style.display = 'none';
+            }
+        });
     </script>
 </body>
 

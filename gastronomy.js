@@ -361,7 +361,27 @@ function showGastronomyDetails(id) {
                 </div>
                 <span class="accommodation-rating-large"><i class="fas fa-star" style="color:#f59e0b;"></i> ${rest.rating || 4.8}</span>
             </div>
-            <p class="modal-location"><i class="fas fa-map-marker-alt"></i> ${rest.location}, San Carlos de Bariloche</p>
+            <p class="modal-location"><i class="fas fa-map-marker-alt" style="color:#e67e22;"></i> ${rest.location}, San Carlos de Bariloche</p>
+            
+            <!-- GOOGLE MAPS STYLE HORARIOS Y DÍAS DE ATENCIÓN -->
+            <div class="google-maps-hours-box" style="background:rgba(15, 23, 42, 0.75); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,0.12); padding:16px 20px; border-radius:18px; margin:14px 0; display:flex; flex-direction:column; gap:10px; box-shadow:0 8px 24px rgba(0,0,0,0.3);">
+                <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="background:rgba(34, 197, 94, 0.18); color:#22c55e; font-weight:800; font-size:0.82rem; padding:5px 14px; border-radius:20px; border:1px solid rgba(34, 197, 94, 0.4); display:inline-flex; align-items:center; gap:7px;">
+                            <span style="width:9px; height:9px; background:#22c55e; border-radius:50%; display:inline-block; box-shadow:0 0 10px #22c55e;"></span>
+                            Abierto ahora
+                        </span>
+                        <span style="font-weight:700; color:var(--text-primary); font-size:0.95rem;">
+                            <i class="far fa-clock" style="color:#e67e22; margin-right:5px;"></i> ${rest.open_hours || '12:00 a 00:00 hs'}
+                        </span>
+                    </div>
+                    <span style="font-size:0.82rem; color:#94a3b8; font-weight:600;"><i class="fas fa-check-circle" style="color:#22c55e;"></i> Horarios confirmados</span>
+                </div>
+                <div style="font-size:0.9rem; color:var(--text-secondary); display:flex; align-items:center; gap:8px; margin-top:2px;">
+                    <i class="far fa-calendar-alt" style="color:#e67e22;"></i>
+                    <span><strong>Días de atención:</strong> ${rest.open_days || 'Lunes a Domingos'}</span>
+                </div>
+            </div>
             
             ${rest.promo ? `
                 <div class="modal-section" style="background:rgba(230, 126, 34, 0.1); padding:16px; border-radius:14px; margin-top:10px; border: 1px solid rgba(230, 126, 34, 0.25);">
