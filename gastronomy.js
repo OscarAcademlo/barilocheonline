@@ -306,12 +306,12 @@ function renderFilteredGastronomy(listToRender) {
                     <p class="accommodation-location-text" style="font-size:0.82rem; color:var(--text-secondary); margin:0; display:flex; align-items:center; gap:5px;"><i class="fas fa-map-marker-alt" style="color:var(--text-secondary);"></i> ${rest.location}</p>
                     
                     <!-- GOOGLE MAPS STYLE HORARIO DE ATENCIÓN Y DÍAS -->
-                    <div style="display:flex; align-items:center; justify-content:space-between; margin-top:8px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.08); font-size:0.78rem;">
-                        <span style="color:#22c55e; font-weight:800; display:inline-flex; align-items:center; gap:4px;">
-                            <span style="width:6px; height:6px; background:#22c55e; border-radius:50%; display:inline-block; box-shadow:0 0 6px #22c55e;"></span> Abierto ahora
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-top:8px; background:rgba(34,197,94,0.12); padding:6px 10px; border-radius:10px; border:1px solid rgba(34,197,94,0.3); font-size:0.8rem;">
+                        <span style="color:#22c55e; font-weight:800; display:inline-flex; align-items:center; gap:5px;">
+                            <i class="far fa-clock" style="color:#e67e22;"></i> ${rest.open_hours || '18:00 a 02:00 hs'}
                         </span>
-                        <span style="color:var(--text-secondary); font-weight:700;">
-                            <i class="far fa-clock" style="color:#e67e22; margin-right:3px;"></i> ${rest.open_hours || '12:00 a 00:00 hs'}
+                        <span style="color:var(--text-secondary); font-size:0.75rem; font-weight:700;">
+                            ${rest.open_days || 'Martes a Dom'}
                         </span>
                     </div>
                 </div>
