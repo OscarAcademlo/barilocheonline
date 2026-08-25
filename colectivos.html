@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Colectivos en Bariloche | Líneas, Recorridos y Paradas Mi Bus | Bariloche.Online</title>
+    <meta name="description" content="Recorridos, paradas principales, cabeceras y mapa interactivo de las líneas de colectivos (Mi Bus) en San Carlos de Bariloche. Línea 20 Llao Llao, Línea 50 Los Coihues, Línea 72 Aeropuerto y más.">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css?v=2213">
+    <style>
+        /* Estilos dedicados para Colectivos */
+        .bus-selector-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+        
+        .bus-select-custom {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--bg-main);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-weight: 700;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .bus-select-custom:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 132, 255, 0.15);
+        }
+
+        .bus-info-banner {
+            background: linear-gradient(135deg, rgba(0,132,255,0.1), rgba(230,126,34,0.1));
+            border: 1px solid rgba(0,132,255,0.25);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+
+        .stop-item-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .stop-item-card:hover {
+            transform: translateX(4px);
+            border-color: var(--primary);
+            background: rgba(0, 132, 255, 0.05);
+        }
+
+        .stop-number-badge {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        /* Bus Marker Custom Leaflet Icon */
+        .bus-leaflet-marker-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .bus-marker-pin {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 3px solid #0084ff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0084ff;
+            font-size: 0.95rem;
+            transition: transform 0.2s ease;
+        }
+        .bus-marker-pin:hover {
+            transform: scale(1.18);
+        }
+
+        /* Botón WhatsApp Flotante */
+        .whatsapp-float-btn {
+            position: fixed;
+            bottom: 85px;
+            right: 20px;
+            width: 54px;
+            height: 54px;
+            background: #25d366;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.7rem;
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+            z-index: 999;
+            text-decoration: none;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .whatsapp-float-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6);
+        }
+        @media (min-width: 769px) {
+            .whatsapp-float-btn {
+                bottom: 30px;
+                right: 30px;
+                width: 60px;
+                height: 60px;
+                font-size: 1.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="page-accommodations native-app">
+    <header class="main-header">
+        <a href="index.html" class="logo" style="text-decoration:none; color:inherit;"><b>B</b> BARILOCHE.ONLINE</a>
+        <nav class="nav-desktop">
+            <a href="mapa.html" class="nav-link"><i class="fas fa-satellite-dish"></i> EN VIVO</a>
+            <a href="servicios.html" class="nav-link">SERVICIOS</a>
+            <a href="comer.html" class="nav-link">COMER</a>
+            <a href="alojamiento.html" class="nav-link">DORMIR</a>
+            <a href="colectivos.html" class="nav-link active" style="color:#0084ff; font-weight:800;"><i class="fas fa-bus"></i> COLECTIVOS</a>
+            <a href="radios.html" class="nav-link">MEDIOS</a>
+            <a href="vuelos.html" class="nav-link">VUELOS</a>
+            <a href="precios.html" class="nav-link" style="color:#0084ff; font-weight:800;"><i class="fas fa-tag"></i> PRECIOS</a>
+        </nav>
+        <div class="header-icons">
+            <div id="userAuthStatus"></div>
+            <div class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()"><i class="fas fa-moon"></i></div>
+        </div>
+    </header>
+
+    <main class="accommodation-layout">
+        <!-- Panel Lateral de Recorridos -->
+        <div class="accommodation-sidebar">
+            <div class="browse-header" style="margin-bottom:14px;">
+                <div>
+                    <h1 style="font-size:1.6rem; display:flex; align-items:center; gap:8px;">
+                        <i class="fas fa-bus-simple" style="color:#0084ff;"></i> Colectivos Bariloche
+                    </h1>
+                    <p style="font-size:0.85rem; color:var(--text-secondary); margin-top:2px;">Líneas urbanas, trazas completas y paradas clave (Mi Bus)</p>
+                </div>
+            </div>
+
+            <!-- Card de Selección de Línea -->
+            <div class="bus-selector-card">
+                <label for="lineaSelect" style="display:block; font-size:0.82rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-secondary); margin-bottom:8px;">
+                    <i class="fas fa-route" style="color:#e67e22;"></i> Elegí la Línea de Colectivo
+                </label>
+                <select id="lineaSelect" class="bus-select-custom">
+                    <option value="">-- Seleccionar línea de transporte --</option>
+                    <option value="20">🚌 Línea 20 (Terminal ⇄ Llao Llao / Av. Bustillo)</option>
+                    <option value="50">🚌 Línea 50 (Centro ⇄ Los Coihues / Lago Gutiérrez)</option>
+                    <option value="72">🚌 Línea 72 (Terminal ⇄ Aeropuerto Bariloche)</option>
+                    <option value="10">🚌 Línea 10 (Centro ⇄ Colonia Suiza / Península San Pedro)</option>
+                    <option value="55">🚌 Línea 55 (Centro ⇄ Cerro Catedral)</option>
+                </select>
+            </div>
+
+            <!-- Chips de acceso rápido -->
+            <div id="busChipsContainer" style="padding: 0 4px; margin-bottom: 16px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;">
+                <span class="gasto-filter-chip active" onclick="selectBusLine('20')" style="background:#e65100; color:white; padding:6px 14px; border-radius:20px; font-weight:700; font-size:0.82rem; white-space:nowrap; cursor:pointer;"><i class="fas fa-bus"></i> Línea 20</span>
+                <span class="gasto-filter-chip" onclick="selectBusLine('50')" style="background:var(--bg-secondary); border:1px solid var(--border); color:var(--text-primary); padding:6px 14px; border-radius:20px; font-weight:700; font-size:0.82rem; white-space:nowrap; cursor:pointer;"><i class="fas fa-bus"></i> Línea 50</span>
+                <span class="gasto-filter-chip" onclick="selectBusLine('72')" style="background:var(--bg-secondary); border:1px solid var(--border); color:var(--text-primary); padding:6px 14px; border-radius:20px; font-weight:700; font-size:0.82rem; white-space:nowrap; cursor:pointer;"><i class="fas fa-bus"></i> Línea 72</span>
+                <span class="gasto-filter-chip" onclick="selectBusLine('10')" style="background:var(--bg-secondary); border:1px solid var(--border); color:var(--text-primary); padding:6px 14px; border-radius:20px; font-weight:700; font-size:0.82rem; white-space:nowrap; cursor:pointer;"><i class="fas fa-bus"></i> Línea 10</span>
+                <span class="gasto-filter-chip" onclick="selectBusLine('55')" style="background:var(--bg-secondary); border:1px solid var(--border); color:var(--text-primary); padding:6px 14px; border-radius:20px; font-weight:700; font-size:0.82rem; white-space:nowrap; cursor:pointer;"><i class="fas fa-bus"></i> Línea 55</span>
+            </div>
+
+            <!-- Banner Informativo de Línea Activa -->
+            <div id="busActiveInfoBanner" class="bus-info-banner" style="display:none;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                    <h3 id="busLineTitle" style="font-size:1.1rem; font-weight:800; color:var(--text-primary); margin:0;"></h3>
+                    <span id="busLineBadge" style="background:#0084ff; color:white; font-size:0.75rem; font-weight:800; padding:3px 8px; border-radius:12px; flex-shrink:0;">SUBE</span>
+                </div>
+                <p id="busLineDesc" style="font-size:0.82rem; color:var(--text-secondary); margin:6px 0 10px 0; line-height:1.3;"></p>
+                <div style="display:flex; gap:12px; flex-wrap:wrap; font-size:0.78rem; font-weight:700; color:var(--text-primary);">
+                    <span><i class="far fa-clock" style="color:#e67e22;"></i> Frecuencia: <span id="busLineFreq">Cada 20 min</span></span>
+                    <span><i class="fas fa-credit-card" style="color:#10b981;"></i> Tarjeta SUBE activa</span>
+                </div>
+            </div>
+
+            <!-- Lista de Paradas Clave -->
+            <div style="margin-top:10px;">
+                <h4 style="font-size:0.9rem; font-weight:800; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                    <i class="fas fa-map-marker-alt" style="color:#ef4444;"></i> Paradas Principales del Recorrido
+                </h4>
+                <div id="busStopsListContainer">
+                    <div style="padding:20px; text-align:center; color:var(--text-secondary); font-size:0.9rem;">
+                        <i class="fas fa-hand-pointer" style="font-size:1.5rem; color:#0084ff; margin-bottom:8px; display:block;"></i>
+                        Selecciona una línea de colectivo arriba para ver sus paradas y traza en el mapa.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenedor del Mapa -->
+        <div class="accommodation-map-container">
+            <div id="map"></div>
+        </div>
+    </main>
+
+    <!-- Botón WhatsApp Flotante para Consultas -->
+    <a href="https://wa.me/542944674774?text=Hola!%20Tengo%20una%20consulta%20sobre%20los%20recorridos%20de%20colectivos%20en%20Bariloche" target="_blank" class="whatsapp-float-btn" title="Consulta por WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- App Bottom Nav Mobile -->
+    <nav class="mobile-nav">
+        <a href="mapa.html" class="mobile-nav-item">
+            <i class="fas fa-satellite-dish"></i>
+            <span>En Vivo</span>
+        </a>
+        <a href="servicios.html" class="mobile-nav-item">
+            <i class="fas fa-briefcase"></i>
+            <span>Servicios</span>
+        </a>
+        <a href="comer.html" class="mobile-nav-item">
+            <i class="fas fa-utensils"></i>
+            <span>Comer</span>
+        </a>
+        <a href="alojamiento.html" class="mobile-nav-item">
+            <i class="fas fa-bed"></i>
+            <span>Dormir</span>
+        </a>
+        <a href="colectivos.html" class="mobile-nav-item active">
+            <i class="fas fa-bus"></i>
+            <span>Colectivos</span>
+        </a>
+    </nav>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="auth_manager.js?v=10006"></script>
+    <script src="app.js?v=10006"></script>
+    <script src="colectivos.js?v=10006"></script>
+</body>
+
+</html>
