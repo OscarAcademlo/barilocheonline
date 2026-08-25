@@ -666,10 +666,40 @@ function closeSubscriptionModal() {
 
 async function payWithMercadoPago(accId) {
     let phone = '5492944123456';
+    let acc = null;
     if (accId) {
-        const acc = accommodations.find(a => String(a.id) === String(accId));
+        acc = accommodations.find(a => String(a.id) === String(accId));
         if (acc && acc.phone) phone = acc.phone;
     }
+
+    // 1. Si el alojamiento tiene un link directo de Mercado Pago (mp_link)
+    if (acc && acc.mp_link && String(acc.mp_link).trim().startsWith('http')) {
+        window.location.href = String(acc.mp_link).trim();
+        return;
+    }
+
+    // 2. Si tiene mp_access_token o preferencia dinámica configurable en backend
+    if (acc && (acc.mp_access_token || acc.id)) {
+        try {
+            const formData = new FormData();
+            formData.append('action', 'create_mp_preference');
+            formData.append('id', acc.id);
+
+            const res = await fetch('save_alojamiento.php', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+            if (data.status === 'success' && data.init_point) {
+                window.location.href = data.init_point;
+                return;
+            }
+        } catch (e) {
+            console.warn('Verificación MP:', e);
+        }
+    }
+
+    // 3. Si no está configurado Mercado Pago, mostrar el modal moderno bien al frente (z-index supremo)
     showModernMpDisabledModal(phone, "Momentáneamente deshabilitado por el proveedor del servicio.");
 }
 
@@ -681,8 +711,8 @@ function showModernMpDisabledModal(waPhone = '5492944123456', message = 'Moment�
     const waUrl = `https://wa.me/${cleanPhone}?text=${waText}`;
 
     const modalHtml = `
-        <div id="modernMpModalOverlay" style="position:fixed; top:0; left:0; right:0; bottom:0; width:100vw; height:100vh; background:rgba(15,23,42,0.88); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); z-index:999999; display:flex; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;" onclick="closeModernMpModal()">
-            <div style="background:#0f172a; border:1.5px solid #334155; border-radius:24px; padding:32px 24px; max-width:400px; width:100%; text-align:center; box-shadow:0 25px 50px -12px rgba(0,0,0,0.7), 0 0 30px rgba(0,168,255,0.25); box-sizing:border-box; margin:auto;" onclick="event.stopPropagation()">
+        <div id="modernMpModalOverlay" style="position:fixed; top:0; left:0; right:0; bottom:0; width:100vw; height:100vh; background:rgba(15,23,42,0.88); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); z-index:99999999; display:flex; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;" onclick="closeModernMpModal()">
+            <div style="background:#0f172a; border:1.5px solid #334155; border-radius:24px; padding:32px 24px; max-width:400px; width:100%; text-align:center; box-shadow:0 25px 50px -12px rgba(0,0,0,0.8), 0 0 35px rgba(0,168,255,0.3); box-sizing:border-box; margin:auto;" onclick="event.stopPropagation()">
                 <div style="width:68px; height:68px; background:rgba(0,168,255,0.12); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 18px; color:#00a8ff; font-size:2rem; border:1.5px solid rgba(0,168,255,0.3);">
                     <i class="fas fa-credit-card"></i>
                 </div>
