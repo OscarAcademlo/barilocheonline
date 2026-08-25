@@ -317,12 +317,14 @@ function showAccommodationDetails(id) {
             </div>
 
             <!-- MEDIOS DE PAGO ACEPTADOS -->
-            <div class="modal-section" style="background:rgba(0,132,255,0.05); border:1px solid var(--border); border-radius:14px; padding:14px;">
-                <h3 style="font-size:0.95rem; margin-bottom:8px; color:var(--primary);"><i class="fas fa-wallet"></i> Medios de Pago Aceptados</h3>
+            <div class="modal-section" style="background:rgba(0,132,255,0.05); border:1px solid var(--border); border-radius:14px; padding:14px; margin-bottom:20px;">
+                <h3 style="font-size:0.95rem; margin-bottom:10px; color:var(--text-primary); font-weight:800; display:flex; align-items:center; gap:8px;">
+                    <i class="fas fa-wallet" style="color:var(--primary);"></i> Medios de Pago Aceptados
+                </h3>
                 <div style="display:flex; flex-wrap:wrap; gap:8px; font-size:0.85rem; font-weight:700;">
-                    ${(acc.payment_methods && acc.payment_methods.cash === false) ? '' : '<span style="background:rgba(16,185,129,0.15); color:#10b981; padding:5px 10px; border-radius:8px;">💵 Efectivo</span>'}
-                    <span style="background:rgba(0,158,227,0.15); color:#009ee3; padding:5px 10px; border-radius:8px;">💳 Mercado Pago</span>
-                    <span style="background:rgba(37,211,102,0.15); color:#25d366; padding:5px 10px; border-radius:8px;">📱 WhatsApp directo</span>
+                    ${(acc.payment_methods && acc.payment_methods.cash === false) ? '' : '<span style="background:rgba(16,185,129,0.15); color:#10b981; padding:6px 12px; border-radius:8px;">💵 Efectivo</span>'}
+                    <span style="background:rgba(0,168,255,0.15); color:#00a8ff; padding:6px 12px; border-radius:8px;">💳 Mercado Pago</span>
+                    <span style="background:rgba(37,211,102,0.15); color:#25d366; padding:6px 12px; border-radius:8px;">📱 WhatsApp directo</span>
                 </div>
                 ${acc.transfer_details ? `
                     <div style="margin-top:10px; font-size:0.8rem; background:var(--bg-main); padding:8px 12px; border-radius:8px; border:1px dashed var(--border); user-select:all;">
@@ -331,17 +333,20 @@ function showAccommodationDetails(id) {
                 ` : ''}
             </div>
             
-            <div class="modal-price-section" style="flex-direction:column; gap:12px; align-items:stretch;">
-                <div class="modal-price" style="justify-content:space-between; display:flex;">
-                    <span class="price-label">Tarifa por noche</span>
-                    <span class="price-amount">$${Number(acc.price).toLocaleString('es-AR')}</span>
+            <div class="modal-price-section" style="display:flex; flex-direction:column; align-items:center; text-align:center; padding-top:10px;">
+                <div style="margin-bottom:14px;">
+                    <span style="font-size:0.8rem; color:var(--text-secondary); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:2px;">Tarifa por noche</span>
+                    <span style="font-size:2.4rem; font-weight:900; color:#00a8ff; font-family:'Outfit', sans-serif;">$${Number(acc.price).toLocaleString('es-AR')}</span>
                 </div>
-                <button type="button" onclick="payWithMercadoPago()" style="background:#009ee3; color:white; border:none; padding:14px 20px; border-radius:14px; font-weight:800; font-size:1rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; box-shadow:0 4px 15px rgba(0,158,227,0.35);">
-                    <i class="fas fa-credit-card"></i> Pagar con Mercado Pago
-                </button>
-                <a href="${waUrl}" target="_blank" class="btn-whatsapp-direct" style="text-align:center; justify-content:center;">
-                    <i class="fab fa-whatsapp"></i> Contactar al Dueño por WhatsApp
-                </a>
+                
+                <div style="display:flex; flex-direction:column; gap:12px; width:100%;">
+                    <button type="button" onclick="payWithMercadoPago()" style="background:#00a8ff; color:#ffffff; border:none; padding:15px 20px; border-radius:16px; font-weight:800; font-size:1.05rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 4px 15px rgba(0,168,255,0.35); width:100%; transition:transform 0.15s ease;">
+                        <i class="fas fa-credit-card"></i> Pagar con Mercado Pago
+                    </button>
+                    <a href="${waUrl}" target="_blank" style="background:#10b981; color:#ffffff; border:none; padding:15px 20px; border-radius:16px; font-weight:800; font-size:1.05rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 4px 15px rgba(16,185,129,0.35); width:100%; text-decoration:none; transition:transform 0.15s ease;">
+                        <i class="fab fa-whatsapp"></i> Contactar al Dueño por WhatsApp
+                    </a>
+                </div>
             </div>
 
             ${isOwnerOrAdmin ? `
