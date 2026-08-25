@@ -664,8 +664,49 @@ function closeSubscriptionModal() {
     if (modal) modal.style.display = 'none';
 }
 
-async function payWithMercadoPago() {
-    alert("Momentaneamente deshabilitado por el provedor del servicio");
+async function payWithMercadoPago(accId) {
+    let phone = '5492944123456';
+    if (accId) {
+        const acc = accommodations.find(a => String(a.id) === String(accId));
+        if (acc && acc.phone) phone = acc.phone;
+    }
+    showModernMpDisabledModal(phone, "Momentáneamente deshabilitado por el proveedor del servicio.");
+}
+
+function showModernMpDisabledModal(waPhone = '5492944123456', message = 'Momentáneamente deshabilitado por el proveedor del servicio.') {
+    closeModernMpModal();
+    let cleanPhone = String(waPhone || '5492944123456').replace(/\D/g, '');
+    if (cleanPhone.length === 10 && !cleanPhone.startsWith('54')) cleanPhone = '549' + cleanPhone;
+    const waText = encodeURIComponent('¡Hola! Quisiera consultar sobre la disponibilidad y forma de pago.');
+    const waUrl = `https://wa.me/${cleanPhone}?text=${waText}`;
+
+    const modalHtml = `
+        <div id="modernMpModalOverlay" class="modern-mp-overlay" onclick="closeModernMpModal()">
+            <div class="modern-mp-box" onclick="event.stopPropagation()">
+                <div style="width:64px; height:64px; background:rgba(0,168,255,0.15); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:#00a8ff; font-size:1.8rem; border:1px solid rgba(0,168,255,0.3);">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <h3 style="font-family:'Outfit', sans-serif; font-size:1.35rem; font-weight:800; color:#ffffff; margin-bottom:8px;">Pago con Mercado Pago</h3>
+                <p style="font-size:0.95rem; color:#94a3b8; line-height:1.55; margin-bottom:24px; font-weight:500;">
+                    ${message}
+                </p>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <button type="button" onclick="closeModernMpModal()" style="background:#00a8ff; color:#ffffff; border:none; padding:14px; border-radius:14px; font-weight:800; font-size:0.95rem; width:100%; cursor:pointer; box-shadow:0 4px 15px rgba(0,168,255,0.35);">
+                        Entendido
+                    </button>
+                    <a href="${waUrl}" target="_blank" style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid #10b981; padding:13px; border-radius:14px; font-weight:800; font-size:0.92rem; width:100%; display:flex; align-items:center; justify-content:center; gap:8px; text-decoration:none;">
+                        <i class="fab fa-whatsapp" style="font-size:1.2rem;"></i> Consultar por WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+function closeModernMpModal() {
+    const el = document.getElementById('modernMpModalOverlay');
+    if (el) el.remove();
 }
 
 async function redeemPromoCode() {

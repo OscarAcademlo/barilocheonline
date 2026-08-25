@@ -584,16 +584,64 @@
         }
 
         async function handlePayTicketWithMP() {
-            // ADMIN BYPASS: Si es el administrador general (oscarns@gmail.com), emitir el ticket de prueba directamente sin cobrar
             const user = window.authManager && window.authManager.currentUser;
             const isAdmin = isUserAdmin 
                             || (user && (user.email === 'oscarns@gmail.com' || (window.authManager.isAdmin && window.authManager.isAdmin()))) 
                             || localStorage.getItem('bariloche_user_email') === 'oscarns@gmail.com';
             if (isAdmin) {
-            if (isUserAdmin) {
                 return handleAdminTestTicket();
             }
-            alert("Momentaneamente deshabilitado por el provedor del servicio");
+
+            const params = new URLSearchParams(window.location.search);
+            const empresa = params.get('empresa') || '';
+
+            // Intentar verificar si la empresa tiene Mercado Pago configurado
+            try {
+                const res = await fetch(`save_alojamiento.php?action=get_payment_config&empresa=${encodeURIComponent(empresa)}&t=${Date.now()}`);
+                const data = await res.json();
+                if (data.status === 'success' && data.config && data.config.accepts_mp && data.config.mp_init_point) {
+                    window.location.href = data.config.mp_init_point;
+                    return;
+                }
+            } catch (e) { }
+
+            showModernMpDisabledModal('5492944674774', 'Momentáneamente deshabilitado por el proveedor del servicio.');
+        }
+
+        function showModernMpDisabledModal(waPhone = '5492944674774', message = 'Momentáneamente deshabilitado por el proveedor del servicio.') {
+            closeModernMpModal();
+            let cleanPhone = String(waPhone || '5492944674774').replace(/\D/g, '');
+            if (cleanPhone.length === 10 && !cleanPhone.startsWith('54')) cleanPhone = '549' + cleanPhone;
+            const waText = encodeURIComponent('¡Hola! Quisiera consultar sobre la reserva de ticket para esta excursión.');
+            const waUrl = `https://wa.me/${cleanPhone}?text=${waText}`;
+
+            const modalHtml = `
+                <div id="modernMpModalOverlay" class="modern-mp-overlay" onclick="closeModernMpModal()">
+                    <div class="modern-mp-box" onclick="event.stopPropagation()">
+                        <div style="width:64px; height:64px; background:rgba(0,168,255,0.15); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:#00a8ff; font-size:1.8rem; border:1px solid rgba(0,168,255,0.3);">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <h3 style="font-family:'Outfit', sans-serif; font-size:1.35rem; font-weight:800; color:#ffffff; margin-bottom:8px;">Pago con Mercado Pago</h3>
+                        <p style="font-size:0.95rem; color:#94a3b8; line-height:1.55; margin-bottom:24px; font-weight:500;">
+                            ${message}
+                        </p>
+                        <div style="display:flex; flex-direction:column; gap:10px;">
+                            <button type="button" onclick="closeModernMpModal()" style="background:#00a8ff; color:#ffffff; border:none; padding:14px; border-radius:14px; font-weight:800; font-size:0.95rem; width:100%; cursor:pointer; box-shadow:0 4px 15px rgba(0,168,255,0.35);">
+                                Entendido
+                            </button>
+                            <a href="${waUrl}" target="_blank" style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid #10b981; padding:13px; border-radius:14px; font-weight:800; font-size:0.92rem; width:100%; display:flex; align-items:center; justify-content:center; gap:8px; text-decoration:none;">
+                                <i class="fab fa-whatsapp" style="font-size:1.2rem;"></i> Reservar por WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        function closeModernMpModal() {
+            const el = document.getElementById('modernMpModalOverlay');
+            if (el) el.remove();
         }
 
         async function handleAdminTestTicket() {
