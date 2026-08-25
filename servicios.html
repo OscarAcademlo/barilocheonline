@@ -421,7 +421,7 @@
             const waText = encodeURIComponent(`¡Hola ${s.name}! Vi tu publicación en Bariloche.Online y quisiera más información.`);
             const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${waText}` : '#';
             
-            const isTestService = s.is_test || 
+            const isTestService = s.is_demo || s.is_test || 
                                   (s.owner_email && (s.owner_email.toLowerCase().includes('test') || s.owner_email.toLowerCase().includes('oscar') || s.owner_email.toLowerCase().includes('demo'))) || 
                                   (s.name && (s.name.toLowerCase().includes('prueba') || s.name.toLowerCase().includes('demo') || s.name.toLowerCase().includes('test')));
 

@@ -258,7 +258,7 @@ function showAccommodationDetails(id) {
     if (!acc) return;
 
     const isOwnerOrAdmin = currentUser && (currentUser.email === acc.owner_email || currentUser.email === ADMIN_EMAIL);
-    const isTestService = acc.is_test || 
+    const isTestService = acc.is_demo || acc.is_test || 
                           (acc.owner_email && (acc.owner_email.toLowerCase().includes('test') || acc.owner_email.toLowerCase().includes('oscar') || acc.owner_email.toLowerCase().includes('demo'))) || 
                           (acc.name && (acc.name.toLowerCase().includes('prueba') || acc.name.toLowerCase().includes('demo') || acc.name.toLowerCase().includes('test')));
 
