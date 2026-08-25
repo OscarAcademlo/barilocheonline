@@ -1111,6 +1111,118 @@ body {
     margin-top: -1px;
 }
 
+/* MOCKUP CARD ON MAP (DESPLAZADAS SIN AMONTONAR CON LÍNEA FINA) */
+.gasto-mockup-card-wrap {
+    background: none !important;
+    border: none !important;
+}
+
+.gasto-mockup-card {
+    background: rgba(15, 23, 42, 0.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1.5px solid #334155;
+    border-radius: 16px;
+    padding: 8px 12px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6), 0 0 15px rgba(230, 126, 34, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #ffffff;
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+    white-space: nowrap;
+    max-width: 220px;
+}
+
+.gasto-mockup-card:hover,
+.gasto-mockup-card.highlighted {
+    transform: translate(-50%, -50%) scale(1.08) !important;
+    border-color: #e67e22;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.7), 0 0 20px rgba(230, 126, 34, 0.4);
+    z-index: 999999 !important;
+}
+
+.gasto-card-icon-box {
+    width: 38px;
+    height: 38px;
+    background: rgba(230, 126, 34, 0.15);
+    border: 1px solid rgba(230, 126, 34, 0.3);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.gasto-card-text-box {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.gasto-card-title-text {
+    font-weight: 800;
+    font-size: 0.82rem;
+    color: #ffffff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 140px;
+}
+
+.gasto-card-sub-text {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    font-weight: 600;
+    margin-top: 1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 140px;
+}
+
+.gasto-card-stars-row {
+    color: #f59e0b;
+    font-size: 0.7rem;
+    margin-top: 2px;
+    letter-spacing: 1px;
+}
+
+.gasto-dot-marker-anchor {
+    width: 12px;
+    height: 12px;
+    background: #e67e22;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(230, 126, 34, 0.8), 0 2px 6px rgba(0,0,0,0.6);
+    transform: translate(-50%, -50%);
+}
+
+@media (max-width: 768px) {
+    .gasto-mockup-card {
+        padding: 6px 10px;
+        max-width: 180px;
+        gap: 8px;
+    }
+    .gasto-card-icon-box {
+        width: 32px;
+        height: 32px;
+        font-size: 1.1rem;
+    }
+    .gasto-card-title-text {
+        font-size: 0.76rem;
+        max-width: 110px;
+    }
+    .gasto-card-sub-text {
+        font-size: 0.68rem;
+        max-width: 110px;
+    }
+}
+
 /* ==============================================================================
    BARIRUTA - ESTILOS DE MAPA EN TIEMPO REAL (LIMPIO Y SIN SOLAPAS QUE TAPEN)
    ============================================================================== */

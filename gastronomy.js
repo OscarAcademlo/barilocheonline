@@ -121,55 +121,94 @@ function initMapGasto() {
     markersGasto = [];
 
     const bounds = [];
-    const mapPins = [];
+    const validLocales = GASTRONOMY.filter(r => r.lat && r.lng);
+    const downtownLocales = validLocales.filter(r => Math.abs(r.lat - (-41.134)) < 0.04 && Math.abs(r.lng - (-71.31)) < 0.04);
+    const outerLocales = validLocales.filter(r => !downtownLocales.includes(r));
 
-    // Calcular elevaciones dinámicas (línea stem) para evitar que los carteles se solapen
-    GASTRONOMY.forEach(rest => {
-        if (!rest.lat || !rest.lng) return;
+    // Posiciones en abanico libre alrededor del centro para que los carteles NUNCA se encimen
+    const downtownOffsets = [
+        { latOffset: 0.007, lngOffset: -0.011 },  // Arriba-Izquierda
+        { latOffset: 0.009, lngOffset: 0.000 },   // Arriba-Centro
+        { latOffset: 0.007, lngOffset: 0.012 },   // Arriba-Derecha
+        { latOffset: -0.006, lngOffset: -0.010 }, // Abajo-Izquierda
+        { latOffset: -0.007, lngOffset: 0.011 },  // Abajo-Derecha
+        { latOffset: 0.001, lngOffset: -0.014 },  // Centro-Izquierda
+        { latOffset: 0.001, lngOffset: 0.015 }    // Centro-Derecha
+    ];
 
+    let dtIndex = 0;
+
+    validLocales.forEach((rest) => {
         let emoji = '🍽️';
         if ((rest.type || '').includes('Cervecería')) emoji = '🍺';
         if ((rest.type || '').includes('Parrilla') || (rest.type || '').includes('Bodegón')) emoji = '🥩';
         if ((rest.type || '').includes('Chocolatería') || (rest.type || '').includes('Helad')) emoji = '🍫';
         if ((rest.type || '').includes('Pizza') || (rest.type || '').includes('Pastas')) emoji = '🍕';
 
-        // Detectar si hay marcadores vecinos cercanos para variar la altura de la línea fina
-        const nearCount = mapPins.filter(p => Math.abs(p.lat - rest.lat) < 0.003 && Math.abs(p.lng - rest.lng) < 0.005).length;
-        const stemHeight = 14 + (nearCount * 22);
+        let cardLat = rest.lat;
+        let cardLng = rest.lng;
 
-        mapPins.push({ rest, stemHeight, emoji });
-    });
+        if (downtownLocales.includes(rest)) {
+            const offset = downtownOffsets[dtIndex % downtownOffsets.length];
+            cardLat = rest.lat + offset.latOffset;
+            cardLng = rest.lng + offset.lngOffset;
+            dtIndex++;
+        } else {
+            // Fuera del centro (ej. Cervecería Patagonia Km 24)
+            cardLat = rest.lat + 0.004;
+        }
 
-    mapPins.forEach(({ rest, stemHeight, emoji }) => {
-        const nameIcon = L.divIcon({
-            className: 'gasto-map-marker-wrap',
+        // 1. Puntito naranja en la ubicación GPS real del local
+        const dotIcon = L.divIcon({
+            className: 'gasto-mockup-card-wrap',
+            html: `<div class="gasto-dot-marker-anchor" id="dot_gasto_${rest.id}"></div>`,
+            iconSize: [0, 0],
+            iconAnchor: [0, 0]
+        });
+        const dotMarker = L.marker([rest.lat, rest.lng], { icon: dotIcon }).addTo(mapGasto);
+        markersGasto.push(dotMarker);
+
+        // 2. Línea fina estética uniendo el punto GPS con el cartel flotante
+        const line = L.polyline([[rest.lat, rest.lng], [cardLat, cardLng]], {
+            color: '#64748b',
+            weight: 1.5,
+            opacity: 0.85,
+            dashArray: '3, 3'
+        }).addTo(mapGasto);
+        line.gastoId = rest.id;
+        markersGasto.push(line);
+
+        // 3. Cartel flotante (Mockup Card) desplazado en zona libre sin encimarse
+        const cardIcon = L.divIcon({
+            className: 'gasto-mockup-card-wrap',
             html: `
-                <div class="gasto-pin-marker" id="pin_gasto_${rest.id}" onclick="showGastronomyDetails('${rest.id}')">
-                    <div class="gasto-pin-head">
-                        <span style="font-size:0.85rem;">${emoji}</span>
-                        <span style="max-width:135px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${rest.name}</span>
+                <div class="gasto-mockup-card" id="pin_gasto_${rest.id}" onclick="showGastronomyDetails('${rest.id}')">
+                    <div class="gasto-card-icon-box">${emoji}</div>
+                    <div class="gasto-card-text-box">
+                        <div class="gasto-card-title-text">${rest.name}</div>
+                        <div class="gasto-card-sub-text">- ${rest.type || 'Gastronomía'}</div>
+                        <div class="gasto-card-stars-row">★★★★★</div>
                     </div>
-                    <div class="gasto-pin-line" style="height:${stemHeight}px;"></div>
-                    <div class="gasto-pin-dot"></div>
                 </div>
             `,
             iconSize: [0, 0],
-            iconAnchor: [0, stemHeight + 20]
+            iconAnchor: [0, 0]
         });
 
-        const marker = L.marker([rest.lat, rest.lng], { icon: nameIcon })
-            .on('click', () => {
-                showGastronomyDetails(rest.id);
-            })
+        const cardMarker = L.marker([cardLat, cardLng], { icon: cardIcon })
+            .on('click', () => showGastronomyDetails(rest.id))
             .addTo(mapGasto);
 
-        marker.gastoId = rest.id;
-        markersGasto.push(marker);
+        cardMarker.gastoId = rest.id;
+        cardMarker.lineRef = line;
+        markersGasto.push(cardMarker);
+
         bounds.push([rest.lat, rest.lng]);
+        bounds.push([cardLat, cardLng]);
     });
 
     if (bounds.length > 0) {
-        mapGasto.fitBounds(bounds, { padding: [60, 60], maxZoom: 14 });
+        mapGasto.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
     }
 }
 
@@ -178,10 +217,16 @@ function highlightMapMarker(id) {
     if (el) {
         el.classList.add('highlighted');
     }
-    const marker = markersGasto.find(m => String(m.gastoId) === String(id));
-    if (marker) {
-        marker.setZIndexOffset(10000);
-    }
+    markersGasto.forEach(m => {
+        if (m.gastoId && String(m.gastoId) === String(id)) {
+            if (m.setStyle) {
+                m.setStyle({ color: '#e67e22', weight: 2.5, opacity: 1, dashArray: null });
+            }
+            if (m.setZIndexOffset) {
+                m.setZIndexOffset(999999);
+            }
+        }
+    });
 }
 
 function unhighlightMapMarker(id) {
@@ -189,10 +234,16 @@ function unhighlightMapMarker(id) {
     if (el) {
         el.classList.remove('highlighted');
     }
-    const marker = markersGasto.find(m => String(m.gastoId) === String(id));
-    if (marker) {
-        marker.setZIndexOffset(0);
-    }
+    markersGasto.forEach(m => {
+        if (m.gastoId && String(m.gastoId) === String(id)) {
+            if (m.setStyle) {
+                m.setStyle({ color: '#64748b', weight: 1.5, opacity: 0.85, dashArray: '3, 3' });
+            }
+            if (m.setZIndexOffset) {
+                m.setZIndexOffset(0);
+            }
+        }
+    });
 }
 
 function renderGastronomy() {
