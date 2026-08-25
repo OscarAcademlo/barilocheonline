@@ -234,6 +234,9 @@ function renderAccommodations(list) {
                         ${(acc.amenities || []).slice(0, 4).map(am => `<span><i class="${getAmenityIcon(am)}"></i> ${am}</span>`).join('')}
                         ${(acc.amenities || []).length > 4 ? `<span>+${acc.amenities.length - 4} más</span>` : ''}
                     </div>
+                    <button type="button" onclick="event.stopPropagation(); payWithMercadoPago('${acc.id}')" style="background:#009ee3; color:white; border:none; padding:10px 14px; border-radius:12px; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; margin-top:10px; box-shadow:0 2px 8px rgba(0,158,227,0.3);">
+                        <i class="fas fa-credit-card"></i> Pagar con Mercado Pago
+                    </button>
                     ${isOwnerOrAdmin ? `
                         <div class="owner-card-actions" onclick="event.stopPropagation()">
                             <button onclick="openEditAccommodation('${acc.id}')" class="btn-owner-edit"><i class="fas fa-edit"></i> Editar</button>
@@ -657,7 +660,7 @@ function closeSubscriptionModal() {
 }
 
 async function payWithMercadoPago() {
-    alert("Por el momento no esta habilitada esta opcion cualqjuier duda contactar a nuestro whatsapp");
+    alert("Momentaneamente deshabilitado por el provedor del servicio");
 }
 
 async function redeemPromoCode() {
