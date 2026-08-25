@@ -681,21 +681,21 @@ function showModernMpDisabledModal(waPhone = '5492944123456', message = 'Moment√
     const waUrl = `https://wa.me/${cleanPhone}?text=${waText}`;
 
     const modalHtml = `
-        <div id="modernMpModalOverlay" class="modern-mp-overlay" onclick="closeModernMpModal()">
-            <div class="modern-mp-box" onclick="event.stopPropagation()">
-                <div style="width:64px; height:64px; background:rgba(0,168,255,0.15); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:#00a8ff; font-size:1.8rem; border:1px solid rgba(0,168,255,0.3);">
+        <div id="modernMpModalOverlay" style="position:fixed; top:0; left:0; right:0; bottom:0; width:100vw; height:100vh; background:rgba(15,23,42,0.88); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); z-index:999999; display:flex; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;" onclick="closeModernMpModal()">
+            <div style="background:#0f172a; border:1.5px solid #334155; border-radius:24px; padding:32px 24px; max-width:400px; width:100%; text-align:center; box-shadow:0 25px 50px -12px rgba(0,0,0,0.7), 0 0 30px rgba(0,168,255,0.25); box-sizing:border-box; margin:auto;" onclick="event.stopPropagation()">
+                <div style="width:68px; height:68px; background:rgba(0,168,255,0.12); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 18px; color:#00a8ff; font-size:2rem; border:1.5px solid rgba(0,168,255,0.3);">
                     <i class="fas fa-credit-card"></i>
                 </div>
-                <h3 style="font-family:'Outfit', sans-serif; font-size:1.35rem; font-weight:800; color:#ffffff; margin-bottom:8px;">Pago con Mercado Pago</h3>
-                <p style="font-size:0.95rem; color:#94a3b8; line-height:1.55; margin-bottom:24px; font-weight:500;">
+                <h3 style="font-family:'Outfit', sans-serif; font-size:1.4rem; font-weight:800; color:#ffffff; margin:0 0 10px 0;">Pago con Mercado Pago</h3>
+                <p style="font-size:0.95rem; color:#94a3b8; line-height:1.55; margin:0 0 24px 0; font-weight:500;">
                     ${message}
                 </p>
-                <div style="display:flex; flex-direction:column; gap:10px;">
-                    <button type="button" onclick="closeModernMpModal()" style="background:#00a8ff; color:#ffffff; border:none; padding:14px; border-radius:14px; font-weight:800; font-size:0.95rem; width:100%; cursor:pointer; box-shadow:0 4px 15px rgba(0,168,255,0.35);">
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                    <button type="button" onclick="closeModernMpModal()" style="background:#00a8ff; color:#ffffff; border:none; padding:15px; border-radius:14px; font-weight:800; font-size:1rem; width:100%; cursor:pointer; box-shadow:0 4px 15px rgba(0,168,255,0.35); font-family:inherit;">
                         Entendido
                     </button>
-                    <a href="${waUrl}" target="_blank" style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid #10b981; padding:13px; border-radius:14px; font-weight:800; font-size:0.92rem; width:100%; display:flex; align-items:center; justify-content:center; gap:8px; text-decoration:none;">
-                        <i class="fab fa-whatsapp" style="font-size:1.2rem;"></i> Consultar por WhatsApp
+                    <a href="${waUrl}" target="_blank" style="background:rgba(16,185,129,0.15); color:#10b981; border:1.5px solid #10b981; padding:14px; border-radius:14px; font-weight:800; font-size:0.95rem; width:100%; display:flex; align-items:center; justify-content:center; gap:8px; text-decoration:none; box-sizing:border-box; font-family:inherit;">
+                        <i class="fab fa-whatsapp" style="font-size:1.25rem;"></i> Consultar por WhatsApp
                     </a>
                 </div>
             </div>
