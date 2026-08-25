@@ -42,8 +42,13 @@
         <!-- Lista lateral de gastronomía -->
         <div class="accommodation-sidebar">
             <div class="browse-header">
-                <h1>Dónde Comer</h1>
-                <p id="gastronomy-count">Cargando restaurantes...</p>
+                <div>
+                    <h1>Dónde Comer</h1>
+                    <p id="gastronomy-count">Cargando restaurantes...</p>
+                </div>
+                <button onclick="handlePublishGastoClick()" class="btn-publish-header" style="background:#e67e22; border-color:#e67e22;">
+                    <i class="fas fa-plus-circle"></i> Publicar Mi Local
+                </button>
             </div>
 
             <div id="gastoCategoryFilters"

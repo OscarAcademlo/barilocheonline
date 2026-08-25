@@ -353,6 +353,20 @@ function closeGastronomyModal() {
     document.body.style.overflow = 'auto';
 }
 
+function handlePublishGastoClick() {
+    const user = (window.authManager && window.authManager.currentUser) || null;
+    if (!user) {
+        if (window.authManager && window.authManager.openAuthModal) {
+            window.authManager.openAuthModal('Para publicar tu local gastronómico, por favor inicia sesión o crea tu cuenta gratuita.');
+        } else {
+            alert('Para publicar tu local gastronómico, por favor inicia sesión o crea tu cuenta gratuita.');
+        }
+        return;
+    }
+    const msg = encodeURIComponent(`¡Hola! Soy el usuario ${user.email} y quisiera publicar mi local gastronómico en Bariloche.Online.`);
+    window.open(`https://wa.me/542944674774?text=${msg}`, '_blank');
+}
+
 if (document.getElementById('gastronomyList')) {
     document.addEventListener('DOMContentLoaded', () => {
         fetchGastronomy();
