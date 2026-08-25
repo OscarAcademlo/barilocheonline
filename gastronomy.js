@@ -129,13 +129,13 @@ function initMapGasto() {
 
     // Distribuir carteles en abanico amplio alrededor del centro para que NUNCA se encimen
     const downtownOffsets = [
-        { latOffset: 0.0075, lngOffset: -0.012 }, // 1. Arriba Izquierda (sobre la costa)
-        { latOffset: 0.0090, lngOffset: 0.001 },  // 2. Arriba Centro (sobre el agua)
-        { latOffset: 0.0075, lngOffset: 0.013 },  // 3. Arriba Derecha
-        { latOffset: -0.0065, lngOffset: -0.011 },// 4. Abajo Izquierda
-        { latOffset: -0.0075, lngOffset: 0.012 }, // 5. Abajo Derecha
-        { latOffset: 0.0015, lngOffset: -0.015 }, // 6. Centro Izquierda
-        { latOffset: 0.0015, lngOffset: 0.015 }   // 7. Centro Derecha
+        { latOffset: 0.0140, lngOffset: -0.028 }, // 1. Arriba Izquierda (sobre el lago Nahuel Huapi)
+        { latOffset: 0.0200, lngOffset: 0.002 },  // 2. Arriba Centro (bien arriba en el agua)
+        { latOffset: 0.0140, lngOffset: 0.030 },  // 3. Arriba Derecha (costa este)
+        { latOffset: -0.0140, lngOffset: -0.026 },// 4. Abajo Izquierda (sudoeste)
+        { latOffset: -0.0160, lngOffset: 0.028 }, // 5. Abajo Derecha (sudeste)
+        { latOffset: 0.0020, lngOffset: -0.034 }, // 6. Centro Izquierda (oeste)
+        { latOffset: 0.0020, lngOffset: 0.035 }   // 7. Centro Derecha (este)
     ];
 
     let dtIndex = 0;
@@ -186,7 +186,7 @@ function initMapGasto() {
         const cardIcon = L.divIcon({
             className: 'gasto-mockup-card-wrap',
             html: `
-                <div class="gasto-mockup-card" id="pin_gasto_${rest.id}" onclick="showGastronomyDetails('${rest.id}')" style="background:rgba(15,23,42,0.94); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border:1.5px solid #334155; border-radius:16px; padding:8px 12px; box-shadow:0 12px 28px rgba(0,0,0,0.6), 0 0 15px rgba(230,126,34,0.2); display:flex; align-items:center; gap:10px; color:#ffffff; cursor:pointer; user-select:none; white-space:nowrap; max-width:220px; font-family:'Outfit', sans-serif;">
+                <div class="gasto-mockup-card" id="pin_gasto_${rest.id}" onclick="showGastronomyDetails('${rest.id}')" style="background:rgba(15,23,42,0.96); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1.5px solid #334155; border-radius:16px; padding:8px 14px; box-shadow:0 12px 28px rgba(0,0,0,0.7), 0 0 15px rgba(230,126,34,0.25); display:flex; align-items:center; gap:10px; color:#ffffff; cursor:pointer; user-select:none; white-space:nowrap; width:max-content; min-width:190px; font-family:'Outfit', sans-serif;">
                     <div style="width:38px; height:38px; background:rgba(230,126,34,0.18); border:1px solid rgba(230,126,34,0.35); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0;">${emoji}</div>
                     <div style="display:flex; flex-direction:column; overflow:hidden;">
                         <div style="font-weight:800; font-size:0.82rem; color:#ffffff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:140px;">${rest.name}</div>
@@ -195,8 +195,8 @@ function initMapGasto() {
                     </div>
                 </div>
             `,
-            iconSize: [0, 0],
-            iconAnchor: [0, 0]
+            iconSize: null,
+            iconAnchor: [95, 25]
         });
 
         const cardMarker = L.marker([cardLat, cardLng], { icon: cardIcon })

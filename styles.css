@@ -1115,26 +1115,29 @@ body {
 .gasto-mockup-card-wrap {
     background: none !important;
     border: none !important;
+    width: auto !important;
+    height: auto !important;
 }
 
 .gasto-mockup-card {
-    background: rgba(15, 23, 42, 0.94);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1.5px solid #334155;
-    border-radius: 16px;
-    padding: 8px 12px;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6), 0 0 15px rgba(230, 126, 34, 0.15);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: #ffffff;
-    cursor: pointer;
+    background: rgba(15, 23, 42, 0.96) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1.5px solid #334155 !important;
+    border-radius: 16px !important;
+    padding: 8px 14px !important;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.7), 0 0 15px rgba(230, 126, 34, 0.25) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    color: #ffffff !important;
+    cursor: pointer !important;
     transform: translate(-50%, -50%);
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     user-select: none;
-    white-space: nowrap;
-    max-width: 220px;
+    white-space: nowrap !important;
+    width: max-content !important;
+    min-width: 190px !important;
 }
 
 .gasto-mockup-card:hover,
