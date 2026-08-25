@@ -121,7 +121,9 @@ function initMapGasto() {
     markersGasto = [];
 
     const bounds = [];
+    const mapPins = [];
 
+    // Calcular elevaciones dinámicas (línea stem) para evitar que los carteles se solapen
     GASTRONOMY.forEach(rest => {
         if (!rest.lat || !rest.lng) return;
 
@@ -131,20 +133,28 @@ function initMapGasto() {
         if ((rest.type || '').includes('Chocolatería') || (rest.type || '').includes('Helad')) emoji = '🍫';
         if ((rest.type || '').includes('Pizza') || (rest.type || '').includes('Pastas')) emoji = '🍕';
 
-        // Pin con el Nombre del Local y Emoji
+        // Detectar si hay marcadores vecinos cercanos para variar la altura de la línea fina
+        const nearCount = mapPins.filter(p => Math.abs(p.lat - rest.lat) < 0.003 && Math.abs(p.lng - rest.lng) < 0.005).length;
+        const stemHeight = 14 + (nearCount * 22);
+
+        mapPins.push({ rest, stemHeight, emoji });
+    });
+
+    mapPins.forEach(({ rest, stemHeight, emoji }) => {
         const nameIcon = L.divIcon({
             className: 'gasto-map-marker-wrap',
             html: `
                 <div class="gasto-pin-marker" id="pin_gasto_${rest.id}" onclick="showGastronomyDetails('${rest.id}')">
                     <div class="gasto-pin-head">
-                        <span>${emoji}</span>
-                        <span>${rest.name}</span>
+                        <span style="font-size:0.85rem;">${emoji}</span>
+                        <span style="max-width:135px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${rest.name}</span>
                     </div>
-                    <div class="gasto-pin-tip"></div>
+                    <div class="gasto-pin-line" style="height:${stemHeight}px;"></div>
+                    <div class="gasto-pin-dot"></div>
                 </div>
             `,
             iconSize: [0, 0],
-            iconAnchor: [0, 0]
+            iconAnchor: [0, stemHeight + 20]
         });
 
         const marker = L.marker([rest.lat, rest.lng], { icon: nameIcon })

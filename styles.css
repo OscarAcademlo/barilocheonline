@@ -1072,32 +1072,42 @@ body {
 
 .gasto-pin-marker:hover,
 .gasto-pin-marker.highlighted {
-    transform: translate(-50%, -108%) scale(1.15) !important;
-    filter: brightness(1.1);
-    z-index: 99999 !important;
+    transform: translate(-50%, -100%) scale(1.15) !important;
+    filter: brightness(1.15);
+    z-index: 999999 !important;
 }
 
 .gasto-pin-head {
-    background: #e67e22;
+    background: linear-gradient(135deg, #e67e22, #d35400);
     color: #ffffff;
     font-weight: 800;
-    font-size: 0.78rem;
-    padding: 4px 8px;
+    font-size: 0.76rem;
+    padding: 4px 10px;
     border-radius: 12px;
-    border: 2px solid #ffffff;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    border: 1.5px solid #ffffff;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
     white-space: nowrap;
+    letter-spacing: 0.2px;
 }
 
-.gasto-pin-tip {
-    width: 0;
-    height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 6px solid #ffffff;
+.gasto-pin-line {
+    width: 2px;
+    background: #e67e22;
+    box-shadow: 0 0 4px rgba(0,0,0,0.5);
+    border-left: 0.5px solid rgba(255,255,255,0.7);
+    margin: 0 auto;
+}
+
+.gasto-pin-dot {
+    width: 8px;
+    height: 8px;
+    background: #e67e22;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.6);
     margin-top: -1px;
 }
 
