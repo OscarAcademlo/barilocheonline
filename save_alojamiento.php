@@ -11,8 +11,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-const MP_ACCESS_TOKEN = 'APP_USR-1090772527948503-082014-ed13352ca2c8535653f673fbdc13a986-741894322';
-const ADMIN_EMAIL = 'oscarns@gmail.com';
+require_once __DIR__ . '/env_loader.php';
+
+define('MP_ACCESS_TOKEN', getEnvVar('MP_ACCESS_TOKEN', 'APP_USR-1090772527948503-082014-ed13352ca2c8535653f673fbdc13a986-741894322'));
+define('ADMIN_EMAIL', getEnvVar('ADMIN_EMAIL', 'oscarns@gmail.com'));
 const PRICE_ARS = 10000;
 
 $action = $_GET['action'] ?? $_POST['action'] ?? '';

@@ -10,11 +10,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// Configuración de la Base de Datos en Producción (Hostinger)
-$host = 'localhost'; // Hostinger normalmente usa localhost o 127.0.0.1
-$db   = 'u237313556_barionline'; // Nombre de la BD según captura
-$user = 'u237313556_barionline'; // Usuario de MySQL según captura
-$pass = 'TU_CONTRASENA_AQUI'; // ¡REEMPLAZAR POR LA CONTRASEÑA DE LA BASE DE DATOS!
+require_once __DIR__ . '/../../env_loader.php';
+
+// Configuración de la Base de Datos desde Variables de Entorno con Fallback
+$host = getEnvVar('DB_HOST', 'localhost');
+$db   = getEnvVar('DB_NAME', 'u237313556_barionline');
+$user = getEnvVar('DB_USER', 'u237313556_barionline');
+$pass = getEnvVar('DB_PASS', 'TU_CONTRASENA_AQUI');
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";

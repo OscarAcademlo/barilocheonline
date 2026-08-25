@@ -3,6 +3,8 @@ error_reporting(0);
 header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *");
 
+require_once __DIR__ . '/env_loader.php';
+
 date_default_timezone_set('America/Argentina/Buenos_Aires');
 $type = isset($_GET['type']) ? $_GET['type'] : 'A';
 $date = date('d-m-Y');
@@ -16,6 +18,8 @@ function get_flights($url)
     if (!function_exists('curl_init'))
         return ['code' => 500, 'body' => 'cURL no disponible'];
 
+    $apiKey = getEnvVar('FLIGHTS_API_KEY', 'HieGcY2nFreIsNLuo5EbXCwE7g0aRzTN');
+
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -23,7 +27,7 @@ function get_flights($url)
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
     $headers = [
-        "key: HieGcY2nFreIsNLuo5EbXCwE7g0aRzTN",
+        "key: {$apiKey}",
         "Accept: application/json, text/plain, */*",
         "Origin: https://www.aeropuertosargentina.com",
         "Referer: https://www.aeropuertosargentina.com/es/BRC",

@@ -9,6 +9,8 @@
 ccvlite/
 *ccv*
 proveedores_servicios.json
+.env
+!.env.example
 
 # Flutter / Dart build artifacts
 **/build/
